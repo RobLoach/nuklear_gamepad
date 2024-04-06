@@ -22,22 +22,14 @@
 #define NK_SDL_RENDERER_IMPLEMENTATION
 #include "../../vendor/nuklear/nuklear.h"
 #include "../../vendor/nuklear/demo/sdl_renderer/nuklear_sdl_renderer.h"
-#include "nuklear_gamepad_sdl.h"
+
+#define NK_GAMEPAD_SDL
+#include "../../nuklear_gamepad.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
 #include "../common/nuklear_gamepad_demo.c"
-
-SDL_GameController *findController() {
-    for (int i = 0; i < SDL_NumJoysticks(); i++) {
-        if (SDL_IsGameController(i)) {
-            return SDL_GameControllerOpen(i);
-        }
-    }
-
-    return NULL;
-}
 
 int main(int argc, char *argv[]) {
     /* Platform */
@@ -53,8 +45,6 @@ int main(int argc, char *argv[]) {
     /* SDL setup */
     SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
-
-    SDL_GameController *controller = findController();
 
     win = SDL_CreateWindow("nuklear_console_demo",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -96,35 +86,25 @@ int main(int argc, char *argv[]) {
         nk_style_set_font(ctx, &font->handle);
     }
 
-    nuklear_console_demo_init(ctx);
+    struct nk_gamepads* gamepads = nk_gamepad_init(ctx);
 
     while (running) {
         /* Input */
         SDL_Event evt;
+
+        nk_gamepad_update(gamepads);
         nk_input_begin(ctx);
         while (SDL_PollEvent(&evt)) {
             if (evt.type == SDL_QUIT) goto cleanup;
             if (evt.type == SDL_KEYUP && evt.key.keysym.scancode == SDL_SCANCODE_ESCAPE) running = 0;
 
             nk_sdl_handle_event(&evt);
-            nk_gamepad_sdl_handle_event(&evt);
+            nk_gamepad_sdl_handle_event(gamepads, &evt);
         }
         nk_input_end(ctx);
 
-        int flags = NK_WINDOW_BORDER;
-        flags |= NK_WINDOW_SCROLL_AUTO_HIDE;
-        if (showWindowTitle) {
-            flags |= NK_WINDOW_TITLE;
-        }
-
-        /* GUI */
-        if (nk_begin(ctx, "nuklear_console", nk_rect(25, 25, WINDOW_WIDTH - 50, WINDOW_HEIGHT - 50), flags)) {
-            /* Render it, and see if we're to stop running. */
-            if (nuklear_console_demo_render()) {
-                running = 0;
-            }
-        }
-        nk_end(ctx);
+        /* Render the gamepad demo */
+        nuklear_gamepad_demo(ctx, gamepads);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -135,7 +115,7 @@ int main(int argc, char *argv[]) {
     }
 
 cleanup:
-    nuklear_console_demo_free();
+    nk_gamepad_free(gamepads);
     nk_sdl_shutdown();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(win);
