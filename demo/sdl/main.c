@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     SDL_Renderer *renderer;
     int running = 1;
     int flags = 0;
-    float font_scale = 3;
+    float font_scale = 2;
 
     /* GUI */
     struct nk_context *ctx;
@@ -46,28 +46,15 @@ int main(int argc, char *argv[]) {
     SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
 
-    win = SDL_CreateWindow("nuklear_console_demo",
+    win = SDL_CreateWindow("nuklear_gamepad_demo",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN|SDL_WINDOW_ALLOW_HIGHDPI);
-
     if (win == NULL) {
         SDL_Log("Error SDL_CreateWindow %s", SDL_GetError());
         return 1;
     }
 
-    flags |= SDL_RENDERER_ACCELERATED;
-    flags |= SDL_RENDERER_PRESENTVSYNC;
-
-#if 0
-    SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles2");
-#endif
-
     renderer = SDL_CreateRenderer(win, -1, flags);
-
     if (renderer == NULL) {
         SDL_Log("Error SDL_CreateRenderer %s", SDL_GetError());
         return 1;
@@ -86,19 +73,23 @@ int main(int argc, char *argv[]) {
         nk_style_set_font(ctx, &font->handle);
     }
 
+    /* Initialize the Gamepads */
     struct nk_gamepads* gamepads = nk_gamepad_init(ctx);
 
     while (running) {
-        /* Input */
         SDL_Event evt;
 
+        /* Update the Gamepad state */
         nk_gamepad_update(gamepads);
+
         nk_input_begin(ctx);
         while (SDL_PollEvent(&evt)) {
             if (evt.type == SDL_QUIT) goto cleanup;
             if (evt.type == SDL_KEYUP && evt.key.keysym.scancode == SDL_SCANCODE_ESCAPE) running = 0;
 
+            /* Allow Gamepads to respond to gamepads being connected/disconnected */
             nk_sdl_handle_event(&evt);
+            
             nk_gamepad_sdl_handle_event(gamepads, &evt);
         }
         nk_input_end(ctx);

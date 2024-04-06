@@ -1,10 +1,10 @@
 #ifndef NUKLEAR_GAMEPAD_SDL_H__
 #define NUKLEAR_GAMEPAD_SDL_H__
 
-void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *evt);
-void nk_gamepad_sdl_init(struct nk_gamepads* gamepads);
-void nk_gamepad_sdl_free(struct nk_gamepads* gamepads);
-const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
+NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *evt);
+NK_API void nk_gamepad_sdl_init(struct nk_gamepads* gamepads);
+NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads);
+NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 
 #endif
 
@@ -12,43 +12,8 @@ const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 #ifndef NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 
-void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event) {
+NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event) {
     switch (event->type) {
-        // case SDL_CONTROLLERBUTTONDOWN:
-        // case SDL_CONTROLLERBUTTONUP: {
-        //     nk_bool pushed = event->type == SDL_CONTROLLERBUTTONDOWN;
-        //     int controller = event->cdevice.which;
-
-        //     switch (event->cbutton.button) {
-        //         case SDL_CONTROLLER_BUTTON_DPAD_UP:
-        //             nk_gamepad_button(gamepads, controller, NK_GAMEPAD_BUTTON_UP, pushed);
-        //             break;
-        //         case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-        //             nk_input_key(ctx, NK_KEY_DOWN, pushed);
-        //             break;
-        //         case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-        //             nk_input_key(ctx, NK_KEY_LEFT, pushed);
-        //             break;
-        //         case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-        //             nk_input_key(ctx, NK_KEY_RIGHT, pushed);
-        //             break;
-        //         case SDL_CONTROLLER_BUTTON_B:
-        //             nk_input_key(ctx, NK_KEY_BACKSPACE, pushed);
-        //             break;
-        //         case SDL_CONTROLLER_BUTTON_A:
-        //             nk_input_key(ctx, NK_KEY_ENTER, pushed);
-        //             break;
-        //         case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-        //             nk_input_key(ctx, NK_KEY_UP, pushed);
-        //             nk_input_key(ctx, NK_KEY_CTRL, pushed);
-        //             break;
-        //         case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-        //             nk_input_key(ctx, NK_KEY_DOWN, pushed);
-        //             nk_input_key(ctx, NK_KEY_CTRL, pushed);
-        //             break;
-        //     }
-        // }
-
         case SDL_CONTROLLERDEVICEADDED:
         case SDL_CONTROLLERDEVICEREMOVED: {
             nk_gamepad_sdl_init(gamepads);
@@ -57,11 +22,11 @@ void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event)
     }
 }
 
-void nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
     if (gamepads == NULL) {
         return;
     }
-    
+
     // Reset the state if we have already initialized
     if (gamepads->gamepads != NULL) {
         nk_gamepad_sdl_free(gamepads);
@@ -87,7 +52,7 @@ void nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
     }
 }
 
-void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
     if (!gamepads) {
         return;
     }
@@ -100,7 +65,7 @@ void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
     }
 }
 
-void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
     int button_mapping[NK_GAMEPAD_BUTTON_MAX] = {
         SDL_CONTROLLER_BUTTON_DPAD_UP, /* NK_GAMEPAD_BUTTON_UP */
         SDL_CONTROLLER_BUTTON_DPAD_DOWN, /* NK_GAMEPAD_BUTTON_DOWN */
@@ -130,7 +95,7 @@ void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
     }
 }
 
-const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
+NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
     if (!gamepads || num < 0 || num >= gamepads->gamepads_count) {
         return NULL;
     }

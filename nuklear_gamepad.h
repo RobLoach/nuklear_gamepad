@@ -29,13 +29,14 @@ struct nk_gamepads {
     struct nk_context* ctx;
 };
 
-struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx);
-void nk_gamepad_free(struct nk_gamepads* gamepads);
-nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
-nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
-nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
-void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down);
-int nk_gamepad_count(struct nk_gamepads* gamepads);
+NK_API struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx);
+NK_API void nk_gamepad_free(struct nk_gamepads* gamepads);
+NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
+NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
+NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
+NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down);
+NK_API int nk_gamepad_count(struct nk_gamepads* gamepads);
+NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 
 #define NK_GAMEPAD_BUTTON_FLAG(button) (1 << (button))
 
@@ -47,9 +48,13 @@ int nk_gamepad_count(struct nk_gamepads* gamepads);
 
 #ifdef NK_GAMEPAD_SDL
 #include "nuklear_gamepad_sdl.h"
+#elif defined(NK_GAMEPAD_GLFW)
+#include "nuklear_gamepad_glfw.h"
+#elif defined(NK_GAMEPAD_RAYLIB)
+#include "nuklear_gamepad_raylib.h"
 #endif
 
-struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx) {
+NK_API struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx) {
     nk_handle unused;
     struct nk_gamepads* gamepads = (struct nk_gamepads*)nk_malloc(unused, NULL, sizeof(struct nk_gamepads));
     nk_zero(gamepads, sizeof(struct nk_gamepads));
@@ -62,7 +67,7 @@ struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx) {
     return gamepads;
 }
 
-void nk_gamepad_free(struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
     if (gamepads == NULL) {
         return;
     }
@@ -75,10 +80,11 @@ void nk_gamepad_free(struct nk_gamepads* gamepads) {
     if (gamepads->gamepads != NULL) {
         nk_mfree(unused, gamepads->gamepads);
     }
+    
     nk_mfree(unused, gamepads);
 }
 
-void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down) {
+NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down) {
     if (gamepads == NULL || num < 0 || num >= gamepads->gamepads_count) {
         return;
     }
@@ -91,7 +97,7 @@ void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_bu
     }
 }
 
-void nk_gamepad_update(struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
     if (gamepads == NULL) {
         return;
     }
@@ -103,10 +109,14 @@ void nk_gamepad_update(struct nk_gamepads* gamepads) {
 
     #ifdef NK_GAMEPAD_SDL
     nk_gamepad_sdl_update(gamepads);
+    #elif defined(NK_GAMEPAD_GLFW)
+    nk_gamepad_glfw_update(gamepads);
+    #elif defined(NK_GAMEPAD_RAYLIB)
+    nk_gamepad_raylib_update(gamepads);
     #endif
 }
 
-nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
+NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     if (gamepads == NULL || num < 0 || num >= gamepads->gamepads_count) {
         return nk_false;
     }
@@ -114,16 +124,16 @@ nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk
     return (gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0/* ? nk_true : nk_false*/;
 }
 
-nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
+NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     if (gamepads == NULL || num < 0 || num >= gamepads->gamepads_count) {
         return nk_false;
     }
-    
+
     return ((gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
 			(gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0)/* ? nk_true : nk_false*/;
 }
 
-nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
+NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     if (gamepads == NULL || num < 0 || num >= gamepads->gamepads_count) {
         return nk_false;
     }
@@ -132,7 +142,7 @@ nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enu
 			(gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) != 0)/* ? nk_true : nk_false*/;
 }
 
-int nk_gamepad_count(struct nk_gamepads* gamepads) {
+NK_API int nk_gamepad_count(struct nk_gamepads* gamepads) {
     if (!gamepads) {
         return 0;
     }
@@ -140,13 +150,17 @@ int nk_gamepad_count(struct nk_gamepads* gamepads) {
     return gamepads->gamepads_count;
 }
 
-const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {
+NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {
     if (!gamepads || num < 0 || num >= gamepads->gamepads_count) {
         return NULL;
     }
 
     #ifdef NK_GAMEPAD_SDL
     return nk_gamepad_sdl_name(gamepads, num);
+    #elif defined(NK_GAMEPAD_GLFW)
+    return nk_gamepad_glfw_name(gamepads, num);
+    #elif defined(NK_GAMEPAD_RAYLIB)
+    return nk_gamepad_raylib_name(gamepads, num);
     #else
     return NULL;
     #endif
