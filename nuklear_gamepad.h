@@ -46,6 +46,16 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 #ifndef NK_GAMEPAD_IMPLEMENTATION_ONCE
 #define NK_GAMEPAD_IMPLEMENTATION_ONCE
 
+#if !defined(NK_GAMEPAD_SDL) && !defined(NK_GAMEPAD_GLFW) && !defined(NK_GAMEPAD_RAYLIB)
+#if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
+#define NK_GAMEPAD_SDL
+#elif defined(NK_GLFW_RENDERER_IMPLEMENTATION) || defined(NK_GLFW_GL2_IMPLEMENTATION) || defined(NK_GLFW_GL3_IMPLEMENTATION) || defined(GLFW_INCLUDE_VULKAN)
+#define NK_GAMEPAD_GLFW
+#elif defined(RAYLIB_NUKLEAR_IMPLEMENTATION)
+#define NK_GAMEPAD_RAYLIB
+#endif
+#endif
+
 #ifdef NK_GAMEPAD_SDL
 #include "nuklear_gamepad_sdl.h"
 #elif defined(NK_GAMEPAD_GLFW)
@@ -80,7 +90,7 @@ NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
     if (gamepads->gamepads != NULL) {
         nk_mfree(unused, gamepads->gamepads);
     }
-    
+
     nk_mfree(unused, gamepads);
 }
 
