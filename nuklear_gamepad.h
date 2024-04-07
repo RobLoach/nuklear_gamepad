@@ -126,30 +126,92 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
     #endif
 }
 
+/**
+ * Check whether or not the given gamepad button is currently down.
+ *
+ * @param gamepads The gamepads to check.
+ * @param num The gamepad number to check. If -1 all gamepads are checked.
+ * @param button The button to check.
+ */
 NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
-    if (gamepads == NULL || num < 0 || num >= gamepads->gamepads_count) {
+    if (gamepads == NULL) {
         return nk_false;
     }
 
-    return (gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0/* ? nk_true : nk_false*/;
+    if (num <= -1) {
+        for (int i = 0; i < gamepads->gamepads_count; i++) {
+            if ((gamepads->gamepads[i].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
+                return nk_true;
+            }
+        }
+        return nk_false;
+    }
+
+    if (num >= gamepads->gamepads_count) {
+        return nk_false;
+    }
+
+    return (gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0;
 }
 
+/**
+ * Check whether or not the given gamepad button was pressed.
+ *
+ * @param gamepads The gamepads to check.
+ * @param num The gamepad number to check. If -1 all gamepads are checked.
+ * @param button The button to check.
+ */
 NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
-    if (gamepads == NULL || num < 0 || num >= gamepads->gamepads_count) {
+    if (gamepads == NULL) {
+        return nk_false;
+    }
+
+    if (num <= -1) {
+        for (int i = 0; i < gamepads->gamepads_count; i++) {
+            if ((gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
+			    (gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
+                return nk_true;
+            }
+        }
+        return nk_false;
+    }
+
+    if (num >= gamepads->gamepads_count) {
         return nk_false;
     }
 
     return ((gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
-			(gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0)/* ? nk_true : nk_false*/;
+			(gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0);
 }
 
+/**
+ * Check whether or not the given gamepad button was released.
+ *
+ * @param gamepads The gamepads to check.
+ * @param num The gamepad number to check. If -1 all gamepads are checked.
+ * @param button The button to check.
+ */
 NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
-    if (gamepads == NULL || num < 0 || num >= gamepads->gamepads_count) {
+    if (gamepads == NULL) {
+        return nk_false;
+    }
+
+    if (num <= -1) {
+        for (int i = 0; i < gamepads->gamepads_count; i++) {
+            if ((gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
+			    (gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
+                return nk_true;
+            }
+        }
+        return nk_false;
+    }
+
+    if (num >= gamepads->gamepads_count) {
         return nk_false;
     }
 
     return ((gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
-			(gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) != 0)/* ? nk_true : nk_false*/;
+			(gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) != 0);
 }
 
 NK_API int nk_gamepad_count(struct nk_gamepads* gamepads) {
