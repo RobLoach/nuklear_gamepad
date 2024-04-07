@@ -168,8 +168,8 @@ NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int nu
 
     if (num <= -1) {
         for (int i = 0; i < gamepads->gamepads_count; i++) {
-            if ((gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
-			    (gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
+            if ((gamepads->gamepads[i].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
+			    (gamepads->gamepads[i].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
                 return nk_true;
             }
         }
@@ -198,8 +198,8 @@ NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int n
 
     if (num <= -1) {
         for (int i = 0; i < gamepads->gamepads_count; i++) {
-            if ((gamepads->gamepads[num].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
-			    (gamepads->gamepads[num].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
+            if ((gamepads->gamepads[i].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
+			    (gamepads->gamepads[i].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
                 return nk_true;
             }
         }
