@@ -14,15 +14,16 @@ NK_API const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num)
 #define NK_GAMEPAD_RAYLIB_GAMEPAD_MAX 4
 #endif
 
+#define NK_GAMEPAD_UPDATE nk_gamepad_raylib_update
+#define NK_GAMEPAD_NAME nk_gamepad_raylib_name
+
 void nk_gamepad_raylib_update(struct nk_gamepads* gamepads) {
     if (!gamepads) {
         return;
     }
 
     if (gamepads->gamepads == NULL) {
-        nk_handle unused;
-        gamepads->gamepads = (struct nk_gamepad*)nk_malloc(unused, NULL, NK_GAMEPAD_RAYLIB_GAMEPAD_MAX * sizeof(struct nk_gamepad));
-        nk_zero(gamepads->gamepads, NK_GAMEPAD_RAYLIB_GAMEPAD_MAX * sizeof(struct nk_gamepad));
+        nk_gamepad_init_gamepads(gamepads, NK_GAMEPAD_RAYLIB_GAMEPAD_MAX);
     }
 
     int button_mapping[NK_GAMEPAD_BUTTON_MAX] = {
@@ -56,18 +57,18 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads) {
     }
 }
 
+#include <stdio.h>
 const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num) {
     if (!gamepads || num < 0 || num >= gamepads->gamepads_count) {
         return NULL;
     }
 
     const char* name = GetGamepadName(num);
-    if (!name) {
-        return "Controller";
+    if (!name || TextLength(name) == 0) {
+        return gamepads->gamepads[num].name;
     }
-    else {
-        return name;
-    }
+
+    return name;
 }
 
 #endif

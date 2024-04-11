@@ -2,7 +2,7 @@
 
 void nuklear_gamepad_button_style(struct nk_context* ctx, struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     // Apply a style to the button if it is pressed.
-    if (nk_gamepad_is_button_down(gamepads, -1, button)) {
+    if (nk_gamepad_is_button_down(gamepads, num, button)) {
         nk_widget_disable_begin(ctx);
     }
     else {

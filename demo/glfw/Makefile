@@ -26,3 +26,6 @@ $(BIN): clean
 
 clean:
 	rm -f $(BIN) $(OBJS)
+
+test: clean $(BIN)
+	./$(BIN)

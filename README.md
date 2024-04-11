@@ -36,6 +36,7 @@ nk_gamepad_free(gamepads);
 ``` c
 struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx);
 void nk_gamepad_free(struct nk_gamepads* gamepads);
+NK_API void nk_gamepad_init_gamepads(struct nk_gamepads* gamepads, int num);
 nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);

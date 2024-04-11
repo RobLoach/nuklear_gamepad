@@ -12,6 +12,11 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 #ifndef NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 
+#define NK_GAMEPAD_INIT nk_gamepad_sdl_init
+#define NK_GAMEPAD_UPDATE nk_gamepad_sdl_update
+#define NK_GAMEPAD_NAME nk_gamepad_sdl_name
+#define NK_GAMEPAD_FREE nk_gamepad_sdl_free
+
 NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event) {
     switch (event->type) {
         case SDL_CONTROLLERDEVICEADDED:
@@ -37,10 +42,7 @@ NK_API void nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
     }
 
     // Initialize the gamepads
-    gamepads->gamepads_count = SDL_NumJoysticks();
-    nk_handle unused;
-    gamepads->gamepads = (struct nk_gamepad*)nk_malloc(unused, NULL, gamepads->gamepads_count * sizeof(struct nk_gamepad));
-    nk_zero(gamepads->gamepads, gamepads->gamepads_count * sizeof(struct nk_gamepad));
+    nk_gamepad_init_gamepads(gamepads, SDL_NumJoysticks());
 
     for (int i = 0; i < gamepads->gamepads_count; i++) {
         if (SDL_IsGameController(i)) {
@@ -107,7 +109,7 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
 
     const char* name = SDL_GameControllerName(controller);
     if (!name) {
-        return "Controller";
+        return gamepads->gamepads[num].name;
     }
 
     return name;

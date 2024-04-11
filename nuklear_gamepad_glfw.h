@@ -10,15 +10,16 @@ NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num);
 #ifndef NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 
+#define NK_GAMEPAD_UPDATE nk_gamepad_glfw_update
+#define NK_GAMEPAD_NAME nk_gamepad_glfw_name
+
 void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
     if (!gamepads) {
         return;
     }
 
     if (gamepads->gamepads == NULL) {
-        nk_handle unused;
-        gamepads->gamepads = (struct nk_gamepad*)nk_malloc(unused, NULL, GLFW_JOYSTICK_LAST * sizeof(struct nk_gamepad));
-        nk_zero(gamepads->gamepads, GLFW_JOYSTICK_LAST * sizeof(struct nk_gamepad));
+        nk_gamepad_init_gamepads(gamepads, GLFW_JOYSTICK_LAST);
     }
 
     int button_mapping[NK_GAMEPAD_BUTTON_MAX] = {
@@ -65,11 +66,9 @@ const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num) {
 
     const char* name = glfwGetGamepadName(num);
     if (!name) {
-        return "Controller";
+        return gamepads->gamepads[num].name;
     }
-    else {
-        return name;
-    }
+    return name;
 }
 
 #endif
