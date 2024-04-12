@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Initialize the Gamepads */
-    struct nk_gamepads* gamepads = nk_gamepad_init(ctx);
+    struct nk_gamepads* gamepads = nk_gamepad_init(ctx, NULL);
 
     while (running) {
         SDL_Event evt;
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 
             /* Allow Gamepads to respond to gamepads being connected/disconnected */
             nk_sdl_handle_event(&evt);
-            
+
             nk_gamepad_sdl_handle_event(gamepads, &evt);
         }
         nk_input_end(ctx);

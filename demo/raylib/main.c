@@ -53,7 +53,7 @@ int main(void)
     struct nk_context *ctx = InitNuklear(20);
 
     /* Initialize the Gamepads */
-    struct nk_gamepads* gamepads = nk_gamepad_init(ctx);
+    struct nk_gamepads* gamepads = nk_gamepad_init(ctx, NULL);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key

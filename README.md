@@ -13,7 +13,7 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 #include "nuklear_gamepad.h"
 
 // Initialize the gamepad system.
-struct nk_gamepads* gamepads = nk_gamepad_init(ctx);
+struct nk_gamepads* gamepads = nk_gamepad_init(ctx, NULL);
 
 // Act on whehter or not the A button is pushed
 if (nk_gamepad_is_button_down(gamepads, 0, NK_GAMEPAD_BUTTON_A)) {
@@ -34,7 +34,7 @@ nk_gamepad_free(gamepads);
 ## API
 
 ``` c
-struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx);
+struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_data);
 void nk_gamepad_free(struct nk_gamepads* gamepads);
 NK_API void nk_gamepad_init_gamepads(struct nk_gamepads* gamepads, int num);
 nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
