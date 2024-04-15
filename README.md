@@ -7,6 +7,7 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 ## Example
 
 ``` c
+#define NK_GAMEPAD_IMPLEMENTATION
 #define NK_GAMEPAD_SDL
 //#define NK_GAMEPAD_GLFW
 //#define NK_GAMEPAD_RAYLIB

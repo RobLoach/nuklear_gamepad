@@ -35,6 +35,7 @@
 #include "raylib-nuklear.h"
 
 #define NK_GAMEPAD_RAYLIB
+#define NK_GAMEPAD_IMPLEMENTATION
 #include "../../nuklear_gamepad.h"
 
 #include "../common/nuklear_gamepad_demo.c"

@@ -26,6 +26,7 @@
 #include "../../vendor/nuklear/demo/glfw_opengl3/nuklear_glfw_gl3.h"
 
 #define NK_GAMEPAD_GLFW
+#define NK_GAMEPAD_IMPLEMENTATION
 #include "../../nuklear_gamepad.h"
 
 #define WINDOW_WIDTH 800

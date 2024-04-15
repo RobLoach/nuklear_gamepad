@@ -71,7 +71,7 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 
 #endif
 
-#ifdef NK_IMPLEMENTATION
+#ifdef NK_GAMEPAD_IMPLEMENTATION
 #ifndef NK_GAMEPAD_IMPLEMENTATION_ONCE
 #define NK_GAMEPAD_IMPLEMENTATION_ONCE
 
@@ -318,5 +318,5 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {
     #endif
 }
 
-#endif
-#endif
+#endif  // NK_GAMEPAD_IMPLEMENTATION_ONCE
+#endif  // NK_GAMEPAD_IMPLEMENTATION
