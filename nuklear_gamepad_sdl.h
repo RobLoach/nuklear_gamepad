@@ -105,7 +105,7 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
 
     SDL_GameController* controller = gamepads->gamepads[num].data;
     if (!controller) {
-        return NULL;
+        return gamepads->gamepads[num].name;
     }
 
     const char* name = SDL_GameControllerName(controller);
