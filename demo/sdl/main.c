@@ -33,6 +33,8 @@
 #include "../common/nuklear_gamepad_demo.c"
 
 int main(int argc, char *argv[]) {
+    NK_UNUSED(argc);
+    NK_UNUSED(argv);
     /* Platform */
     SDL_Window *win;
     SDL_Renderer *renderer;

@@ -27,6 +27,10 @@
 #ifndef NUKLEAR_GAMEPAD_H__
 #define NUKLEAR_GAMEPAD_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_UP,
     NK_GAMEPAD_BUTTON_DOWN,
@@ -60,6 +64,7 @@ struct nk_gamepads {
 NK_API struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_data);
 NK_API void nk_gamepad_free(struct nk_gamepads* gamepads);
 NK_API void nk_gamepad_init_gamepads(struct nk_gamepads* gamepads, int num);
+NK_API void nk_gamepad_update(struct nk_gamepads* gamepads);
 NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
@@ -68,6 +73,10 @@ NK_API int nk_gamepad_count(struct nk_gamepads* gamepads);
 NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 
 #define NK_GAMEPAD_BUTTON_FLAG(button) (1 << (button))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

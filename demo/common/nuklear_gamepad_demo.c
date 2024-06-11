@@ -35,7 +35,8 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) 
             WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - padding * 2);
 
         // Make a window for each controller
-        if (nk_begin_titled(ctx, name, nk_gamepad_name(gamepads, i), window_bounds,
+        const char* title = nk_gamepad_name(gamepads, i);
+        if (nk_begin_titled(ctx, name, title ? title : "UNKNOWN", window_bounds,
             NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE))
         {
             nk_layout_row_dynamic(ctx, 0, 7);
