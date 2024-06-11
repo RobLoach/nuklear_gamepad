@@ -10,11 +10,7 @@ project(nuklear_gamepad_pntr
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/.cmake")
 
 # Targets
-option(SDL "Build SDL" TRUE)
 option(RAYLIB "Build raylib" TRUE)
-option(LIBRETRO "Build libretro" FALSE)
-option(CLI "Build CLI" FALSE)
-option(WEB "Build Web" FALSE)
 
 # Sources
 set(SOURCES
