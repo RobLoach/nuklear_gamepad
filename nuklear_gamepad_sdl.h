@@ -8,7 +8,7 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 
 #endif
 
-#ifdef NK_IMPLEMENTATION
+#ifdef NK_GAMEPAD_IMPLEMENTATION
 #ifndef NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 

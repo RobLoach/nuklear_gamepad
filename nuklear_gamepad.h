@@ -75,19 +75,23 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 #ifndef NK_GAMEPAD_IMPLEMENTATION_ONCE
 #define NK_GAMEPAD_IMPLEMENTATION_ONCE
 
-#if !defined(NK_GAMEPAD_SDL) && !defined(NK_GAMEPAD_GLFW) && !defined(NK_GAMEPAD_RAYLIB) && !defined(NK_GAMEPAD_NONE)
+#if !defined(NK_GAMEPAD_SDL) && !defined(NK_GAMEPAD_GLFW) && !defined(NK_GAMEPAD_RAYLIB) && !defined(NK_GAMEPAD_PNTR) && !defined(NK_GAMEPAD_NONE)
 #if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
-#define NK_GAMEPAD_SDL
+    #define NK_GAMEPAD_SDL
 #elif defined(NK_GLFW_RENDERER_IMPLEMENTATION) || defined(NK_GLFW_GL2_IMPLEMENTATION) || defined(NK_GLFW_GL3_IMPLEMENTATION) || defined(GLFW_INCLUDE_VULKAN)
-#define NK_GAMEPAD_GLFW
+    #define NK_GAMEPAD_GLFW
 #elif defined(RAYLIB_NUKLEAR_IMPLEMENTATION) || defined(NK_RAYLIB_IMPLEMENTATION)
-#define NK_GAMEPAD_RAYLIB
+    #define NK_GAMEPAD_RAYLIB
+#elif defined(PNTR_NUKLEAR_IMPLEMENTATION)
+    #define NK_GAMEPAD_PNTR
 #endif
 #endif
 
 #ifndef NK_GAMEPAD_MFREE
 #ifdef NK_GAMEPAD_SDL
 #define NK_GAMEPAD_MFREE(unused, ptr) SDL_free(ptr)
+#elif defined(NK_GAMEPAD_PNTR)
+#define NK_GAMEPAD_MFREE(unused, ptr) pntr_unload_memory(ptr)
 #elif defined(NK_GAMEPAD_GLFW)
 // GLFW: Defer to NK_INCLUDE_DEFAULT_ALLOCATOR
 #elif defined(NK_GAMEPAD_RAYLIB)
@@ -102,6 +106,8 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 #ifndef NK_GAMEPAD_MALLOC
 #ifdef NK_GAMEPAD_SDL
 #define NK_GAMEPAD_MALLOC(unused, old, size) SDL_malloc(size)
+#elif defined(NK_GAMEPAD_PNTR)
+#define NK_GAMEPAD_MALLOC(unused, old, size) pntr_load_memory(size)
 #elif defined(NK_GAMEPAD_GLFW)
 // GLFW: Defer to NK_INCLUDE_DEFAULT_ALLOCATOR
 #elif defined(NK_GAMEPAD_RAYLIB)
@@ -119,6 +125,8 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 #include "nuklear_gamepad_glfw.h"
 #elif defined(NK_GAMEPAD_RAYLIB)
 #include "nuklear_gamepad_raylib.h"
+#elif defined(NK_GAMEPAD_PNTR)
+#include "nuklear_gamepad_pntr.h"
 #endif
 
 NK_API struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_data) {

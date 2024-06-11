@@ -11,6 +11,7 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 #define NK_GAMEPAD_SDL
 //#define NK_GAMEPAD_GLFW
 //#define NK_GAMEPAD_RAYLIB
+//#define NK_GAMEPAD_PNTR
 #include "nuklear_gamepad.h"
 
 // Initialize the gamepad system.
@@ -30,7 +31,8 @@ nk_gamepad_free(gamepads);
 - [SDL](https://www.libsdl.org/)
 - [GLFW](https://www.glfw.org/)
 - [raylib](https://www.raylib.com/)
-- Add more!
+- [pntr](https://github.com/robloach/pntr) with [pntr_app](https://github.com/robloach/pntr_app)
+- [Add more!](https://github.com/RobLoach/nuklear_gamepad/issues)
 
 ## API
 

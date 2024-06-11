@@ -6,7 +6,7 @@ NK_API const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num)
 
 #endif
 
-#ifdef NK_IMPLEMENTATION
+#ifdef NK_GAMEPAD_IMPLEMENTATION
 #ifndef NUKLEAR_GAMEPAD_RAYLIB_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_RAYLIB_IMPLEMENTATION_ONCE
 
@@ -57,7 +57,6 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads) {
     }
 }
 
-#include <stdio.h>
 const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num) {
     if (!gamepads || num < 0 || num >= gamepads->gamepads_count) {
         return NULL;
