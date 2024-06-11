@@ -36,6 +36,7 @@ NK_API void nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
     if (gamepads->gamepads != NULL) {
         nk_gamepad_sdl_free(gamepads);
         nk_handle unused;
+        NK_UNUSED(unused);
         NK_GAMEPAD_MFREE(unused, gamepads->gamepads);
         gamepads->gamepads = NULL;
         gamepads->gamepads_count = 0;
@@ -104,7 +105,7 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
 
     SDL_GameController* controller = gamepads->gamepads[num].data;
     if (!controller) {
-        return NULL;
+        return gamepads->gamepads[num].name;
     }
 
     const char* name = SDL_GameControllerName(controller);
