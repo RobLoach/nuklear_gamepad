@@ -12,6 +12,7 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 //#define NK_GAMEPAD_GLFW
 //#define NK_GAMEPAD_RAYLIB
 //#define NK_GAMEPAD_PNTR
+//#define NK_GAMEPAD_NONE
 #include "nuklear_gamepad.h"
 
 // Initialize the gamepad system.
@@ -39,7 +40,7 @@ nk_gamepad_free(gamepads);
 ``` c
 struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_data);
 void nk_gamepad_free(struct nk_gamepads* gamepads);
-NK_API void nk_gamepad_init_gamepads(struct nk_gamepads* gamepads, int num);
+void nk_gamepad_init_gamepads(struct nk_gamepads* gamepads, int num);
 nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
@@ -47,6 +48,22 @@ void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_bu
 int nk_gamepad_count(struct nk_gamepads* gamepads);
 const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 ```
+
+## Configuration
+
+| Define | Description |
+| ------ | ----------- |
+| `NK_GAMEPAD_SDL` | Use [SDL](https://www.libsdl.org/) |
+| `NK_GAMEPAD_GLFW` | Use [glfw](https://www.glfw.org/) |
+| `NK_GAMEPAD_RAYLIB` | Use [raylib](https://github.com/raysan5/raylib) |
+| `NK_GAMEPAD_PNTR` | Use [pntr_app](https://github.com/robloach/pntr_app) |
+| `NK_GAMEPAD_NONE` | When set, will avoid detecting which platform to use |
+| `NK_GAMEPAD_MALLOC` | Function that will allocate memory, matching `nk_malloc(unused, old, size)` |
+| `NK_GAMEPAD_MFREE` | Function to free memory, matching `nk_mfree(unused, ptr)` |
+| `NK_GAMEPAD_INIT` | Callback used to initialize gamepads |
+| `NK_GAMEPAD_UPDATE` | Callback used to update all gamepad states |
+| `NK_GAMEPAD_NAME` | Callback used to get a controller's name |
+| `NK_GAMEPAD_FREE` | Callback used to disconnect the controllers |
 
 ## License
 

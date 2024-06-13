@@ -10,6 +10,14 @@ NK_API const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num)
 #ifndef NUKLEAR_GAMEPAD_RAYLIB_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_RAYLIB_IMPLEMENTATION_ONCE
 
+#ifndef NK_GAMEPAD_MFREE
+    #define NK_GAMEPAD_MFREE(unused, ptr) SDL_free(ptr)
+#endif
+
+#ifndef NK_GAMEPAD_MALLOC
+    #define NK_GAMEPAD_MALLOC(unused, old, size) MemAlloc((unsigned int)(size))
+#endif
+
 #ifndef NK_GAMEPAD_RAYLIB_GAMEPAD_MAX
 #define NK_GAMEPAD_RAYLIB_GAMEPAD_MAX 4
 #endif

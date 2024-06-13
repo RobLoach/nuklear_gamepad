@@ -9,6 +9,14 @@ NK_API void nk_gamepad_pntr_update(struct nk_gamepads* gamepads);
 #ifndef NUKLEAR_GAMEPAD_PNTR_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_PNTR_IMPLEMENTATION_ONCE
 
+#ifndef NK_GAMEPAD_MFREE
+    #define NK_GAMEPAD_MFREE(unused, ptr) pntr_unload_memory(ptr)
+#endif
+
+#ifndef NK_GAMEPAD_MALLOC
+    #define NK_GAMEPAD_MALLOC(unused, old, size) pntr_load_memory((size_t)(size))
+#endif
+
 #define NK_GAMEPAD_UPDATE nk_gamepad_pntr_update
 
 int nk_gamepad_pntr_to_nk_gamepad(int button) {

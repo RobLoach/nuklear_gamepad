@@ -85,47 +85,33 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 #define NK_GAMEPAD_IMPLEMENTATION_ONCE
 
 #if !defined(NK_GAMEPAD_SDL) && !defined(NK_GAMEPAD_GLFW) && !defined(NK_GAMEPAD_RAYLIB) && !defined(NK_GAMEPAD_PNTR) && !defined(NK_GAMEPAD_NONE)
-#if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
-    #define NK_GAMEPAD_SDL
-#elif defined(NK_GLFW_RENDERER_IMPLEMENTATION) || defined(NK_GLFW_GL2_IMPLEMENTATION) || defined(NK_GLFW_GL3_IMPLEMENTATION) || defined(GLFW_INCLUDE_VULKAN)
-    #define NK_GAMEPAD_GLFW
-#elif defined(RAYLIB_NUKLEAR_IMPLEMENTATION) || defined(NK_RAYLIB_IMPLEMENTATION)
-    #define NK_GAMEPAD_RAYLIB
-#elif defined(PNTR_NUKLEAR_IMPLEMENTATION)
-    #define NK_GAMEPAD_PNTR
-#endif
-#endif
-
-#ifndef NK_GAMEPAD_MFREE
-#ifdef NK_GAMEPAD_SDL
-#define NK_GAMEPAD_MFREE(unused, ptr) SDL_free(ptr)
-#elif defined(NK_GAMEPAD_PNTR)
-#define NK_GAMEPAD_MFREE(unused, ptr) pntr_unload_memory(ptr)
-#elif defined(NK_GAMEPAD_GLFW)
-// GLFW: Defer to NK_INCLUDE_DEFAULT_ALLOCATOR
-#elif defined(NK_GAMEPAD_RAYLIB)
-#define NK_GAMEPAD_MFREE(unused, ptr) MemFree(ptr)
-#endif
+    #if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
+        #define NK_GAMEPAD_SDL
+    #elif defined(NK_GLFW_RENDERER_IMPLEMENTATION) || defined(NK_GLFW_GL2_IMPLEMENTATION) || defined(NK_GLFW_GL3_IMPLEMENTATION) || defined(GLFW_INCLUDE_VULKAN)
+        #define NK_GAMEPAD_GLFW
+    #elif defined(RAYLIB_NUKLEAR_IMPLEMENTATION) || defined(NK_RAYLIB_IMPLEMENTATION)
+        #define NK_GAMEPAD_RAYLIB
+    #elif defined(PNTR_NUKLEAR_IMPLEMENTATION)
+        #define NK_GAMEPAD_PNTR
+    #endif
 #endif
 
-#if !defined(NK_GAMEPAD_MFREE) && defined(NK_INCLUDE_DEFAULT_ALLOCATOR)
-#define NK_GAMEPAD_MFREE(unused, ptr) nk_mfree(unused, ptr)
-#endif
-
-#ifndef NK_GAMEPAD_MALLOC
-#ifdef NK_GAMEPAD_SDL
-#define NK_GAMEPAD_MALLOC(unused, old, size) SDL_malloc(size)
-#elif defined(NK_GAMEPAD_PNTR)
-#define NK_GAMEPAD_MALLOC(unused, old, size) pntr_load_memory(size)
-#elif defined(NK_GAMEPAD_GLFW)
-// GLFW: Defer to NK_INCLUDE_DEFAULT_ALLOCATOR
-#elif defined(NK_GAMEPAD_RAYLIB)
-#define NK_GAMEPAD_MALLOC(unused, old, size) MemAlloc(size)
-#endif
-#endif
-
-#if !defined(NK_GAMEPAD_MALLOC) && defined(NK_INCLUDE_DEFAULT_ALLOCATOR)
-#define NK_GAMEPAD_MALLOC(unused, old, size) nk_malloc(unused, old, size)
+#ifdef NK_INCLUDE_DEFAULT_ALLOCATOR
+    #ifndef NK_GAMEPAD_MALLOC
+        #define NK_GAMEPAD_MALLOC(unused, old, size) nk_malloc(unused, old, size)
+    #endif
+    #ifndef NK_GAMEPAD_MFREE
+        #define NK_GAMEPAD_MFREE(unused, ptr) nk_mfree(unused, ptr)
+    #endif
+#elif defined(NK_GAMEPAD_NONE)
+    #ifndef NK_GAMEPAD_MALLOC
+        #include <stdlib.h>
+        #define NK_GAMEPAD_MALLOC(unused, old, size) malloc(size)
+    #endif
+    #ifndef NK_GAMEPAD_MFREE
+        #include <stdlib.h>
+        #define NK_GAMEPAD_MFREE(unused, ptr) free(ptr)
+    #endif
 #endif
 
 #ifdef NK_GAMEPAD_SDL
@@ -138,16 +124,24 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 #include "nuklear_gamepad_pntr.h"
 #endif
 
+/**
+ * Initialize the gamepads.
+ *
+ * @param ctx The Nuklear context.
+ * @param user_data The user data to pass to the gamepad.
+ *
+ * @return The initialized gamepads, or NULL if it failed.
+ */
 NK_API struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_data) {
     nk_handle unused = {0};
-    (void)unused;
+    NK_UNUSED(unused);
     struct nk_gamepads* gamepads = (struct nk_gamepads*)NK_GAMEPAD_MALLOC(unused, NULL, sizeof(struct nk_gamepads));
     nk_zero(gamepads, sizeof(struct nk_gamepads));
     gamepads->ctx = ctx;
     gamepads->user_data = user_data;
 
     #ifdef NK_GAMEPAD_INIT
-    NK_GAMEPAD_INIT(gamepads);
+        NK_GAMEPAD_INIT(gamepads);
     #endif
 
     return gamepads;
@@ -159,11 +153,11 @@ NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
     }
 
     #ifdef NK_GAMEPAD_FREE
-    NK_GAMEPAD_FREE(gamepads);
+        NK_GAMEPAD_FREE(gamepads);
     #endif
 
     nk_handle unused = {0};
-    (void)unused;
+    NK_UNUSED(unused);
     if (gamepads->gamepads != NULL) {
         NK_GAMEPAD_MFREE(unused, gamepads->gamepads);
     }
@@ -177,17 +171,15 @@ NK_API void nk_gamepad_init_gamepads(struct nk_gamepads* gamepads, int num) {
     }
 
     // Clean up if needed.
+    nk_handle unused = {0};
+    NK_UNUSED(unused);
     if (gamepads->gamepads != NULL) {
-        nk_handle unused = {0};
-        (void)unused;
         NK_GAMEPAD_MFREE(unused, gamepads->gamepads);
         gamepads->gamepads = NULL;
         gamepads->gamepads_count = 0;
     }
 
     // Initialize the new gamepad
-    nk_handle unused = {0};
-    (void)unused;
     gamepads->gamepads = (struct nk_gamepad*)NK_GAMEPAD_MALLOC(unused, NULL, num * sizeof(struct nk_gamepad));
     nk_zero(gamepads->gamepads, num * sizeof(struct nk_gamepad));
     gamepads->gamepads_count = num;
@@ -212,6 +204,13 @@ NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gam
     }
 }
 
+/**
+ * Update all the gamepad states.
+ *
+ * @param gamepads The gamepads to update.
+ *
+ * @see NK_GAMEPAD_UPDATE
+ */
 NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
     if (gamepads == NULL) {
         return;
@@ -223,7 +222,7 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
     }
 
     #ifdef NK_GAMEPAD_UPDATE
-    NK_GAMEPAD_UPDATE(gamepads);
+        NK_GAMEPAD_UPDATE(gamepads);
     #endif
 }
 
@@ -233,6 +232,8 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
  * @param gamepads The gamepads to check.
  * @param num The gamepad number to check. If -1 all gamepads are checked.
  * @param button The button to check.
+ *
+ * @return True or false whether or not the button is actively down.
  */
 NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     if (gamepads == NULL) {
@@ -291,6 +292,8 @@ NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int nu
  * @param gamepads The gamepads to check.
  * @param num The gamepad number to check. If -1 all gamepads are checked.
  * @param button The button to check.
+ *
+ * @return Whether or not the button was released.
  */
 NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     if (gamepads == NULL) {
@@ -329,9 +332,9 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {
     }
 
     #ifdef NK_GAMEPAD_NAME
-    return NK_GAMEPAD_NAME(gamepads, num);
+        return NK_GAMEPAD_NAME(gamepads, num);
     #else
-    return gamepads->gamepads[num].name;
+        return gamepads->gamepads[num].name;
     #endif
 }
 
