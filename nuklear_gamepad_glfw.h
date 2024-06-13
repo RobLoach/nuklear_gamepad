@@ -6,7 +6,7 @@ NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num);
 
 #endif
 
-#if defined(NK_IMPLEMENTATION)
+#if defined(NK_GAMEPAD_IMPLEMENTATION)
 #ifndef NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 
