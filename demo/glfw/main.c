@@ -115,6 +115,10 @@ int main(void)
         nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
         glfwSwapBuffers(win);
     }
+
+    // Terminate
+    nk_gamepad_free(gamepads);
+
     nk_glfw3_shutdown(&glfw);
     glfwTerminate();
     return 0;
