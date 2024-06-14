@@ -32,7 +32,9 @@ extern "C" {
 #endif
 
 enum nk_gamepad_button {
-    NK_GAMEPAD_BUTTON_UP,
+    NK_GAMEPAD_BUTTON_INVALID = -1,
+    NK_GAMEPAD_BUTTON_FIRST = 0,
+    NK_GAMEPAD_BUTTON_UP = 0,
     NK_GAMEPAD_BUTTON_DOWN,
     NK_GAMEPAD_BUTTON_LEFT,
     NK_GAMEPAD_BUTTON_RIGHT,
@@ -44,7 +46,7 @@ enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_RB,
     NK_GAMEPAD_BUTTON_BACK,
     NK_GAMEPAD_BUTTON_START,
-    NK_GAMEPAD_BUTTON_MAX
+    NK_GAMEPAD_BUTTON_LAST
 };
 
 struct nk_gamepad {

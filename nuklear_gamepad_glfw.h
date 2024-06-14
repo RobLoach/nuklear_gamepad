@@ -22,6 +22,24 @@ NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num);
 #define NK_GAMEPAD_UPDATE nk_gamepad_glfw_update
 #define NK_GAMEPAD_NAME nk_gamepad_glfw_name
 
+int nk_gamepad_glfw_map_button(int button) {
+    switch (button) {
+        case NK_GAMEPAD_BUTTON_UP: return GLFW_GAMEPAD_BUTTON_DPAD_UP;
+        case NK_GAMEPAD_BUTTON_DOWN: return GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
+        case NK_GAMEPAD_BUTTON_LEFT: return GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
+        case NK_GAMEPAD_BUTTON_RIGHT: return GLFW_GAMEPAD_BUTTON_DPAD_RIGHT;
+        case NK_GAMEPAD_BUTTON_A: return GLFW_GAMEPAD_BUTTON_A;
+        case NK_GAMEPAD_BUTTON_B: return GLFW_GAMEPAD_BUTTON_B;
+        case NK_GAMEPAD_BUTTON_X: return GLFW_GAMEPAD_BUTTON_X;
+        case NK_GAMEPAD_BUTTON_Y: return GLFW_GAMEPAD_BUTTON_Y;
+        case NK_GAMEPAD_BUTTON_LB: return GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
+        case NK_GAMEPAD_BUTTON_RB: return GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
+        case NK_GAMEPAD_BUTTON_BACK: return GLFW_GAMEPAD_BUTTON_BACK;
+        case NK_GAMEPAD_BUTTON_START: return GLFW_GAMEPAD_BUTTON_START;
+        default: return -1;
+    }
+}
+
 void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
     if (!gamepads) {
         return;
@@ -31,22 +49,8 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
         nk_gamepad_init_gamepads(gamepads, GLFW_JOYSTICK_LAST);
     }
 
-    int button_mapping[NK_GAMEPAD_BUTTON_MAX] = {
-        GLFW_GAMEPAD_BUTTON_DPAD_UP, /* NK_GAMEPAD_BUTTON_UP */
-        GLFW_GAMEPAD_BUTTON_DPAD_DOWN, /* NK_GAMEPAD_BUTTON_DOWN */
-        GLFW_GAMEPAD_BUTTON_DPAD_LEFT, /* NK_GAMEPAD_BUTTON_LEFT */
-        GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, /* NK_GAMEPAD_BUTTON_RIGHT */
-        GLFW_GAMEPAD_BUTTON_A, /* NK_GAMEPAD_BUTTON_A */
-        GLFW_GAMEPAD_BUTTON_B, /* NK_GAMEPAD_BUTTON_B */
-        GLFW_GAMEPAD_BUTTON_X, /* NK_GAMEPAD_BUTTON_X */
-        GLFW_GAMEPAD_BUTTON_Y, /* NK_GAMEPAD_BUTTON_Y */
-        GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, /* NK_GAMEPAD_BUTTON_LB */
-        GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, /* NK_GAMEPAD_BUTTON_RB */
-        GLFW_GAMEPAD_BUTTON_BACK, /* NK_GAMEPAD_BUTTON_BACK */
-        GLFW_GAMEPAD_BUTTON_START /* NK_GAMEPAD_BUTTON_START */
-    };
-
     gamepads->gamepads_count = 0;
+    GLFWgamepadstate state;
     for (int num = 0; num < GLFW_JOYSTICK_LAST; num++) {
         if (glfwJoystickPresent(num) == GLFW_FALSE) {
             break;
@@ -57,10 +61,10 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
             continue;
         }
 
-     	GLFWgamepadstate state;
         if (glfwGetGamepadState(num, &state) == GLFW_TRUE) {
-            for (int i = 0; i < NK_GAMEPAD_BUTTON_MAX; i++) {
-                if (state.buttons[button_mapping[i]]) {
+            for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
+                int glfwButton = nk_gamepad_glfw_map_button(i);
+                if (glfwButton >= 0 && state.buttons[glfwButton]) {
                     nk_gamepad_button(gamepads, num, i, nk_true);
                 }
             }

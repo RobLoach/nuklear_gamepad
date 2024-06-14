@@ -76,30 +76,33 @@ NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
     }
 }
 
-NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
-    int button_mapping[NK_GAMEPAD_BUTTON_MAX] = {
-        SDL_CONTROLLER_BUTTON_DPAD_UP, /* NK_GAMEPAD_BUTTON_UP */
-        SDL_CONTROLLER_BUTTON_DPAD_DOWN, /* NK_GAMEPAD_BUTTON_DOWN */
-        SDL_CONTROLLER_BUTTON_DPAD_LEFT, /* NK_GAMEPAD_BUTTON_LEFT */
-        SDL_CONTROLLER_BUTTON_DPAD_RIGHT, /* NK_GAMEPAD_BUTTON_RIGHT */
-        SDL_CONTROLLER_BUTTON_A, /* NK_GAMEPAD_BUTTON_A */
-        SDL_CONTROLLER_BUTTON_B, /* NK_GAMEPAD_BUTTON_B */
-        SDL_CONTROLLER_BUTTON_X, /* NK_GAMEPAD_BUTTON_X */
-        SDL_CONTROLLER_BUTTON_Y, /* NK_GAMEPAD_BUTTON_Y */
-        SDL_CONTROLLER_BUTTON_LEFTSHOULDER, /* NK_GAMEPAD_BUTTON_LB */
-        SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, /* NK_GAMEPAD_BUTTON_RB */
-        SDL_CONTROLLER_BUTTON_BACK, /* NK_GAMEPAD_BUTTON_BACK */
-        SDL_CONTROLLER_BUTTON_START /* NK_GAMEPAD_BUTTON_START */
-    };
+int nk_gamepad_sdl_map_button(int button) {
+    switch (button) {
+        case NK_GAMEPAD_BUTTON_UP: return SDL_CONTROLLER_BUTTON_DPAD_UP;
+        case NK_GAMEPAD_BUTTON_DOWN: return SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+        case NK_GAMEPAD_BUTTON_LEFT: return SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+        case NK_GAMEPAD_BUTTON_RIGHT: return SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+        case NK_GAMEPAD_BUTTON_A: return SDL_CONTROLLER_BUTTON_A;
+        case NK_GAMEPAD_BUTTON_B: return SDL_CONTROLLER_BUTTON_B;
+        case NK_GAMEPAD_BUTTON_X: return SDL_CONTROLLER_BUTTON_X;
+        case NK_GAMEPAD_BUTTON_Y: return SDL_CONTROLLER_BUTTON_Y;
+        case NK_GAMEPAD_BUTTON_LB: return SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
+        case NK_GAMEPAD_BUTTON_RB: return SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
+        case NK_GAMEPAD_BUTTON_BACK: return SDL_CONTROLLER_BUTTON_BACK;
+        case NK_GAMEPAD_BUTTON_START: return SDL_CONTROLLER_BUTTON_START;
+        default: return SDL_CONTROLLER_BUTTON_INVALID;
+    }
+}
 
+NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
     for (int num = 0; num < gamepads->gamepads_count; num++) {
         SDL_GameController* controller = gamepads->gamepads[num].data;
         if (!controller) {
             continue;
         }
 
-        for (int i = 0; i < NK_GAMEPAD_BUTTON_MAX; i++) {
-            if (SDL_GameControllerGetButton(controller, button_mapping[i])) {
+        for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
+            if (SDL_GameControllerGetButton(controller, nk_gamepad_sdl_map_button(i))) {
                 nk_gamepad_button(gamepads, num, i, nk_true);
             }
         }
