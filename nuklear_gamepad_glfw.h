@@ -10,13 +10,13 @@ NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num);
 #ifndef NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 
+#ifndef NK_GAMEPAD_MALLOC
+    #define NK_GAMEPAD_MALLOC(unused, old, size) malloc(size)
+#endif
+
 #ifndef NK_GAMEPAD_MFREE
     // TODO: Switch to allow using GLFWallocator.
     #define NK_GAMEPAD_MFREE(unused, ptr) free(ptr)
-#endif
-
-#ifndef NK_GAMEPAD_MALLOC
-    #define NK_GAMEPAD_MALLOC(unused, old, size) malloc(size)
 #endif
 
 #define NK_GAMEPAD_UPDATE nk_gamepad_glfw_update

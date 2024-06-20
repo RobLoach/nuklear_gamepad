@@ -12,12 +12,12 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 #ifndef NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 
-#ifndef NK_GAMEPAD_MFREE
-    #define NK_GAMEPAD_MFREE(unused, ptr) SDL_free(ptr)
-#endif
-
 #ifndef NK_GAMEPAD_MALLOC
     #define NK_GAMEPAD_MALLOC(unused, old, size) SDL_malloc(size)
+#endif
+
+#ifndef NK_GAMEPAD_MFREE
+    #define NK_GAMEPAD_MFREE(unused, ptr) SDL_free(ptr)
 #endif
 
 #define NK_GAMEPAD_INIT nk_gamepad_sdl_init
