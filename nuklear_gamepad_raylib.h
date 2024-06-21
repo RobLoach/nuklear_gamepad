@@ -49,7 +49,9 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads) {
     }
 
     if (gamepads->gamepads == NULL) {
-        nk_gamepad_init_gamepads(gamepads, NK_GAMEPAD_RAYLIB_GAMEPAD_MAX);
+        if (nk_gamepad_init_gamepads(gamepads, NK_GAMEPAD_RAYLIB_GAMEPAD_MAX) == nk_false) {
+            return;
+        }
     }
 
     gamepads->gamepads_count = 0;

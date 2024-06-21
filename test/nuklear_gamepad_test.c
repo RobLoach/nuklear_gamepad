@@ -24,7 +24,9 @@ int main() {
 
     // Add 4 controllers.
     printf("nk_gamepad_init_gamepads()\n");
-    nk_gamepad_init_gamepads(gamepads, 4);
+    assert(nk_gamepad_init_gamepads(NULL, 4) == nk_false);
+    assert(nk_gamepad_init_gamepads(gamepads, -5) == nk_false);
+    assert(nk_gamepad_init_gamepads(gamepads, 4) == nk_true);
 
     printf("nk_gamepad_count()\n");
     assert(nk_gamepad_count(gamepads) == 4);

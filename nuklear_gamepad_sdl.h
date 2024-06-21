@@ -1,8 +1,8 @@
 #ifndef NUKLEAR_GAMEPAD_SDL_H__
 #define NUKLEAR_GAMEPAD_SDL_H__
 
-NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *evt);
-NK_API void nk_gamepad_sdl_init(struct nk_gamepads* gamepads);
+NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event);
+NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads);
 NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads);
 NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 
@@ -35,9 +35,9 @@ NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event 
     }
 }
 
-NK_API void nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
+NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
     if (gamepads == NULL) {
-        return;
+        return nk_false;
     }
 
     // Reset the state if we have already initialized
@@ -51,7 +51,9 @@ NK_API void nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
     }
 
     // Initialize the gamepads
-    nk_gamepad_init_gamepads(gamepads, SDL_NumJoysticks());
+    if (nk_gamepad_init_gamepads(gamepads, SDL_NumJoysticks()) == nk_false) {
+        return nk_false;
+    }
 
     for (int i = 0; i < gamepads->gamepads_count; i++) {
         if (SDL_IsGameController(i)) {
@@ -61,6 +63,8 @@ NK_API void nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
             }
         }
     }
+
+    return nk_true;
 }
 
 NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {

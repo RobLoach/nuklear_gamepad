@@ -46,7 +46,9 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
     }
 
     if (gamepads->gamepads == NULL) {
-        nk_gamepad_init_gamepads(gamepads, GLFW_JOYSTICK_LAST);
+        if (nk_gamepad_init_gamepads(gamepads, GLFW_JOYSTICK_LAST) == nk_false) {
+            return;
+        }
     }
 
     gamepads->gamepads_count = 0;
@@ -81,6 +83,7 @@ const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num) {
     if (!name) {
         return gamepads->gamepads[num].name;
     }
+
     return name;
 }
 

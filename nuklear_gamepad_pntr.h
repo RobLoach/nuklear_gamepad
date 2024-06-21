@@ -43,7 +43,9 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads) {
     }
 
     if (gamepads->gamepads == NULL) {
-        nk_gamepad_init_gamepads(gamepads, PNTR_APP_MAX_GAMEPADS);
+        if (nk_gamepad_init_gamepads(gamepads, PNTR_APP_MAX_GAMEPADS) == nk_false) {
+            return;
+        }
     }
 
     for (int num = 0; num < PNTR_APP_MAX_GAMEPADS; num++) {
