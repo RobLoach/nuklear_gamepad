@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.11)
+
 # raylib
 find_package(raylib QUIET)
 if (NOT raylib_FOUND)
