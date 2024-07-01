@@ -56,6 +56,13 @@ int main() {
     assert(nk_gamepad_is_button_down(gamepads, 0, NK_GAMEPAD_BUTTON_A) == nk_true);
     assert(nk_gamepad_is_button_down(gamepads, 0, NK_GAMEPAD_BUTTON_B) == nk_false);
 
+    // nk_gamepad_any_button_pressed()
+    int num = 9999;
+    enum nk_gamepad_button button = NK_GAMEPAD_BUTTON_B;
+    assert(nk_gamepad_any_button_pressed(gamepads, -1, &num, &button) == nk_true);
+    assert(num == 0);
+    assert(button == NK_GAMEPAD_BUTTON_A);
+
     printf("nk_gamepad_free()\n");
     nk_gamepad_free(gamepads);
 
