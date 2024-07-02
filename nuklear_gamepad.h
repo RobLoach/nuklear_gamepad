@@ -174,6 +174,26 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
  */
 NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads);
 
+/**
+ * Get the first gamepad button that is found to be pressed.
+ *
+ * @param gamepads The associated gamepad system.
+ * @param num The gamepad number to check against. Provide -1 to check all gamepads.
+ * @param out_num The gamepad number that the button is pressed on.
+ * @param out_button The button that was pressed.
+ *
+ * @return True or False depending on whether or not a button was pressed.
+ *
+ * @code
+ * int num;
+ * enum nk_gamepad_button button;
+ * if (nk_gamepad_any_button_pressed(gamepads, -1, &num, &button)) {
+ *   printf("Gamepad: %d. Button: %d\n", num, button);
+ * }
+ * @endcode
+ */
+NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button);
+
 #define NK_GAMEPAD_BUTTON_FLAG(button) (1 << (button))
 
 #ifdef __cplusplus
@@ -420,6 +440,44 @@ NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads) {
     }
 
     return gamepads->user_data;
+}
+
+NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button) {
+    if (gamepads == NULL || num > gamepads->gamepads_count) {
+        return nk_false;
+    }
+
+    if (num <= -1) {
+        for (num = 0; num < gamepads->gamepads_count; num++) {
+            for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
+                if (nk_gamepad_is_button_pressed(gamepads, num, i)) {
+                    if (out_num != NULL) {
+                        *out_num = num;
+                    }
+                    if (out_button != NULL) {
+                        *out_button = i;
+                    }
+                    return nk_true;
+                }
+            }
+        }
+
+        return nk_false;
+    }
+
+    for (int button = NK_GAMEPAD_BUTTON_FIRST; button < NK_GAMEPAD_BUTTON_LAST; button++) {
+        if (nk_gamepad_is_button_pressed(gamepads, num, button)) {
+            if (out_num != NULL) {
+                *out_num = num;
+            }
+            if (out_button != NULL) {
+                *out_button = button;
+            }
+            return nk_true;
+        }
+    }
+
+    return nk_false;
 }
 
 #endif  // NK_GAMEPAD_IMPLEMENTATION_ONCE
