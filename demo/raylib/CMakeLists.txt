@@ -27,7 +27,7 @@ if (NOT raylib_nuklear_FOUND)
     FetchContent_Declare(
         raylib_nuklear
         GIT_REPOSITORY https://github.com/RobLoach/raylib-nuklear.git
-        GIT_TAG 33ae426a4c2798e26b0fddf9760669d0aedfb6a0
+        GIT_TAG 35995099100620b7e5b14f0fcb5521a6215a2971
     )
     FetchContent_GetProperties(raylib_nuklear)
     if (NOT raylib_nuklear_POPULATED)
