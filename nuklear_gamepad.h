@@ -31,6 +31,10 @@
 extern "C" {
 #endif
 
+#ifndef NK_GAMEPADS_MAX
+#define NK_GAMEPADS_MAX 8
+#endif  // NK_GAMEPADS_MAX
+
 enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_INVALID = -1,
     NK_GAMEPAD_BUTTON_FIRST = 0,
@@ -50,15 +54,15 @@ enum nk_gamepad_button {
 };
 
 struct nk_gamepad {
-    int buttons;
-    int buttons_prev;
-    void* data;
+    nk_bool connected;
     char name[32];
+    unsigned int buttons;
+    unsigned int buttons_prev;
+    void* data;
 };
 
 struct nk_gamepads {
-    struct nk_gamepad* gamepads;
-    int gamepads_count;
+    struct nk_gamepad gamepads[NK_GAMEPADS_MAX];
     struct nk_context* ctx;
     void* user_data;
 };
@@ -73,6 +77,11 @@ struct nk_gamepads {
  * @see nk_gamepad_free()
  */
 NK_API struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_data);
+
+/**
+ * Initialize the Nuklear Gamepad system with the default implementation.
+ */
+NK_API nk_bool nk_gamepad_setup(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data);
 
 /**
  * Disconnect all the gamepads and frees associated memory.
@@ -254,6 +263,19 @@ NK_API struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_da
         return NULL;
     }
 
+    if (!nk_gamepad_setup(gamepads, ctx, user_data)) {
+        NK_GAMEPAD_MFREE(unused, gamepads);
+        return NULL;
+    }
+
+    return gamepads;
+}
+
+NK_API nk_bool nk_gamepad_setup(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data) {
+    if (gamepads == NULL) {
+        return nk_false;
+    }
+
     nk_zero(gamepads, sizeof(struct nk_gamepads));
     gamepads->ctx = ctx;
     gamepads->user_data = user_data;
@@ -264,8 +286,6 @@ NK_API struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_da
             return NULL;
         }
     #endif
-
-    return gamepads;
 }
 
 NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
