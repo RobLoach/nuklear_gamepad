@@ -31,9 +31,9 @@
 extern "C" {
 #endif
 
-#ifndef NK_GAMEPADS_MAX
-#define NK_GAMEPADS_MAX 8
-#endif  // NK_GAMEPADS_MAX
+#ifndef NK_GAMEPAD_MAX
+#define NK_GAMEPAD_MAX 8
+#endif  // NK_GAMEPAD_MAX
 
 enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_INVALID = -1,
@@ -62,7 +62,7 @@ struct nk_gamepad {
 };
 
 struct nk_gamepads {
-    struct nk_gamepad gamepads[NK_GAMEPADS_MAX];
+    struct nk_gamepad gamepads[NK_GAMEPAD_MAX];
     struct nk_context* ctx;
     void* user_data;
 };
@@ -306,41 +306,8 @@ NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
     NK_GAMEPAD_MFREE(unused, gamepads);
 }
 
-NK_API nk_bool nk_gamepad_init_gamepads(struct nk_gamepads* gamepads, int num) {
-    if (gamepads == NULL || num <= 0) {
-        return nk_false;
-    }
-
-    // Clean up if needed.
-    nk_handle unused = {0};
-    NK_UNUSED(unused);
-    if (gamepads->gamepads != NULL) {
-        NK_GAMEPAD_MFREE(unused, gamepads->gamepads);
-        gamepads->gamepads = NULL;
-        gamepads->gamepads_count = 0;
-    }
-
-    // Initialize the new gamepad
-    gamepads->gamepads = (struct nk_gamepad*)NK_GAMEPAD_MALLOC(unused, NULL, num * sizeof(struct nk_gamepad));
-    if (gamepads->gamepads == NULL) {
-        return nk_false;
-    }
-
-    // Clear the memory
-    nk_zero(gamepads->gamepads, num * sizeof(struct nk_gamepad));
-    gamepads->gamepads_count = num;
-
-    // Set up the initial name for the gamepads
-    for (int i = 0; i < num; i++) {
-        NK_MEMCPY((void*)gamepads->gamepads[i].name, "Controller ", 11);
-        nk_itoa(gamepads->gamepads[i].name + 11, i + 1);
-    }
-
-    return nk_true;
-}
-
 NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down) {
-    if (gamepads == NULL || num < 0 || num >= gamepads->gamepads_count) {
+    if (gamepads == NULL || num < 0 || num >= NK_GAMEPADS_MAX || gamepads->gamepads[num].connected == nk_false) {
         return;
     }
 
@@ -357,7 +324,10 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
         return;
     }
 
-    for (int i = 0; i < gamepads->gamepads_count; i++) {
+    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        if (gamepads->gamepads[i].connected == nk_false) {
+            continue;
+        }
         gamepads->gamepads[i].buttons_prev = gamepads->gamepads[i].buttons;
         gamepads->gamepads[i].buttons = 0;
     }
@@ -373,7 +343,11 @@ NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, 
     }
 
     if (num <= -1) {
-        for (int i = 0; i < gamepads->gamepads_count; i++) {
+        for (int i = 0; i < NK_GAMEPADS_MAX; i++) {
+            if (gamepads->gamepads[i].connected == nk_false) {
+                continue;
+            }
+
             if ((gamepads->gamepads[i].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
                 return nk_true;
             }
@@ -381,7 +355,7 @@ NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, 
         return nk_false;
     }
 
-    if (num >= gamepads->gamepads_count) {
+    if (num >= NK_GAMEPADS_MAX || gamepads->gamepads[num].connected == nk_false) {
         return nk_false;
     }
 
@@ -394,7 +368,11 @@ NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int nu
     }
 
     if (num <= -1) {
-        for (int i = 0; i < gamepads->gamepads_count; i++) {
+        for (int i = 0; i < NK_GAMEPADS_MAX; i++) {
+            if (gamepads->gamepads[i].connected == nk_false) {
+                continue;
+            }
+
             if ((gamepads->gamepads[i].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
 			    (gamepads->gamepads[i].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
                 return nk_true;
@@ -403,7 +381,7 @@ NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int nu
         return nk_false;
     }
 
-    if (num >= gamepads->gamepads_count) {
+    if (num >= NK_GAMEPADS_MAX || gamepads->gamepads[num].connected == nk_false) {
         return nk_false;
     }
 
@@ -417,7 +395,11 @@ NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int n
     }
 
     if (num <= -1) {
-        for (int i = 0; i < gamepads->gamepads_count; i++) {
+        for (int i = 0; i < NK_GAMEPADS_MAX; i++) {
+            if (gamepads->gamepads[i].connected == nk_false) {
+                continue;
+            }
+
             if ((gamepads->gamepads[i].buttons & NK_GAMEPAD_BUTTON_FLAG(button)) == 0 &&
 			    (gamepads->gamepads[i].buttons_prev & NK_GAMEPAD_BUTTON_FLAG(button)) != 0) {
                 return nk_true;
@@ -426,7 +408,7 @@ NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int n
         return nk_false;
     }
 
-    if (num >= gamepads->gamepads_count) {
+    if (num >= NK_GAMEPADS_MAX || gamepads->gamepads[num].connected == nk_false) {
         return nk_false;
     }
 
@@ -439,11 +421,11 @@ NK_API int nk_gamepad_count(struct nk_gamepads* gamepads) {
         return 0;
     }
 
-    return gamepads->gamepads_count;
+    return NK_GAMEPADS_MAX;
 }
 
 NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {
-    if (!gamepads || num < 0 || num >= gamepads->gamepads_count) {
+    if (!gamepads || num < 0 || num >= NK_GAMEPADS_MAX || gamepads->gamepads[num].connected == nk_false) {
         return NULL;
     }
 
@@ -463,12 +445,12 @@ NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads) {
 }
 
 NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button) {
-    if (gamepads == NULL || num > gamepads->gamepads_count) {
+    if (gamepads == NULL || num > NK_GAMEPADS_MAX) {
         return nk_false;
     }
 
-    if (num <= -1) {
-        for (num = 0; num < gamepads->gamepads_count; num++) {
+    if (num < 0) {
+        for (num = 0; num < NK_GAMEPADS_MAX; num++) {
             for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
                 if (nk_gamepad_is_button_pressed(gamepads, num, i)) {
                     if (out_num != NULL) {
@@ -482,6 +464,10 @@ NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int n
             }
         }
 
+        return nk_false;
+    }
+
+    if (gamepads->gamepads[num].connected == nk_false) {
         return nk_false;
     }
 
