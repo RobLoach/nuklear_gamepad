@@ -450,12 +450,12 @@ NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int n
     if (num <= -1) {
         for (num = 0; num < gamepads->gamepads_count; num++) {
             for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
-                if (nk_gamepad_is_button_pressed(gamepads, num, i)) {
+                if (nk_gamepad_is_button_pressed(gamepads, num, (enum nk_gamepad_button)i)) {
                     if (out_num != NULL) {
                         *out_num = num;
                     }
                     if (out_button != NULL) {
-                        *out_button = i;
+                        *out_button = (enum nk_gamepad_button)i;
                     }
                     return nk_true;
                 }
@@ -466,12 +466,12 @@ NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int n
     }
 
     for (int button = NK_GAMEPAD_BUTTON_FIRST; button < NK_GAMEPAD_BUTTON_LAST; button++) {
-        if (nk_gamepad_is_button_pressed(gamepads, num, button)) {
+        if (nk_gamepad_is_button_pressed(gamepads, num, (enum nk_gamepad_button)button)) {
             if (out_num != NULL) {
                 *out_num = num;
             }
             if (out_button != NULL) {
-                *out_button = button;
+                *out_button = (enum nk_gamepad_button)button;
             }
             return nk_true;
         }

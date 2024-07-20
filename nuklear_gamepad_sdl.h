@@ -74,13 +74,13 @@ NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
 
     for (int i = 0; i < gamepads->gamepads_count; i++) {
         if (gamepads->gamepads[i].data) {
-            SDL_GameControllerClose(gamepads->gamepads[i].data);
+            SDL_GameControllerClose((SDL_GameController*)gamepads->gamepads[i].data);
             gamepads->gamepads[i].data = NULL;
         }
     }
 }
 
-int nk_gamepad_sdl_map_button(int button) {
+SDL_GameControllerButton nk_gamepad_sdl_map_button(int button) {
     switch (button) {
         case NK_GAMEPAD_BUTTON_UP: return SDL_CONTROLLER_BUTTON_DPAD_UP;
         case NK_GAMEPAD_BUTTON_DOWN: return SDL_CONTROLLER_BUTTON_DPAD_DOWN;
@@ -100,14 +100,14 @@ int nk_gamepad_sdl_map_button(int button) {
 
 NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
     for (int num = 0; num < gamepads->gamepads_count; num++) {
-        SDL_GameController* controller = gamepads->gamepads[num].data;
+        SDL_GameController* controller = (SDL_GameController*)gamepads->gamepads[num].data;
         if (!controller) {
             continue;
         }
 
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (SDL_GameControllerGetButton(controller, nk_gamepad_sdl_map_button(i))) {
-                nk_gamepad_button(gamepads, num, i, nk_true);
+                nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
     }
@@ -118,7 +118,7 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
         return NULL;
     }
 
-    SDL_GameController* controller = gamepads->gamepads[num].data;
+    SDL_GameController* controller = (SDL_GameController*)gamepads->gamepads[num].data;
     if (!controller) {
         return gamepads->gamepads[num].name;
     }
