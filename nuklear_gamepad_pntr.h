@@ -1,11 +1,15 @@
 #ifndef NUKLEAR_GAMEPAD_PNTR_H__
 #define NUKLEAR_GAMEPAD_PNTR_H__
 
+#ifndef NK_GAMEPAD_MAX
+#define NK_GAMEPAD_MAX PNTR_APP_MAX_GAMEPADS
+#endif  // NK_GAMEPAD_MAX
+
 NK_API void nk_gamepad_pntr_update(struct nk_gamepads* gamepads);
 
 #endif
 
-#ifdef NK_GAMEPAD_IMPLEMENTATION
+#if defined(NK_GAMEPAD_IMPLEMENTATION) && !defined(NK_GAMEPAD_HEADER_ONLY)
 #ifndef NUKLEAR_GAMEPAD_PNTR_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_PNTR_IMPLEMENTATION_ONCE
 
@@ -42,13 +46,8 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads) {
         return;
     }
 
-    if (gamepads->gamepads == NULL) {
-        if (nk_gamepad_init_gamepads(gamepads, PNTR_APP_MAX_GAMEPADS) == nk_false) {
-            return;
-        }
-    }
-
     for (int num = 0; num < PNTR_APP_MAX_GAMEPADS; num++) {
+        gamepads->gamepads[num].connected = nk_true;
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (pntr_app_gamepad_button_down(gamepads->user_data, num, nk_gamepad_pntr_map_button(i))) {
                 nk_gamepad_button(gamepads, num, i, nk_true);

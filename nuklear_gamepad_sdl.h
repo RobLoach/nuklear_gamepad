@@ -8,7 +8,7 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 
 #endif
 
-#ifdef NK_GAMEPAD_IMPLEMENTATION
+#if defined(NK_GAMEPAD_IMPLEMENTATION) && !defined(NK_GAMEPAD_HEADER_ONLY)
 #ifndef NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 
@@ -27,9 +27,24 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 
 NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event) {
     switch (event->type) {
-        case SDL_CONTROLLERDEVICEADDED:
+        case SDL_CONTROLLERDEVICEADDED: {
+            int which = event->cdevice.which;
+            if (which < NK_GAMEPAD_MAX && SDL_IsGameController(which)) {
+                SDL_GameController* controller = SDL_GameControllerOpen(which);
+                if (controller) {
+                    gamepads->gamepads[which].data = controller;
+                    gamepads->gamepads[which].connected = nk_true;
+                }
+            }
+            break;
+        }
         case SDL_CONTROLLERDEVICEREMOVED: {
-            nk_gamepad_sdl_init(gamepads);
+            int which = event->cdevice.which;
+            if (which < NK_GAMEPAD_MAX && gamepads->gamepads[which].data) {
+                SDL_GameControllerClose(gamepads->gamepads[which].data);
+                gamepads->gamepads[which].data = NULL;
+                gamepads->gamepads[which].connected = nk_false;
+            }
             break;
         }
     }
@@ -40,26 +55,12 @@ NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
         return nk_false;
     }
 
-    // Reset the state if we have already initialized
-    if (gamepads->gamepads != NULL) {
-        nk_gamepad_sdl_free(gamepads);
-        nk_handle unused;
-        NK_UNUSED(unused);
-        NK_GAMEPAD_MFREE(unused, gamepads->gamepads);
-        gamepads->gamepads = NULL;
-        gamepads->gamepads_count = 0;
-    }
-
-    // Initialize the gamepads
-    if (nk_gamepad_init_gamepads(gamepads, SDL_NumJoysticks()) == nk_false) {
-        return nk_false;
-    }
-
-    for (int i = 0; i < gamepads->gamepads_count; i++) {
+    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
         if (SDL_IsGameController(i)) {
             SDL_GameController* controller = SDL_GameControllerOpen(i);
-            if (controller) {
+            if (controller != NULL) {
                 gamepads->gamepads[i].data = controller;
+                gamepads->gamepad[i].connected = nk_true;
             }
         }
     }
@@ -72,10 +73,11 @@ NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
         return;
     }
 
-    for (int i = 0; i < gamepads->gamepads_count; i++) {
-        if (gamepads->gamepads[i].data) {
+    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        if (gamepads->gamepads[i].data != NULL) {
             SDL_GameControllerClose(gamepads->gamepads[i].data);
             gamepads->gamepads[i].data = NULL;
+            gamepads->gamepads[i].connected = nk_false;
         }
     }
 }
@@ -99,9 +101,9 @@ int nk_gamepad_sdl_map_button(int button) {
 }
 
 NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
-    for (int num = 0; num < gamepads->gamepads_count; num++) {
+    for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
         SDL_GameController* controller = gamepads->gamepads[num].data;
-        if (!controller) {
+        if (controller == NULL) {
             continue;
         }
 
@@ -114,17 +116,17 @@ NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
 }
 
 NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
-    if (!gamepads || num < 0 || num >= gamepads->gamepads_count) {
+    if (!gamepads || num < 0 || num >= NK_GAMEPAD_MAX) {
         return NULL;
     }
 
     SDL_GameController* controller = gamepads->gamepads[num].data;
-    if (!controller) {
-        return gamepads->gamepads[num].name;
+    if (controller == NULL) {
+        return NULL;
     }
 
     const char* name = SDL_GameControllerName(controller);
-    if (!name) {
+    if (name == NULL || name[0] == '\0') {
         return gamepads->gamepads[num].name;
     }
 
