@@ -57,7 +57,7 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads) {
         gamepads->gamepads[num].available = nk_true;
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (IsGamepadButtonDown(num, nk_gamepad_raylib_map_button(i))) {
-                nk_gamepad_button(gamepads, num, i, nk_true);
+                nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
     }
