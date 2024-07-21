@@ -25,6 +25,10 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) 
 
     // Make a window for each gamepad
     for (int i = 0; i < nk_gamepad_count(gamepads); i++) {
+        if (nk_gamepad_is_available(gamepads, i) == nk_false) {
+            continue;
+        }
+
         // Make a unique name for the window.
         char name[32];
         name[0] = i + 95;

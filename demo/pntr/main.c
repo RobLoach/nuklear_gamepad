@@ -18,7 +18,7 @@
 typedef struct AppData {
     pntr_font* font;
     struct nk_context* ctx;
-    struct nk_gamepads* gamepads;
+    struct nk_gamepads gamepads;
 } AppData;
 
 bool Init(pntr_app* app) {
@@ -30,7 +30,7 @@ bool Init(pntr_app* app) {
     appData->ctx = pntr_load_nuklear(appData->font);
 
     // Initialize the Gamepads
-    appData->gamepads = nk_gamepad_init(appData->ctx, app);
+    nk_gamepad_init(&appData->gamepads, appData->ctx, app);
 
     return true;
 }
@@ -43,13 +43,13 @@ bool Update(pntr_app* app, pntr_image* screen) {
     pntr_nuklear_update(ctx, app);
 
     // Update the gamepad state
-    nk_gamepad_update(appData->gamepads);
+    nk_gamepad_update(&appData->gamepads);
 
     // Clear the background
     pntr_clear_background(screen, PNTR_BLACK);
 
     // Update the context
-    nuklear_gamepad_demo(ctx, appData->gamepads);
+    nuklear_gamepad_demo(ctx, &appData->gamepads);
 
     // Draw it on the screen
     pntr_draw_nuklear(screen, ctx);
@@ -62,7 +62,7 @@ void Close(pntr_app* app) {
 
     // Unload the font
     pntr_unload_font(appData->font);
-    nk_gamepad_free(appData->gamepads);
+    nk_gamepad_free(&appData->gamepads);
     pntr_unload_nuklear(appData->ctx);
 
     pntr_unload_memory(appData);

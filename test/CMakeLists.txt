@@ -14,4 +14,5 @@ endif()
 
 # Set up the test
 list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+set(CTEST_OUTPUT_ON_FAILURE TRUE)
 add_test(NAME nuklear_gamepad_test COMMAND nuklear_gamepad_test)

@@ -1,8 +1,16 @@
 #ifndef NUKLEAR_GAMEPAD_RAYLIB_H__
 #define NUKLEAR_GAMEPAD_RAYLIB_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 NK_API void nk_gamepad_raylib_update(struct nk_gamepads* gamepads);
 NK_API const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
@@ -10,16 +18,12 @@ NK_API const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num)
 #ifndef NUKLEAR_GAMEPAD_RAYLIB_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_RAYLIB_IMPLEMENTATION_ONCE
 
-#ifndef NK_GAMEPAD_MALLOC
-    #define NK_GAMEPAD_MALLOC(unused, old, size) MemAlloc((unsigned int)(size))
-#endif
-
-#ifndef NK_GAMEPAD_MFREE
-    #define NK_GAMEPAD_MFREE(unused, ptr) MemFree(ptr)
-#endif
-
 #define NK_GAMEPAD_UPDATE nk_gamepad_raylib_update
 #define NK_GAMEPAD_NAME nk_gamepad_raylib_name
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int nk_gamepad_raylib_map_button(int button) {
     switch (button) {
@@ -46,11 +50,11 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads) {
 
     for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
         if (!IsGamepadAvailable(num)) {
-            gamepads->gamepads[num].connected = nk_false;
+            gamepads->gamepads[num].available = nk_false;
             continue;
         }
 
-        gamepads->gamepads[num].connected = nk_true;
+        gamepads->gamepads[num].available = nk_true;
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (IsGamepadButtonDown(num, nk_gamepad_raylib_map_button(i))) {
                 nk_gamepad_button(gamepads, num, i, nk_true);
@@ -65,12 +69,16 @@ const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num) {
     }
 
     const char* name = GetGamepadName(num);
-    if (!name || TextLength(name) == 0) {
+    if (name == NULL || TextLength(name) == 0) {
         return gamepads->gamepads[num].name;
     }
 
     return name;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

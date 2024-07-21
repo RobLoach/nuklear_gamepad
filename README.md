@@ -16,15 +16,16 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 #include "nuklear_gamepad.h"
 
 // Initialize the gamepad system.
-struct nk_gamepads* gamepads = nk_gamepad_init(ctx, NULL);
+struct nk_gamepads gamepads;
+nk_gamepad_init(&gamepads, ctx, NULL);
 
-// Act on whehter or not the A button is pushed
-if (nk_gamepad_is_button_down(gamepads, 0, NK_GAMEPAD_BUTTON_A)) {
+// Act on whether or not the A button is pushed
+if (nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_A)) {
     nk_label(ctx, "Button A is down", NK_TEXT_LEFT);
 }
 
-// Clean up the memory
-nk_gamepad_free(gamepads);
+// Clear the gamepad state.
+nk_gamepad_free(&gamepads);
 ```
 
 ## Platform Support
@@ -38,10 +39,10 @@ nk_gamepad_free(gamepads);
 ## API
 
 ``` c
-struct nk_gamepads* nk_gamepad_init(struct nk_context* ctx, void* user_data);
+nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data);
 void nk_gamepad_free(struct nk_gamepads* gamepads);
-nk_bool nk_gamepad_init_gamepads(struct nk_gamepads* gamepads, int num);
 void nk_gamepad_update(struct nk_gamepads* gamepads);
+nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num);
 nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
@@ -56,17 +57,15 @@ void* nk_gamepad_user_data(struct nk_gamepads* gamepads);
 
 | Define | Description |
 | ------ | ----------- |
-| `NK_GAMEPAD_NONE` | When set, will avoid detecting which platform to use |
-| `NK_GAMEPAD_SDL` | Use [SDL](https://www.libsdl.org/) |
-| `NK_GAMEPAD_GLFW` | Use [glfw](https://www.glfw.org/) |
+| `NK_GAMEPAD_NONE`   | When set, will avoid detecting which platform to use |
+| `NK_GAMEPAD_SDL`    | Use [SDL](https://www.libsdl.org/) |
+| `NK_GAMEPAD_GLFW`   | Use [glfw](https://www.glfw.org/) |
 | `NK_GAMEPAD_RAYLIB` | Use [raylib](https://github.com/raysan5/raylib) |
-| `NK_GAMEPAD_PNTR` | Use [pntr_app](https://github.com/robloach/pntr_app) |
-| `NK_GAMEPAD_MALLOC` | Function that will allocate memory, matching `nk_malloc(unused, old, size)` |
-| `NK_GAMEPAD_MFREE` | Function to free memory, matching `nk_mfree(unused, ptr)` |
-| `NK_GAMEPAD_INIT` | Callback used to initialize gamepads |
+| `NK_GAMEPAD_PNTR`   | Use [pntr_app](https://github.com/robloach/pntr_app) |
+| `NK_GAMEPAD_INIT`   | Callback used to initialize gamepads |
 | `NK_GAMEPAD_UPDATE` | Callback used to update all gamepad states |
-| `NK_GAMEPAD_NAME` | Callback used to get a controller's name |
-| `NK_GAMEPAD_FREE` | Callback used to disconnect the controllers |
+| `NK_GAMEPAD_NAME`   | Callback used to get a controller's name |
+| `NK_GAMEPAD_FREE`   | Callback used to disconnect the controllers |
 
 ## License
 

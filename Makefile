@@ -3,6 +3,3 @@ sdl:
 
 glfw:
 	$(MAKE) -C demo/glfw test
-
-raylib:
-	$(MAKE) -C demo/raylib test

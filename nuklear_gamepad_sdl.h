@@ -1,10 +1,18 @@
 #ifndef NUKLEAR_GAMEPAD_SDL_H__
 #define NUKLEAR_GAMEPAD_SDL_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event);
 NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads);
 NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads);
 NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
@@ -12,18 +20,14 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 #ifndef NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 
-#ifndef NK_GAMEPAD_MALLOC
-    #define NK_GAMEPAD_MALLOC(unused, old, size) SDL_malloc(size)
-#endif
-
-#ifndef NK_GAMEPAD_MFREE
-    #define NK_GAMEPAD_MFREE(unused, ptr) SDL_free(ptr)
-#endif
-
 #define NK_GAMEPAD_INIT nk_gamepad_sdl_init
 #define NK_GAMEPAD_UPDATE nk_gamepad_sdl_update
 #define NK_GAMEPAD_NAME nk_gamepad_sdl_name
 #define NK_GAMEPAD_FREE nk_gamepad_sdl_free
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event) {
     switch (event->type) {
@@ -33,7 +37,7 @@ NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event 
                 SDL_GameController* controller = SDL_GameControllerOpen(which);
                 if (controller) {
                     gamepads->gamepads[which].data = controller;
-                    gamepads->gamepads[which].connected = nk_true;
+                    gamepads->gamepads[which].available = nk_true;
                 }
             }
             break;
@@ -43,7 +47,7 @@ NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event 
             if (which < NK_GAMEPAD_MAX && gamepads->gamepads[which].data) {
                 SDL_GameControllerClose(gamepads->gamepads[which].data);
                 gamepads->gamepads[which].data = NULL;
-                gamepads->gamepads[which].connected = nk_false;
+                gamepads->gamepads[which].available = nk_false;
             }
             break;
         }
@@ -60,9 +64,13 @@ NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
             SDL_GameController* controller = SDL_GameControllerOpen(i);
             if (controller != NULL) {
                 gamepads->gamepads[i].data = controller;
-                gamepads->gamepad[i].connected = nk_true;
+                gamepads->gamepads[i].available = nk_true;
+                continue;
             }
         }
+
+        gamepads->gamepads[i].data = NULL;
+        gamepads->gamepads[i].available = nk_false;
     }
 
     return nk_true;
@@ -77,7 +85,7 @@ NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
         if (gamepads->gamepads[i].data != NULL) {
             SDL_GameControllerClose(gamepads->gamepads[i].data);
             gamepads->gamepads[i].data = NULL;
-            gamepads->gamepads[i].connected = nk_false;
+            gamepads->gamepads[i].available = nk_false;
         }
     }
 }
@@ -132,6 +140,10 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
 
     return name;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif
