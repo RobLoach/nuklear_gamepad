@@ -83,14 +83,14 @@ NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
 
     for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
         if (gamepads->gamepads[i].data != NULL) {
-            SDL_GameControllerClose(gamepads->gamepads[i].data);
+            SDL_GameControllerClose((SDL_GameController*)gamepads->gamepads[i].data);
             gamepads->gamepads[i].data = NULL;
             gamepads->gamepads[i].available = nk_false;
         }
     }
 }
 
-int nk_gamepad_sdl_map_button(int button) {
+SDL_GameControllerButton nk_gamepad_sdl_map_button(int button) {
     switch (button) {
         case NK_GAMEPAD_BUTTON_UP: return SDL_CONTROLLER_BUTTON_DPAD_UP;
         case NK_GAMEPAD_BUTTON_DOWN: return SDL_CONTROLLER_BUTTON_DPAD_DOWN;
@@ -110,30 +110,25 @@ int nk_gamepad_sdl_map_button(int button) {
 
 NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
     for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
-        SDL_GameController* controller = gamepads->gamepads[num].data;
-        if (controller == NULL) {
+        if (gamepads->gamepads[num].data == NULL) {
             continue;
         }
 
+        SDL_GameController* controller = (SDL_GameController*)gamepads->gamepads[num].data;
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (SDL_GameControllerGetButton(controller, nk_gamepad_sdl_map_button(i))) {
-                nk_gamepad_button(gamepads, num, i, nk_true);
+                nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
     }
 }
 
 NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
-    if (!gamepads || num < 0 || num >= NK_GAMEPAD_MAX) {
+    if (!gamepads || num < 0 || num >= NK_GAMEPAD_MAX || gamepads->gamepads[num].data == NULL) {
         return NULL;
     }
 
-    SDL_GameController* controller = gamepads->gamepads[num].data;
-    if (controller == NULL) {
-        return NULL;
-    }
-
-    const char* name = SDL_GameControllerName(controller);
+    const char* name = SDL_GameControllerName((SDL_GameController*)gamepads->gamepads[num].data);
     if (name == NULL || name[0] == '\0') {
         return gamepads->gamepads[num].name;
     }

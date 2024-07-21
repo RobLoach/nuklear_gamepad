@@ -65,7 +65,7 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             int glfwButton = nk_gamepad_glfw_map_button(i);
             if (glfwButton >= 0 && state.buttons[glfwButton]) {
-                nk_gamepad_button(gamepads, num, i, nk_true);
+                nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
     }

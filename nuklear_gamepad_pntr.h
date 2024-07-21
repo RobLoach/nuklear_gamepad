@@ -55,7 +55,7 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads) {
         gamepads->gamepads[num].available = nk_true;
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (pntr_app_gamepad_button_down(gamepads->user_data, num, nk_gamepad_pntr_map_button(i))) {
-                nk_gamepad_button(gamepads, num, i, nk_true);
+                nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
     }
