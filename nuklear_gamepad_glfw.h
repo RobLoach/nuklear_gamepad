@@ -72,10 +72,6 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
 }
 
 const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num) {
-    if (!gamepads || num < 0 || num >= NK_GAMEPAD_MAX) {
-        return NULL;
-    }
-
     const char* name = glfwGetGamepadName(num);
     if (name == NULL || name[0] == '\0') {
         return gamepads->gamepads[num].name;

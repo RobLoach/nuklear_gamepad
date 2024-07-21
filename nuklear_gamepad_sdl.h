@@ -124,10 +124,6 @@ NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
 }
 
 NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
-    if (!gamepads || num < 0 || num >= NK_GAMEPAD_MAX) {
-        return NULL;
-    }
-
     SDL_GameController* controller = gamepads->gamepads[num].data;
     if (controller == NULL) {
         return NULL;

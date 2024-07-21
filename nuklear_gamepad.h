@@ -27,21 +27,32 @@
 #ifndef NUKLEAR_GAMEPAD_H__
 #define NUKLEAR_GAMEPAD_H__
 
-#ifndef NK_GAMEPAD_NAME_PREFIX
-#define NK_GAMEPAD_NAME_PREFIX "Controller "
-#endif  // NK_GAMEPAD_NAME_PREFIX
-
 #ifndef NK_GAMEPAD_MAX
+/**
+ * The maximum amount of gamepads that can be supported.
+ */
 #define NK_GAMEPAD_MAX 4
 #endif  // NK_GAMEPAD_MAX
 
+#ifndef NK_GAMEPAD_NAME_PREFIX
+/**
+ * The prefix to use for the default gamepad names.
+ */
+#define NK_GAMEPAD_NAME_PREFIX "Controller "
+#endif  // NK_GAMEPAD_NAME_PREFIX
+
 #ifndef NK_GAMEPAD_NAME_SIZE
-#define NK_GAMEPAD_NAME_SIZE 32
+/**
+ * The maximum string size of gamepad names.
+ */
+#define NK_GAMEPAD_NAME_SIZE 16
 #endif  // NK_GAMEPAD_NAME_SIZE
 
-#ifndef NK_GAMEPAD_BUTTON_FLAG
+/**
+ * Create a flag for the specified button.
+ * @internal
+ */
 #define NK_GAMEPAD_BUTTON_FLAG(button) (1 << (button))
-#endif  // NK_GAMEPAD_BUTTON_FLAG
 
 enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_INVALID = -1,
@@ -63,9 +74,9 @@ enum nk_gamepad_button {
 
 struct nk_gamepad {
     nk_bool available;
-    char name[NK_GAMEPAD_NAME_SIZE];
     unsigned int buttons;
     unsigned int buttons_prev;
+    char name[NK_GAMEPAD_NAME_SIZE];
     void* data;
 };
 
@@ -99,21 +110,21 @@ NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* 
 NK_API void nk_gamepad_free(struct nk_gamepads* gamepads);
 
 /**
- * Check whether or not the given gamepad is available.
- *
- * @param gamepads The gamepad system.
- * @param num Which gamepad to check is available or not.
- *
- * @return True if the gamepads is available, false otherwise.
- */
-NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num);
-
-/**
  * Updates the state of all the gamepads.
  *
  * @param gamepads The gamepad system to update.
  */
 NK_API void nk_gamepad_update(struct nk_gamepads* gamepads);
+
+/**
+ * Check whether or not a gamepad is available.
+ *
+ * @param gamepads The gamepad system.
+ * @param num Which gamepad to check is available or not. -1 will check if any gamepad is available.
+ *
+ * @return True if the gamepads is available, false otherwise.
+ */
+NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num);
 
 /**
  * Checks whether the specified button of the given gamepad is currently down.
@@ -153,6 +164,26 @@ NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int nu
 NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 
 /**
+ * Get the first gamepad button that is found to be pressed.
+ *
+ * @param gamepads The associated gamepad system.
+ * @param num The gamepad number to check against. Provide -1 to check all gamepads.
+ * @param out_num The gamepad number that the button is pressed on.
+ * @param out_button The button that was pressed.
+ *
+ * @return True or False depending on whether or not a button was pressed.
+ *
+ * @code
+ * int num;
+ * enum nk_gamepad_button button;
+ * if (nk_gamepad_any_button_pressed(gamepads, -1, &num, &button)) {
+ *   printf("Gamepad: %d. Button: %d\n", num, button);
+ * }
+ * @endcode
+ */
+NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button);
+
+/**
  * Invoke a button press or release for the specified gamepad.
  *
  * @param gamepads The associated gamepad system.
@@ -168,6 +199,8 @@ NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gam
  * @param gamepads The associated gamepad system.
  *
  * @return The amount of gamepads currently available.
+ *
+ * @see NK_GAMEPAD_MAX
  */
 NK_API int nk_gamepad_count(struct nk_gamepads* gamepads);
 
@@ -189,26 +222,6 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
  * @return The user data for the gamepad system.
  */
 NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads);
-
-/**
- * Get the first gamepad button that is found to be pressed.
- *
- * @param gamepads The associated gamepad system.
- * @param num The gamepad number to check against. Provide -1 to check all gamepads.
- * @param out_num The gamepad number that the button is pressed on.
- * @param out_button The button that was pressed.
- *
- * @return True or False depending on whether or not a button was pressed.
- *
- * @code
- * int num;
- * enum nk_gamepad_button button;
- * if (nk_gamepad_any_button_pressed(gamepads, -1, &num, &button)) {
- *   printf("Gamepad: %d. Button: %d\n", num, button);
- * }
- * @endcode
- */
-NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button);
 
 #ifdef __cplusplus
 }
@@ -268,10 +281,9 @@ NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* 
         for (j = 0; j < nk_strlen(name_prefix); j++) {
             gamepads->gamepads[i].name[j] = name_prefix[j];
         }
-        gamepads->gamepads[i].name[j] = '\0';
 
         // Add the # of the controller to the name.
-        nk_itoa(&gamepads->gamepads[i].name[j], i + 1);
+        nk_itoa(&gamepads->gamepads[i].name[j], (long)(i + 1));
     }
 
     #ifdef NK_GAMEPAD_INIT
@@ -483,7 +495,20 @@ NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int n
 }
 
 NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num) {
-    if (gamepads == NULL || num < 0 || num >= NK_GAMEPAD_MAX) {
+    if (gamepads == NULL) {
+        return nk_false;
+    }
+
+    if (num < 0) {
+        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+            if (gamepads->gamepads[i].available) {
+                return nk_true;
+            }
+        }
+        return nk_false;
+    }
+
+    if (num >= NK_GAMEPAD_MAX) {
         return nk_false;
     }
 

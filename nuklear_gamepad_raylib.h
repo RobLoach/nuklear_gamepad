@@ -64,10 +64,6 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads) {
 }
 
 const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num) {
-    if (!gamepads || num < 0 || num >= NK_GAMEPAD_MAX) {
-        return NULL;
-    }
-
     const char* name = GetGamepadName(num);
     if (name == NULL || TextLength(name) == 0) {
         return gamepads->gamepads[num].name;

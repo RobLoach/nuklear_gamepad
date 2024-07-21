@@ -29,6 +29,7 @@ int main() {
     {
         assert(nk_gamepad_is_available(&gamepads, 0) == nk_true);
         assert(nk_gamepad_is_available(&gamepads, 1) == nk_true);
+        assert(nk_gamepad_is_available(&gamepads, -1) == nk_true);
     }
 
     printf("nk_gamepad_name()\n");

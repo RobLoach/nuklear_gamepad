@@ -29,7 +29,7 @@ bool Init(pntr_app* app) {
     appData->font = pntr_load_font_default();
     appData->ctx = pntr_load_nuklear(appData->font);
 
-    // Initialize the Gamepads
+    // Initialize the Gamepads, passing in the pntr_app as the user data.
     nk_gamepad_init(&appData->gamepads, appData->ctx, app);
 
     return true;
