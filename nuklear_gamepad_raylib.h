@@ -36,7 +36,7 @@ int nk_gamepad_raylib_map_button(int button) {
         case NK_GAMEPAD_BUTTON_X: return GAMEPAD_BUTTON_RIGHT_FACE_LEFT;
         case NK_GAMEPAD_BUTTON_Y: return GAMEPAD_BUTTON_RIGHT_FACE_UP;
         case NK_GAMEPAD_BUTTON_LB: return GAMEPAD_BUTTON_LEFT_TRIGGER_1;
-        case NK_GAMEPAD_BUTTON_RB: return GAMEPAD_BUTTON_LEFT_TRIGGER_2;
+        case NK_GAMEPAD_BUTTON_RB: return GAMEPAD_BUTTON_RIGHT_TRIGGER_1;
         case NK_GAMEPAD_BUTTON_BACK: return GAMEPAD_BUTTON_MIDDLE_LEFT;
         case NK_GAMEPAD_BUTTON_START: return GAMEPAD_BUTTON_MIDDLE_RIGHT;
         default: return -1;
