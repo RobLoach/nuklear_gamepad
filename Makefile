@@ -3,3 +3,9 @@ sdl:
 
 glfw:
 	$(MAKE) -C demo/glfw test
+
+pntr:
+	$(MAKE) -C demo/pntr test
+
+raylib:
+	$(MAKE) -C demo/raylib test
