@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
     int running = 1;
     int flags = 0;
     float font_scale = 2;
+    struct nk_gamepads gamepads;
 
     /* GUI */
     struct nk_context *ctx;
@@ -77,13 +78,13 @@ int main(int argc, char *argv[]) {
     }
 
     /* Initialize the Gamepads */
-    struct nk_gamepads* gamepads = nk_gamepad_init(ctx, NULL);
+    nk_gamepad_init(&gamepads, ctx, NULL);
 
     while (running) {
         SDL_Event evt;
 
         /* Update the Gamepad state */
-        nk_gamepad_update(gamepads);
+        nk_gamepad_update(&gamepads);
 
         nk_input_begin(ctx);
         while (SDL_PollEvent(&evt)) {
@@ -93,12 +94,12 @@ int main(int argc, char *argv[]) {
             /* Allow Gamepads to respond to gamepads being connected/disconnected */
             nk_sdl_handle_event(&evt);
 
-            nk_gamepad_sdl_handle_event(gamepads, &evt);
+            nk_gamepad_sdl_handle_event(&gamepads, &evt);
         }
         nk_input_end(ctx);
 
         /* Render the gamepad demo */
-        nuklear_gamepad_demo(ctx, gamepads);
+        nuklear_gamepad_demo(ctx, &gamepads);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -109,7 +110,7 @@ int main(int argc, char *argv[]) {
     }
 
 cleanup:
-    nk_gamepad_free(gamepads);
+    nk_gamepad_free(&gamepads);
     nk_sdl_shutdown();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(win);

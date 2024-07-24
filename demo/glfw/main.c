@@ -52,6 +52,7 @@ int main(void)
     static GLFWwindow *win;
     int width = 0, height = 0;
     struct nk_context *ctx;
+    struct nk_gamepads gamepads;
     float font_scale = 2;
 
     /* GLFW */
@@ -90,7 +91,7 @@ int main(void)
     }
 
     /* Initialize the Gamepads */
-    struct nk_gamepads* gamepads = nk_gamepad_init(ctx, NULL);
+    nk_gamepad_init(&gamepads, ctx, NULL);
 
     while (!glfwWindowShouldClose(win))
     {
@@ -98,12 +99,12 @@ int main(void)
         glfwPollEvents();
 
         /* Update the Gamepad state */
-        nk_gamepad_update(gamepads);
+        nk_gamepad_update(&gamepads);
 
         nk_glfw3_new_frame(&glfw);
 
         /* Render the gamepad demo */
-        nuklear_gamepad_demo(ctx, gamepads);
+        nuklear_gamepad_demo(ctx, &gamepads);
 
         /* ----------------------------------------- */
 
@@ -117,7 +118,7 @@ int main(void)
     }
 
     // Terminate
-    nk_gamepad_free(gamepads);
+    nk_gamepad_free(&gamepads);
 
     nk_glfw3_shutdown(&glfw);
     glfwTerminate();

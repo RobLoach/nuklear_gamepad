@@ -54,7 +54,8 @@ int main(void)
     struct nk_context *ctx = InitNuklear(20);
 
     /* Initialize the Gamepads */
-    struct nk_gamepads* gamepads = nk_gamepad_init(ctx, NULL);
+    struct nk_gamepads gamepads;
+    nk_gamepad_init(&gamepads, ctx, NULL);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -63,10 +64,10 @@ int main(void)
         UpdateNuklear(ctx);
 
         // Update the gamepad state
-        nk_gamepad_update(gamepads);
+        nk_gamepad_update(&gamepads);
 
         // Render the gamepad demo
-        nuklear_gamepad_demo(ctx, gamepads);
+        nuklear_gamepad_demo(ctx, &gamepads);
 
         // Draw
         //----------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
 
-    nk_gamepad_free(gamepads);
+    nk_gamepad_free(&gamepads);
 
     UnloadNuklear(ctx);     // Unload the Nuklear GUI
     CloseWindow();

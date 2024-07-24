@@ -1,26 +1,33 @@
 #ifndef NUKLEAR_GAMEPAD_GLFW_H__
 #define NUKLEAR_GAMEPAD_GLFW_H__
 
+#ifndef NK_GAMEPAD_MAX
+#define NK_GAMEPAD_MAX GLFW_JOYSTICK_LAST
+#endif  // NK_GAMEPAD_MAX
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 NK_API void nk_gamepad_glfw_update(struct nk_gamepads* gamepads);
 NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num);
 
+#ifdef __cplusplus
+}
 #endif
 
-#if defined(NK_GAMEPAD_IMPLEMENTATION)
+#endif
+
+#if defined(NK_GAMEPAD_IMPLEMENTATION) && !defined(NK_GAMEPAD_HEADER_ONLY)
 #ifndef NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 
-#ifndef NK_GAMEPAD_MALLOC
-    #define NK_GAMEPAD_MALLOC(unused, old, size) malloc(size)
-#endif
-
-#ifndef NK_GAMEPAD_MFREE
-    // TODO: Switch to allow using GLFWallocator.
-    #define NK_GAMEPAD_MFREE(unused, ptr) free(ptr)
-#endif
-
 #define NK_GAMEPAD_UPDATE nk_gamepad_glfw_update
 #define NK_GAMEPAD_NAME nk_gamepad_glfw_name
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int nk_gamepad_glfw_map_button(int button) {
     switch (button) {
@@ -45,47 +52,37 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
         return;
     }
 
-    if (gamepads->gamepads == NULL) {
-        if (nk_gamepad_init_gamepads(gamepads, GLFW_JOYSTICK_LAST) == nk_false) {
-            return;
-        }
-    }
-
-    gamepads->gamepads_count = 0;
     GLFWgamepadstate state;
     for (int num = 0; num < GLFW_JOYSTICK_LAST; num++) {
-        if (glfwJoystickPresent(num) == GLFW_FALSE) {
-            break;
-        }
-
-        gamepads->gamepads_count++;
-        if (glfwJoystickIsGamepad(num) == GLFW_FALSE) {
+        if ((glfwJoystickPresent(num) == GLFW_FALSE) ||
+            (glfwJoystickIsGamepad(num) == GLFW_FALSE) ||
+            (glfwGetGamepadState(num, &state) == GLFW_FALSE)) {
+            gamepads->gamepads[num].available = nk_false;
             continue;
         }
 
-        if (glfwGetGamepadState(num, &state) == GLFW_TRUE) {
-            for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
-                int glfwButton = nk_gamepad_glfw_map_button(i);
-                if (glfwButton >= 0 && state.buttons[glfwButton]) {
-                    nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
-                }
+        gamepads->gamepads[num].available = nk_true;
+        for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
+            int glfwButton = nk_gamepad_glfw_map_button(i);
+            if (glfwButton >= 0 && state.buttons[glfwButton]) {
+                nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
     }
 }
 
 const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num) {
-    if (!gamepads || num < 0 || num >= gamepads->gamepads_count) {
-        return NULL;
-    }
-
     const char* name = glfwGetGamepadName(num);
-    if (!name) {
+    if (name == NULL || name[0] == '\0') {
         return gamepads->gamepads[num].name;
     }
 
     return name;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif
