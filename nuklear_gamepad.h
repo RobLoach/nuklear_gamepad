@@ -231,7 +231,7 @@ NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads);
 
 #endif
 
-#ifdef NK_GAMEPAD_IMPLEMENTATION
+#if defined(NK_GAMEPAD_IMPLEMENTATION) && !defined(NK_GAMEPAD_HEADER_ONLY)
 #ifndef NK_GAMEPAD_IMPLEMENTATION_ONCE
 #define NK_GAMEPAD_IMPLEMENTATION_ONCE
 
