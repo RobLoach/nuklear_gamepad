@@ -58,6 +58,8 @@ int main() {
     nk_gamepad_button(&gamepads, 0, NK_GAMEPAD_BUTTON_A, nk_true);
     assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_A) == nk_true);
     assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_B) == nk_false);
+    assert(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_A) == nk_true);
+    assert(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_B) == nk_false);
 
     // nk_gamepad_any_button_pressed()
     int num = 9999;
