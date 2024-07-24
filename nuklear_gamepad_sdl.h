@@ -6,9 +6,11 @@ extern "C" {
 #endif
 
 NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event);
-NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads);
-NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads);
-NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
+NK_API nk_bool nk_gamepad_sdl_init(void* user_data, struct nk_gamepads* gamepads);
+NK_API void nk_gamepad_sdl_update(void* user_data, struct nk_gamepads* gamepads);
+NK_API void nk_gamepad_sdl_free(void* user_data, struct nk_gamepads* gamepads);
+NK_API const char* nk_gamepad_sdl_name(void* user_data, struct nk_gamepads* gamepads, int num);
+NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_soure(void);
 
 #ifdef __cplusplus
 }
@@ -20,10 +22,9 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num);
 #ifndef NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 
-#define NK_GAMEPAD_INIT nk_gamepad_sdl_init
-#define NK_GAMEPAD_UPDATE nk_gamepad_sdl_update
-#define NK_GAMEPAD_NAME nk_gamepad_sdl_name
-#define NK_GAMEPAD_FREE nk_gamepad_sdl_free
+#ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
+#define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_sdl_input_soure
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,7 +55,8 @@ NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event 
     }
 }
 
-NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
+NK_API nk_bool nk_gamepad_sdl_init(void* user_data, struct nk_gamepads* gamepads) {
+    NK_UNUSED(user_data);
     if (gamepads == NULL) {
         return nk_false;
     }
@@ -76,7 +78,8 @@ NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads) {
     return nk_true;
 }
 
-NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_sdl_free(void* user_data, struct nk_gamepads* gamepads) {
+    NK_UNUSED(user_data);
     if (!gamepads) {
         return;
     }
@@ -108,7 +111,8 @@ SDL_GameControllerButton nk_gamepad_sdl_map_button(int button) {
     }
 }
 
-NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_sdl_update(void* user_data, struct nk_gamepads* gamepads) {
+    NK_UNUSED(user_data);
     for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
         if (gamepads->gamepads[num].data == NULL) {
             continue;
@@ -123,7 +127,8 @@ NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads) {
     }
 }
 
-NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
+NK_API const char* nk_gamepad_sdl_name(void* user_data, struct nk_gamepads* gamepads, int num) {
+    NK_UNUSED(user_data);
     if (gamepads->gamepads[num].data == NULL) {
         return NULL;
     }
@@ -134,6 +139,17 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num) {
     }
 
     return name;
+}
+
+NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_soure(void) {
+    struct nk_gamepad_input_source source = {
+        NULL,
+        &nk_gamepad_sdl_init,
+        &nk_gamepad_sdl_update,
+        &nk_gamepad_sdl_free,
+        &nk_gamepad_sdl_name,
+    };
+    return source;
 }
 
 #ifdef __cplusplus

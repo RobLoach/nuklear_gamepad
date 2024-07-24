@@ -10,7 +10,8 @@
 extern "C" {
 #endif
 
-NK_API void nk_gamepad_pntr_update(struct nk_gamepads* gamepads);
+NK_API void nk_gamepad_pntr_update(void* user_data, struct nk_gamepads* gamepads);
+NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_soure(void);
 
 #ifdef __cplusplus
 }
@@ -22,7 +23,9 @@ NK_API void nk_gamepad_pntr_update(struct nk_gamepads* gamepads);
 #ifndef NUKLEAR_GAMEPAD_PNTR_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_PNTR_IMPLEMENTATION_ONCE
 
-#define NK_GAMEPAD_UPDATE nk_gamepad_pntr_update
+#ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
+#define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_pntr_input_soure
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +49,7 @@ int nk_gamepad_pntr_map_button(int button) {
     }
 }
 
-void nk_gamepad_pntr_update(struct nk_gamepads* gamepads) {
+void nk_gamepad_pntr_update(void* user_data, struct nk_gamepads* gamepads) {
     if (!gamepads || !gamepads->user_data) {
         return;
     }
@@ -59,6 +62,17 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads) {
             }
         }
     }
+}
+
+NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_soure(void) {
+    struct nk_gamepad_input_source source = {
+        NULL,
+        NULL,
+        &nk_gamepad_pntr_update,
+        NULL,
+        NULL,
+    };
+    return source;
 }
 
 #ifdef __cplusplus
