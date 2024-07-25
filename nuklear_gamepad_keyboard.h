@@ -2,7 +2,7 @@
 #define NUKLEAR_GAMEPAD_KEYBOARD_H__
 
 #ifndef NK_GAMEPAD_MAX
-#define NK_GAMEPAD_MAX 1 // Only one keyboard
+#define NK_GAMEPAD_MAX 1
 #endif  // NK_GAMEPAD_MAX
 
 #ifdef __cplusplus
