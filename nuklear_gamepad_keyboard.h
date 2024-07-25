@@ -5,6 +5,17 @@
 #define NK_GAMEPAD_MAX 1
 #endif  // NK_GAMEPAD_MAX
 
+/**
+ * Keyboard mapping to gamepad buttons.
+ *
+ * @see nk_gamepad_keyboard_map_default
+ * @see nk_gamepad_keyboard_input_source()
+ */
+struct nk_gamepad_keyboard_map {
+    enum nk_keys keys[NK_GAMEPAD_BUTTON_LAST]; /** A mapping from an enum nk_gamepad_button to a enum nk_keys. */
+    enum nk_gamepad_button chars[256]; /** Mapping between a char and a enum nk_gamepad_button. */
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +24,12 @@ extern "C" {
  * Keyboard input source for the gamepad.
  *
  * Since Nuklear's text buffer is cleared every frame, this only captures button presses, not holds.
+ *
+ * @param user_data [nk_gamepad_keyboard_map] A custom keyboard map. If NULL, the default keyboard map is used.
+ *
+ * @return The input source for the keyboard.
+ *
+ * @see nk_gamepad_keyboard_map_default
  */
 NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* user_data);
 NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user_data);
@@ -37,55 +54,37 @@ NK_API const char* nk_gamepad_keyboard_name(struct nk_gamepads* gamepads, int nu
 extern "C" {
 #endif
 
-static enum nk_keys nk_gamepad_keyboard_map(enum nk_gamepad_button button) {
-    switch (button) {
-        case NK_GAMEPAD_BUTTON_BACK: return NK_KEY_SHIFT;
-        case NK_GAMEPAD_BUTTON_START: return NK_KEY_ENTER;
-        case NK_GAMEPAD_BUTTON_UP: return NK_KEY_UP;
-        case NK_GAMEPAD_BUTTON_DOWN: return NK_KEY_DOWN;
-        case NK_GAMEPAD_BUTTON_LEFT: return NK_KEY_LEFT;
-        case NK_GAMEPAD_BUTTON_RIGHT: return NK_KEY_RIGHT;
-        default: return NK_KEY_NONE;
-    }
-}
-
 /**
- * Maps the gamepad button to a character. This is used to check if the key is in the text buffer.
- *
- * The text buffer is cleared each frame, so this is only capable when a button is pressed.
+ * Default keyboard mapping for the gamepad.
  */
-static char nk_gamepad_keyboard_char(enum nk_gamepad_button button) {
-    // TODO: Since the text buffer is cleared each frame, perhaps move A/B to CTRL/SHIFT?
-    switch (button) {
-        case NK_GAMEPAD_BUTTON_A: return 'Z';
-        case NK_GAMEPAD_BUTTON_B: return 'X';
-        case NK_GAMEPAD_BUTTON_X: return 'A';
-        case NK_GAMEPAD_BUTTON_Y: return 'S';
-        case NK_GAMEPAD_BUTTON_LB: return 'Q';
-        case NK_GAMEPAD_BUTTON_RB: return 'W';
-        default: return 0;
-    }
-}
+static struct nk_gamepad_keyboard_map nk_gamepad_keyboard_map_default;
 
 NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_data) {
     if (!gamepads) {
         return;
     }
-    NK_UNUSED(user_data);
 
+    // Grab the keyboard mapping.
+    struct nk_gamepad_keyboard_map* map = (user_data == NULL) ? &nk_gamepad_keyboard_map_default : (struct nk_gamepad_keyboard_map*)user_data;
+
+    // Keys
     for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
-        enum nk_keys key = nk_gamepad_keyboard_map(i);
+        enum nk_keys key = map->keys[i];
         if (key != NK_KEY_NONE) {
             nk_gamepad_button(gamepads, 0, (enum nk_gamepad_button)i, nk_input_is_key_down(&gamepads->ctx->input, key));
-            continue;
+        }
+    }
+
+    // Text Buffer
+    for (int i = 0; i < gamepads->ctx->input.keyboard.text_len; i++) {
+        // Error correction.
+        if (gamepads->ctx->input.keyboard.text[i] == '\0') {
+            break;
         }
 
-        // Check if the key appears in the keyboard text buffer.
-        char char_key = nk_gamepad_keyboard_char(i);
-        for (int j = 0; j < gamepads->ctx->input.keyboard.text_len; j++) {
-            if (gamepads->ctx->input.keyboard.text[j] == char_key || gamepads->ctx->input.keyboard.text[j] == char_key + 32) {
-                nk_gamepad_button(gamepads, 0, (enum nk_gamepad_button)i, nk_true);
-            }
+        int character = gamepads->ctx->input.keyboard.text[i];
+        if (map->chars[character] != NK_GAMEPAD_BUTTON_INVALID) {
+            nk_gamepad_button(gamepads, 0, (enum nk_gamepad_button)map->chars[character], nk_true);
         }
     }
 }
@@ -96,11 +95,45 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     }
     NK_UNUSED(user_data);
 
-    // Only one keyboard available.
-    for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
+    // Only one keyboard is available.
+    gamepads->gamepads[0].available = nk_true;
+    for (int num = 1; num < NK_GAMEPAD_MAX; num++) {
         gamepads->gamepads[num].available = nk_false;
     }
-    gamepads->gamepads[0].available = nk_true;
+
+    // Initialize the default keyboard mapping.
+    nk_zero(&nk_gamepad_keyboard_map_default, sizeof(nk_gamepad_keyboard_map_default));
+
+    // Keys
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_START] = NK_KEY_ENTER;
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_BACK] = NK_KEY_SHIFT;
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_UP] = NK_KEY_UP;
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_DOWN] = NK_KEY_DOWN;
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_LEFT] = NK_KEY_LEFT;
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_RIGHT] = NK_KEY_RIGHT;
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_BACKSPACE;
+
+    // Text Buttons
+    for (int i = 0; i < 256; i++) {
+        nk_gamepad_keyboard_map_default.chars[i] = NK_GAMEPAD_BUTTON_INVALID;
+    }
+    nk_gamepad_keyboard_map_default.chars['Z'] = NK_GAMEPAD_BUTTON_A;
+    nk_gamepad_keyboard_map_default.chars['z'] = NK_GAMEPAD_BUTTON_A;
+    nk_gamepad_keyboard_map_default.chars[' '] = NK_GAMEPAD_BUTTON_A;
+    nk_gamepad_keyboard_map_default.chars['X'] = NK_GAMEPAD_BUTTON_B;
+    nk_gamepad_keyboard_map_default.chars['x'] = NK_GAMEPAD_BUTTON_B;
+    nk_gamepad_keyboard_map_default.chars['A'] = NK_GAMEPAD_BUTTON_X;
+    nk_gamepad_keyboard_map_default.chars['a'] = NK_GAMEPAD_BUTTON_X;
+    nk_gamepad_keyboard_map_default.chars['S'] = NK_GAMEPAD_BUTTON_Y;
+    nk_gamepad_keyboard_map_default.chars['s'] = NK_GAMEPAD_BUTTON_Y;
+    nk_gamepad_keyboard_map_default.chars['Q'] = NK_GAMEPAD_BUTTON_LB;
+    nk_gamepad_keyboard_map_default.chars['q'] = NK_GAMEPAD_BUTTON_LB;
+    nk_gamepad_keyboard_map_default.chars['W'] = NK_GAMEPAD_BUTTON_RB;
+    nk_gamepad_keyboard_map_default.chars['w'] = NK_GAMEPAD_BUTTON_RB;
+    nk_gamepad_keyboard_map_default.chars['1'] = NK_GAMEPAD_BUTTON_START;
+    nk_gamepad_keyboard_map_default.chars['!'] = NK_GAMEPAD_BUTTON_START;
+    nk_gamepad_keyboard_map_default.chars['2'] = NK_GAMEPAD_BUTTON_BACK;
+    nk_gamepad_keyboard_map_default.chars['@'] = NK_GAMEPAD_BUTTON_BACK;
 
     return nk_true;
 }
@@ -121,7 +154,6 @@ NK_API const char* nk_gamepad_keyboard_name(struct nk_gamepads* gamepads, int nu
     }
     NK_UNUSED(gamepads);
     NK_UNUSED(user_data);
-
     return NULL;
 }
 
