@@ -41,8 +41,6 @@
 
 #include "../common/nuklear_gamepad_demo.c"
 
-#include "../../nuklear_gamepad_keyboard.h"
-
 int main(void)
 {
     // Initialization
