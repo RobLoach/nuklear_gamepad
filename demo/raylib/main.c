@@ -35,10 +35,13 @@
 #include "raylib-nuklear.h"
 
 #define NK_GAMEPAD_RAYLIB
+#define NK_GAMEPAD_KEYBOARD
 #define NK_GAMEPAD_IMPLEMENTATION
 #include "../../nuklear_gamepad.h"
 
 #include "../common/nuklear_gamepad_demo.c"
+
+#include "../../nuklear_gamepad_keyboard.h"
 
 int main(void)
 {
@@ -56,6 +59,7 @@ int main(void)
     /* Initialize the Gamepads */
     struct nk_gamepads gamepads;
     nk_gamepad_init(&gamepads, ctx, NULL);
+    //nk_gamepad_init_with_source(&gamepads, ctx, nk_gamepad_keyboard_input_source(NULL));
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
