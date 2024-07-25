@@ -288,12 +288,12 @@ extern "C" {
 #endif
 
 #ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
-static struct nk_gamepad_input_source nk_gamepad_none_input_soure(void* user_data) {
+static struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_data) {
     struct nk_gamepad_input_source source = {user_data};
     return source;
 }
 
-#define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_none_input_soure
+#define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_none_input_source
 #endif
 
 NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data) {
