@@ -261,7 +261,7 @@ NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepad
 #define NK_GAMEPAD_IMPLEMENTATION_ONCE
 
 // Platform detection.
-#if !defined(NK_GAMEPAD_SDL) && !defined(NK_GAMEPAD_GLFW) && !defined(NK_GAMEPAD_RAYLIB) && !defined(NK_GAMEPAD_PNTR) && !defined(NK_GAMEPAD_NONE)
+#if !defined(NK_GAMEPAD_SDL) && !defined(NK_GAMEPAD_GLFW) && !defined(NK_GAMEPAD_RAYLIB) && !defined(NK_GAMEPAD_PNTR) && !defined(NK_GAMEPAD_KEYBOARD) && !defined(NK_GAMEPAD_NONE)
     #if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
         #define NK_GAMEPAD_SDL
     #elif defined(NK_GLFW_RENDERER_IMPLEMENTATION) || defined(NK_GLFW_GL2_IMPLEMENTATION) || defined(NK_GLFW_GL3_IMPLEMENTATION) || defined(GLFW_INCLUDE_VULKAN)
@@ -273,14 +273,21 @@ NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepad
     #endif
 #endif
 
+// Include all the enabled platform-specific implementations.
 #ifdef NK_GAMEPAD_SDL
 #include "nuklear_gamepad_sdl.h"
-#elif defined(NK_GAMEPAD_GLFW)
+#endif
+#ifdef NK_GAMEPAD_GLFW
 #include "nuklear_gamepad_glfw.h"
-#elif defined(NK_GAMEPAD_RAYLIB)
+#endif
+#ifdef NK_GAMEPAD_RAYLIB
 #include "nuklear_gamepad_raylib.h"
-#elif defined(NK_GAMEPAD_PNTR)
+#endif
+#ifdef NK_GAMEPAD_PNTR
 #include "nuklear_gamepad_pntr.h"
+#endif
+#ifdef NK_GAMEPAD_KEYBOARD
+#include "nuklear_gamepad_keyboard.h"
 #endif
 
 #ifdef __cplusplus
