@@ -46,10 +46,6 @@ NK_API const char* nk_gamepad_keyboard_name(struct nk_gamepads* gamepads, int nu
 #ifndef NUKLEAR_GAMEPAD_KEYBOARD_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_KEYBOARD_IMPLEMENTATION_ONCE
 
-#ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
-    #define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_keyboard_input_source
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -144,6 +140,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* use
         .init = &nk_gamepad_keyboard_init,
         .update = &nk_gamepad_keyboard_update,
         .name = &nk_gamepad_keyboard_name,
+        .input_source_name = "Keyboard",
     };
     return source;
 }

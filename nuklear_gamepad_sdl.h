@@ -10,7 +10,7 @@ NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepad, void* user_data)
 NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads, void* user_data);
 NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads, void* user_data);
 NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num, void* user_data);
-NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_soure(void* user_data);
+NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_source(void* user_data);
 
 #ifdef __cplusplus
 }
@@ -21,10 +21,6 @@ NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_soure(void* user_data
 #if defined(NK_GAMEPAD_IMPLEMENTATION) && !defined(NK_GAMEPAD_HEADER_ONLY)
 #ifndef NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_SDL_IMPLEMENTATION_ONCE
-
-#ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
-#define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_sdl_input_soure
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -141,13 +137,14 @@ NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num, vo
     return name;
 }
 
-NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_soure(void* user_data) {
+NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_source(void* user_data) {
     struct nk_gamepad_input_source source = {
-        user_data,
-        &nk_gamepad_sdl_init,
-        &nk_gamepad_sdl_update,
-        &nk_gamepad_sdl_free,
-        &nk_gamepad_sdl_name,
+        .user_data = user_data,
+        .init = &nk_gamepad_sdl_init,
+        .update = &nk_gamepad_sdl_update,
+        .free = &nk_gamepad_sdl_free,
+        .name = &nk_gamepad_sdl_name,
+        .input_source_name = "SDL",
     };
     return source;
 }

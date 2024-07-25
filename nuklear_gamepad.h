@@ -78,6 +78,7 @@ typedef nk_bool (*nk_gamepad_init_fn)(struct nk_gamepads *gamepads, void* user_d
 typedef void (*nk_gamepad_update_fn)(struct nk_gamepads *gamepads, void* user_data);
 typedef void (*nk_gamepad_free_fn)(struct nk_gamepads *gamepads, void* user_data);
 typedef const char *(*nk_gamepad_name_fn)(struct nk_gamepads *gamepads, int num, void* user_data);
+typedef struct nk_gamepad_input_source (*nk_gamepad_input_source_fn)(void* user_data);
 
 struct nk_gamepad_input_source {
     void* user_data;
@@ -85,6 +86,7 @@ struct nk_gamepad_input_source {
     nk_gamepad_update_fn update;
     nk_gamepad_free_fn free;
     nk_gamepad_name_fn name;
+    const char* input_source_name;
 };
 
 struct nk_gamepad {
@@ -250,6 +252,14 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
  */
 NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepads* gamepads);
 
+/**
+ * Get all the available input sources for the gamepad system.
+ */
+NK_API nk_gamepad_input_source_fn* nk_gamepad_input_sources();
+NK_API int nk_gamepad_input_sources_count();
+
+NK_API struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_data);
+
 #ifdef __cplusplus
 }
 #endif
@@ -294,19 +304,50 @@ NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepad
 extern "C" {
 #endif
 
-#ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
-static struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_data) {
+static nk_gamepad_input_source_fn nk_gamepad_input_sources_available[] = {
+    #ifdef NK_GAMEPAD_INPUT_SOURCE
+        &NK_GAMEPAD_INPUT_SOURCE,
+    #endif
+    #ifdef NK_GAMEPAD_INPUT_SOURCE_1
+        &NK_GAMEPAD_INPUT_SOURCE_1,
+    #endif
+    #ifdef NK_GAMEPAD_INPUT_SOURCE_2
+        &NK_GAMEPAD_INPUT_SOURCE_2,
+    #endif
+    #ifdef NK_GAMEPAD_INPUT_SOURCE_3
+        &NK_GAMEPAD_INPUT_SOURCE_3,
+    #endif
+    #ifdef NK_GAMEPAD_SDL
+        &nk_gamepad_sdl_input_source,
+    #endif
+    #ifdef NK_GAMEPAD_GLFW
+        &nk_gamepad_glfw_input_source,
+    #endif
+    #ifdef NK_GAMEPAD_RAYLIB
+        &nk_gamepad_raylib_input_source,
+    #endif
+    #ifdef NK_GAMEPAD_PNTR
+        &nk_gamepad_pntr_input_source,
+    #endif
+    #ifdef NK_GAMEPAD_KEYBOARD
+        &nk_gamepad_keyboard_input_source,
+    #endif
+    &nk_gamepad_none_input_source,
+    NULL
+};
+
+NK_API struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_data) {
     struct nk_gamepad_input_source source = {
-        .user_data = user_data
+        .user_data = user_data,
+        .input_source_name = "None",
     };
     return source;
 }
 
-#define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_none_input_source
-#endif
-
 NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data) {
-    return nk_gamepad_init_with_source(gamepads, ctx, NK_GAMEPAD_DEFAULT_INPUT_SOURCE(user_data));
+    nk_gamepad_input_source_fn* input_sources = nk_gamepad_input_sources();
+    struct nk_gamepad_input_source input_source = input_sources[0](user_data);
+    return nk_gamepad_init_with_source(gamepads, ctx, input_source);
 }
 
 NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct nk_context* ctx, struct nk_gamepad_input_source input_source) {
@@ -560,6 +601,18 @@ NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num) {
     }
 
     return gamepads->gamepads[num].available;
+}
+
+NK_API nk_gamepad_input_source_fn* nk_gamepad_input_sources() {
+    return nk_gamepad_input_sources_available;
+}
+
+NK_API int nk_gamepad_input_sources_count() {
+    int count = 0;
+    while (nk_gamepad_input_sources_available[count] != NULL) {
+        count++;
+    }
+    return count;
 }
 
 #ifdef __cplusplus

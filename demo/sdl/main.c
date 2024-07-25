@@ -23,8 +23,9 @@
 #include "../../vendor/nuklear/nuklear.h"
 #include "../../vendor/nuklear/demo/sdl_renderer/nuklear_sdl_renderer.h"
 
-#define NK_GAMEPAD_IMPLEMENTATION
 #define NK_GAMEPAD_SDL
+#define NK_GAMEPAD_KEYBOARD
+#define NK_GAMEPAD_IMPLEMENTATION
 #include "../../nuklear_gamepad.h"
 
 #define WINDOW_WIDTH 800

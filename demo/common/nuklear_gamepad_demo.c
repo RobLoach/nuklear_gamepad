@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+int input_source_selected = 0;
+void* input_source_default_user_data = NULL;
+
 void nuklear_gamepad_button_style(struct nk_context* ctx, struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     // Apply a style to the button if it is pressed.
     if (nk_gamepad_is_button_down(gamepads, num, button)) {
@@ -23,6 +26,24 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) 
         return;
     }
 
+    // Switch Gamepad Input Source
+    if (nk_begin(ctx, "Input Source", nk_rect(0, 0, 200, WINDOW_HEIGHT), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+        nk_layout_row_dynamic(ctx, 0, 1);
+
+        for (int i = 0; i < nk_gamepad_input_sources_count(); i++) {
+            nk_bool active = i == input_source_selected;
+            if (nk_radio_label(ctx, nk_gamepad_input_sources()[i](NULL).input_source_name, &active)) {
+                void* user_data = i == 0 ? input_source_default_user_data : NULL;
+                nk_gamepad_input_source_fn* input_sources = nk_gamepad_input_sources();
+                struct nk_gamepad_input_source input_source = input_sources[i](user_data);
+                nk_gamepad_init_with_source(gamepads, ctx, input_source);
+                input_source_selected = i;
+            }
+        }
+
+        nk_end(ctx);
+    }
+
     // Make a window for each gamepad
     for (int i = 0; i < nk_gamepad_count(gamepads); i++) {
         if (nk_gamepad_is_available(gamepads, i) == nk_false) {
@@ -35,7 +56,7 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) 
         name[1] = '\0';
 
         struct nk_rect window_bounds = nk_rect(
-            padding + (padding * i * 5), padding + (padding * i * 5),
+            200 + padding + (padding * i * 5), padding + (padding * i * 5),
             WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - padding * 2);
 
         // Make a window for each controller

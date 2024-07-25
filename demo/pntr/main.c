@@ -7,6 +7,7 @@
 #include "pntr_nuklear.h"
 
 #define NK_GAMEPAD_PNTR
+#define NK_GAMEPAD_KEYBOARD
 #define NK_GAMEPAD_IMPLEMENTATION
 #include "../../nuklear_gamepad.h"
 
@@ -31,6 +32,7 @@ bool Init(pntr_app* app) {
 
     // Initialize the Gamepads, passing in the pntr_app as the user data.
     nk_gamepad_init(&appData->gamepads, appData->ctx, app);
+    input_source_default_user_data = app;
 
     return true;
 }
