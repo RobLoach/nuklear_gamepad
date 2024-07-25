@@ -9,3 +9,6 @@ pntr:
 
 raylib:
 	$(MAKE) -C demo/raylib test
+
+none:
+	$(MAKE) -C demo/none test

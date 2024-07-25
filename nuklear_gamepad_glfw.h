@@ -1,7 +1,7 @@
 #ifndef NUKLEAR_GAMEPAD_GLFW_H__
 #define NUKLEAR_GAMEPAD_GLFW_H__
 
-#ifndef NK_GAMEPAD_MAX
+#if !defined(NK_GAMEPAD_MAX) && defined(GLFW_JOYSTICK_LAST)
 #define NK_GAMEPAD_MAX GLFW_JOYSTICK_LAST
 #endif  // NK_GAMEPAD_MAX
 
@@ -9,8 +9,9 @@
 extern "C" {
 #endif
 
-NK_API void nk_gamepad_glfw_update(struct nk_gamepads* gamepads);
-NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num);
+NK_API void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data);
+NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num, void* user_data);
+NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_soure(void* user_data);
 
 #ifdef __cplusplus
 }
@@ -22,8 +23,9 @@ NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num);
 #ifndef NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 #define NUKLEAR_GAMEPAD_GLFW_IMPLEMENTATION_ONCE
 
-#define NK_GAMEPAD_UPDATE nk_gamepad_glfw_update
-#define NK_GAMEPAD_NAME nk_gamepad_glfw_name
+#ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
+#define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_glfw_input_soure
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,13 +49,14 @@ int nk_gamepad_glfw_map_button(int button) {
     }
 }
 
-void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
+void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
+    NK_UNUSED(user_data);
     if (!gamepads) {
         return;
     }
 
     GLFWgamepadstate state;
-    for (int num = 0; num < GLFW_JOYSTICK_LAST; num++) {
+    for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
         if ((glfwJoystickPresent(num) == GLFW_FALSE) ||
             (glfwJoystickIsGamepad(num) == GLFW_FALSE) ||
             (glfwGetGamepadState(num, &state) == GLFW_FALSE)) {
@@ -71,13 +74,25 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads) {
     }
 }
 
-const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num) {
+const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num, void* user_data) {
+    NK_UNUSED(user_data);
     const char* name = glfwGetGamepadName(num);
     if (name == NULL || name[0] == '\0') {
         return gamepads->gamepads[num].name;
     }
 
     return name;
+}
+
+NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_soure(void* user_data) {
+    struct nk_gamepad_input_source source = {
+        user_data,
+        NULL,
+        &nk_gamepad_glfw_update,
+        NULL,
+        &nk_gamepad_glfw_name,
+    };
+    return source;
 }
 
 #ifdef __cplusplus
