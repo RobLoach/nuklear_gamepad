@@ -74,10 +74,10 @@ enum nk_gamepad_button {
 
 struct nk_gamepads;
 
-typedef nk_bool (*nk_gamepad_init_fn)(void* user_data, struct nk_gamepads *gamepads);
-typedef void (*nk_gamepad_update_fn)(void* user_data, struct nk_gamepads *gamepads);
-typedef void (*nk_gamepad_free_fn)(void* user_data, struct nk_gamepads *gamepads);
-typedef const char *(*nk_gamepad_name_fn)(void* user_data, struct nk_gamepads *gamepads, int num);
+typedef nk_bool (*nk_gamepad_init_fn)(struct nk_gamepads *gamepads, void* user_data);
+typedef void (*nk_gamepad_update_fn)(struct nk_gamepads *gamepads, void* user_data);
+typedef void (*nk_gamepad_free_fn)(struct nk_gamepads *gamepads, void* user_data);
+typedef const char *(*nk_gamepad_name_fn)(struct nk_gamepads *gamepads, int num, void* user_data);
 
 struct nk_gamepad_input_source {
     void* user_data;
@@ -253,6 +253,15 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
  */
 NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads);
 
+/**
+ * Get the input source of the specified gamepad.
+ *
+ * @param gamepads The associated gamepad system.
+ *
+ * @return A pointer to the specified gamepad's input source.
+ */
+NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepads* gamepads);
+
 #ifdef __cplusplus
 }
 #endif
@@ -330,7 +339,7 @@ NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct 
         nk_itoa(&gamepads->gamepads[i].name[j], (long)(i + 1));
     }
 
-        if (input_source.init && input_source.init(input_source.user_data, gamepads) == nk_false) {
+        if (input_source.init && input_source.init(gamepads, input_source.user_data) == nk_false) {
             return nk_false;
         }
 
@@ -349,7 +358,7 @@ NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
 
     // Tell the runner that we are freeing the gamepads.
     if (gamepads->input_source.free) {
-        gamepads->input_source.free(gamepads->input_source.user_data, gamepads);
+        gamepads->input_source.free(gamepads, gamepads->input_source.user_data);
     }
 
     // Reset the default state of the gamepad data.
@@ -383,7 +392,7 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
     }
 
     if (gamepads->input_source.update) {
-        gamepads->input_source.update(gamepads->input_source.user_data, gamepads);
+        gamepads->input_source.update(gamepads, gamepads->input_source.user_data);
     }
 }
 
@@ -480,7 +489,7 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {
     }
 
     if (gamepads->input_source.name) {
-        return gamepads->input_source.name(gamepads->input_source.user_data, gamepads, num);
+        return gamepads->input_source.name(gamepads, num, gamepads->input_source.user_data);
     } else {
         return gamepads->gamepads[num].name;
     }
@@ -492,6 +501,14 @@ NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads) {
     }
 
     return gamepads->user_data;
+}
+
+NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepads* gamepads) {
+    if (gamepads == NULL) {
+        return NULL;
+    }
+
+    return &gamepads->input_source;
 }
 
 NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button) {

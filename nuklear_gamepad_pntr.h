@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-NK_API void nk_gamepad_pntr_update(void* user_data, struct nk_gamepads* gamepads);
+NK_API void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data);
 NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_soure(void);
 
 #ifdef __cplusplus
@@ -49,7 +49,7 @@ int nk_gamepad_pntr_map_button(int button) {
     }
 }
 
-void nk_gamepad_pntr_update(void* user_data, struct nk_gamepads* gamepads) {
+void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data) {
     if (!gamepads || !gamepads->user_data) {
         return;
     }

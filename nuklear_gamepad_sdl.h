@@ -6,10 +6,10 @@ extern "C" {
 #endif
 
 NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event);
-NK_API nk_bool nk_gamepad_sdl_init(void* user_data, struct nk_gamepads* gamepads);
-NK_API void nk_gamepad_sdl_update(void* user_data, struct nk_gamepads* gamepads);
-NK_API void nk_gamepad_sdl_free(void* user_data, struct nk_gamepads* gamepads);
-NK_API const char* nk_gamepad_sdl_name(void* user_data, struct nk_gamepads* gamepads, int num);
+NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepad, void* user_data);
+NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads, void* user_data);
+NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads, void* user_data);
+NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num, void* user_data);
 NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_soure(void);
 
 #ifdef __cplusplus
@@ -55,7 +55,7 @@ NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event 
     }
 }
 
-NK_API nk_bool nk_gamepad_sdl_init(void* user_data, struct nk_gamepads* gamepads) {
+NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads, void* user_data) {
     NK_UNUSED(user_data);
     if (gamepads == NULL) {
         return nk_false;
@@ -78,7 +78,7 @@ NK_API nk_bool nk_gamepad_sdl_init(void* user_data, struct nk_gamepads* gamepads
     return nk_true;
 }
 
-NK_API void nk_gamepad_sdl_free(void* user_data, struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads, void* user_data) {
     NK_UNUSED(user_data);
     if (!gamepads) {
         return;
@@ -111,7 +111,7 @@ SDL_GameControllerButton nk_gamepad_sdl_map_button(int button) {
     }
 }
 
-NK_API void nk_gamepad_sdl_update(void* user_data, struct nk_gamepads* gamepads) {
+NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads, void* user_data) {
     NK_UNUSED(user_data);
     for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
         if (gamepads->gamepads[num].data == NULL) {
@@ -127,7 +127,7 @@ NK_API void nk_gamepad_sdl_update(void* user_data, struct nk_gamepads* gamepads)
     }
 }
 
-NK_API const char* nk_gamepad_sdl_name(void* user_data, struct nk_gamepads* gamepads, int num) {
+NK_API const char* nk_gamepad_sdl_name(struct nk_gamepads* gamepads, int num, void* user_data) {
     NK_UNUSED(user_data);
     if (gamepads->gamepads[num].data == NULL) {
         return NULL;

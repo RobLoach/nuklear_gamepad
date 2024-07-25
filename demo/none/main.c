@@ -53,7 +53,7 @@ SDL_GameControllerButton custom_sdl_map_button(int button) {
 }
 
 /* Uses custom_sdl_map_button to switch A and B. */
-void custom_sdl_update(void* user_data, struct nk_gamepads* gamepads) {
+void custom_sdl_update(struct nk_gamepads* gamepads, void* user_data) {
     NK_UNUSED(user_data);
     for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
         if (gamepads->gamepads[num].data == NULL) {

@@ -9,8 +9,8 @@
 extern "C" {
 #endif
 
-NK_API void nk_gamepad_glfw_update(void* user_data, struct nk_gamepads* gamepads);
-NK_API const char* nk_gamepad_glfw_name(void* user_data, struct nk_gamepads* gamepads, int num);
+NK_API void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data);
+NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num, void* user_data);
 NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_soure(void);
 
 #ifdef __cplusplus
@@ -49,7 +49,7 @@ int nk_gamepad_glfw_map_button(int button) {
     }
 }
 
-void nk_gamepad_glfw_update(void* user_data, struct nk_gamepads* gamepads) {
+void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
     NK_UNUSED(user_data);
     if (!gamepads) {
         return;
@@ -74,7 +74,7 @@ void nk_gamepad_glfw_update(void* user_data, struct nk_gamepads* gamepads) {
     }
 }
 
-const char* nk_gamepad_glfw_name(void* user_data, struct nk_gamepads* gamepads, int num) {
+const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num, void* user_data) {
     NK_UNUSED(user_data);
     const char* name = glfwGetGamepadName(num);
     if (name == NULL || name[0] == '\0') {

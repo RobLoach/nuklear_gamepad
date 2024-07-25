@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-NK_API void nk_gamepad_raylib_update(void* user_data, struct nk_gamepads* gamepads);
-NK_API const char* nk_gamepad_raylib_name(void* user_data, struct nk_gamepads* gamepads, int num);
+NK_API void nk_gamepad_raylib_update(struct nk_gamepads* gamepads, void* user_data);
+NK_API const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num, void* user_data);
 NK_API struct nk_gamepad_input_source nk_gamepad_raylib_input_soure(void);
 
 #ifdef __cplusplus
@@ -45,7 +45,7 @@ int nk_gamepad_raylib_map_button(int button) {
     }
 }
 
-void nk_gamepad_raylib_update(void* user_data, struct nk_gamepads* gamepads) {
+void nk_gamepad_raylib_update(struct nk_gamepads* gamepads, void* user_data) {
     NK_UNUSED(user_data);
     if (!gamepads) {
         return;
@@ -66,7 +66,7 @@ void nk_gamepad_raylib_update(void* user_data, struct nk_gamepads* gamepads) {
     }
 }
 
-const char* nk_gamepad_raylib_name(void* user_data, struct nk_gamepads* gamepads, int num) {
+const char* nk_gamepad_raylib_name(struct nk_gamepads* gamepads, int num, void* user_data) {
     NK_UNUSED(user_data);
     const char* name = GetGamepadName(num);
     if (name == NULL || TextLength(name) == 0) {
