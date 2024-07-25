@@ -17,6 +17,7 @@ extern "C" {
 NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* user_data);
 NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user_data);
 NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_data);
+NK_API const char* nk_gamepad_keyboard_name(struct nk_gamepads* gamepads, int num, void* user_data);
 
 #ifdef __cplusplus
 }
@@ -109,8 +110,19 @@ NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* use
         .user_data = user_data,
         .init = &nk_gamepad_keyboard_init,
         .update = &nk_gamepad_keyboard_update,
+        .name = &nk_gamepad_keyboard_name,
     };
     return source;
+}
+
+NK_API const char* nk_gamepad_keyboard_name(struct nk_gamepads* gamepads, int num, void* user_data) {
+    if (num == 0) {
+        return "Keyboard";
+    }
+    NK_UNUSED(gamepads);
+    NK_UNUSED(user_data);
+
+    return NULL;
 }
 
 #ifdef __cplusplus
