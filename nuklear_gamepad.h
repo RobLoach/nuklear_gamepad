@@ -98,7 +98,6 @@ struct nk_gamepad {
 struct nk_gamepads {
     struct nk_gamepad gamepads[NK_GAMEPAD_MAX];
     struct nk_context* ctx;
-    void* user_data;
     struct nk_gamepad_input_source input_source;
 };
 
@@ -111,8 +110,7 @@ extern "C" {
  *
  * @param gamepads The gamepad system to initialize.
  * @param ctx The Nuklear context.
- * @param user_data Any user data to pass through to the gamepad system.
- *
+ * @param user_data Any user data to pass through to the default input source.
  * @return True if the gamepads were initialized properly, false otherwise.
  */
 NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data);
@@ -122,12 +120,11 @@ NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* 
  *
  * @param gamepads The gamepad system to initialize.
  * @param ctx The Nuklear context.
- * @param user_data Any user data to pass through to the gamepad system.
  * @param input_source The input source to read gamepad state from.
  *
  * @return True if the gamepads were initialized properly, false otherwise.
  */
-NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data, struct nk_gamepad_input_source input_source);
+NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct nk_context* ctx, struct nk_gamepad_input_source input_source);
 
 /**
  * Disconnect all the gamepads and frees associated memory.
@@ -245,15 +242,6 @@ NK_API int nk_gamepad_count(struct nk_gamepads* gamepads);
 NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 
 /**
- * Get the user data for the associated gamepad system.
- *
- * @param gamepads The associated gamepad system.
- *
- * @return The user data for the gamepad system.
- */
-NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads);
-
-/**
  * Get the input source of the specified gamepad.
  *
  * @param gamepads The associated gamepad system.
@@ -300,8 +288,8 @@ extern "C" {
 #endif
 
 #ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
-static struct nk_gamepad_input_source nk_gamepad_none_input_soure(void) {
-    struct nk_gamepad_input_source source = {0};
+static struct nk_gamepad_input_source nk_gamepad_none_input_soure(void* user_data) {
+    struct nk_gamepad_input_source source = {user_data};
     return source;
 }
 
@@ -309,10 +297,10 @@ static struct nk_gamepad_input_source nk_gamepad_none_input_soure(void) {
 #endif
 
 NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data) {
-    return nk_gamepad_init_with_source(gamepads, ctx, user_data, NK_GAMEPAD_DEFAULT_INPUT_SOURCE());
+    return nk_gamepad_init_with_source(gamepads, ctx, NK_GAMEPAD_DEFAULT_INPUT_SOURCE(user_data));
 }
 
-NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data, struct nk_gamepad_input_source input_source) {
+NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct nk_context* ctx, struct nk_gamepad_input_source input_source) {
     if (gamepads == NULL) {
         return nk_false;
     }
@@ -320,7 +308,6 @@ NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct 
     // Initialize the gamepads as a default state.
     nk_zero(gamepads, sizeof(struct nk_gamepads));
     gamepads->ctx = ctx;
-    gamepads->user_data = user_data;
     gamepads->input_source = input_source;
 
     // Set the default state for all gamepads.
@@ -493,14 +480,6 @@ NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {
     } else {
         return gamepads->gamepads[num].name;
     }
-}
-
-NK_API void* nk_gamepad_user_data(struct nk_gamepads* gamepads) {
-    if (gamepads == NULL) {
-        return NULL;
-    }
-
-    return gamepads->user_data;
 }
 
 NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepads* gamepads) {

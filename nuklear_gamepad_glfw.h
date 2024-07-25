@@ -11,7 +11,7 @@ extern "C" {
 
 NK_API void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data);
 NK_API const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num, void* user_data);
-NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_soure(void);
+NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_soure(void* user_data);
 
 #ifdef __cplusplus
 }
@@ -84,9 +84,9 @@ const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num, void* us
     return name;
 }
 
-NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_soure(void) {
+NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_soure(void* user_data) {
     struct nk_gamepad_input_source source = {
-        NULL,
+        user_data,
         NULL,
         &nk_gamepad_glfw_update,
         NULL,

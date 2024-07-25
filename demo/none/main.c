@@ -116,11 +116,11 @@ int main(int argc, char *argv[]) {
 
     /* Override 'update' with a custom handler that swaps A and B buttons. In the real world more 
        complex remapping logic could be added this way. */
-    struct nk_gamepad_input_source input_source = nk_gamepad_sdl_input_soure();
+    struct nk_gamepad_input_source input_source = nk_gamepad_sdl_input_soure(NULL);
     input_source.update = &custom_sdl_update;
 
     /* Initialize the Gamepads */
-    nk_gamepad_init_with_source(&gamepads, ctx, NULL, input_source);
+    nk_gamepad_init_with_source(&gamepads, ctx,  input_source);
 
     while (running) {
         SDL_Event evt;

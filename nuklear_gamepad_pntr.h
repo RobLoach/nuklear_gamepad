@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 NK_API void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data);
-NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_soure(void);
+NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_soure(void* user_data);
 
 #ifdef __cplusplus
 }
@@ -50,23 +50,23 @@ int nk_gamepad_pntr_map_button(int button) {
 }
 
 void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data) {
-    if (!gamepads || !gamepads->user_data) {
+    if (!gamepads || !gamepads->input_source.user_data) {
         return;
     }
 
     for (int num = 0; num < PNTR_APP_MAX_GAMEPADS; num++) {
         gamepads->gamepads[num].available = nk_true;
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
-            if (pntr_app_gamepad_button_down(gamepads->user_data, num, nk_gamepad_pntr_map_button(i))) {
+            if (pntr_app_gamepad_button_down(gamepads->input_source.user_data, num, nk_gamepad_pntr_map_button(i))) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
     }
 }
 
-NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_soure(void) {
+NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_soure(void* user_data) {
     struct nk_gamepad_input_source source = {
-        NULL,
+        user_data,
         NULL,
         &nk_gamepad_pntr_update,
         NULL,
