@@ -289,7 +289,9 @@ extern "C" {
 
 #ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
 static struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_data) {
-    struct nk_gamepad_input_source source = {user_data};
+    struct nk_gamepad_input_source source = {
+        .user_data = user_data
+    };
     return source;
 }
 

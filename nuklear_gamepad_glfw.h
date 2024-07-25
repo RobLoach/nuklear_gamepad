@@ -1,7 +1,7 @@
 #ifndef NUKLEAR_GAMEPAD_GLFW_H__
 #define NUKLEAR_GAMEPAD_GLFW_H__
 
-#ifndef NK_GAMEPAD_MAX
+#if !defined(NK_GAMEPAD_MAX) && defined(GLFW_JOYSTICK_LAST)
 #define NK_GAMEPAD_MAX GLFW_JOYSTICK_LAST
 #endif  // NK_GAMEPAD_MAX
 
@@ -56,7 +56,7 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
     }
 
     GLFWgamepadstate state;
-    for (int num = 0; num < GLFW_JOYSTICK_LAST; num++) {
+    for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
         if ((glfwJoystickPresent(num) == GLFW_FALSE) ||
             (glfwJoystickIsGamepad(num) == GLFW_FALSE) ||
             (glfwGetGamepadState(num, &state) == GLFW_FALSE)) {
