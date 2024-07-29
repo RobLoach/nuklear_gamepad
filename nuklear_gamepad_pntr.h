@@ -45,6 +45,7 @@ int nk_gamepad_pntr_map_button(int button) {
         case NK_GAMEPAD_BUTTON_RB: return PNTR_APP_GAMEPAD_BUTTON_RIGHT_SHOULDER;
         case NK_GAMEPAD_BUTTON_BACK: return PNTR_APP_GAMEPAD_BUTTON_SELECT;
         case NK_GAMEPAD_BUTTON_START: return PNTR_APP_GAMEPAD_BUTTON_START;
+        case NK_GAMEPAD_BUTTON_GUIDE: return PNTR_APP_GAMEPAD_BUTTON_MENU;
         default: return PNTR_APP_GAMEPAD_BUTTON_UNKNOWN;
     }
 }
