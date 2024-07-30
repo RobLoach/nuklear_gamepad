@@ -15,7 +15,7 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) 
 
     if (nk_gamepad_count(gamepads) == 0) {
         struct nk_rect window_bounds = nk_rect(padding, padding, WINDOW_WIDTH - padding * 2, WINDOW_HEIGHT - padding * 2);
-        if (nk_begin(ctx, "nuklear_gamepad", window_bounds, NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+        if (nk_begin(ctx, "nuklear_gamepad", window_bounds, NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_NO_SCROLLBAR)) {
             nk_layout_row_dynamic(ctx, 0, 1);
             nk_label(ctx, "No Gamepads Detected", NK_TEXT_CENTERED);
         }
@@ -40,7 +40,7 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) 
 
         // Make a window for each controller
         if (nk_begin_titled(ctx, name, nk_gamepad_name(gamepads, i), window_bounds,
-            NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE))
+            NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_NO_SCROLLBAR))
         {
             nk_layout_row_dynamic(ctx, 0, 7);
 
@@ -79,12 +79,15 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) 
             nk_button_label(ctx, "A");
 
             // Start/Back buttons
-            nk_layout_row_dynamic(ctx, 0, 3);
+            nk_layout_row_dynamic(ctx, 0, 5);
             nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_BACK);
-            nk_button_label(ctx, "Back");
+            nk_button_symbol(ctx, NK_SYMBOL_MINUS);
+            nk_spacing(ctx, 1);
+            nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_GUIDE);
+            nk_button_symbol(ctx, NK_SYMBOL_RECT_SOLID);
             nk_spacing(ctx, 1);
             nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_START);
-            nk_button_label(ctx, "Start");
+            nk_button_symbol(ctx, NK_SYMBOL_PLUS);
 
             // Finish applying any disable styles.
             nk_widget_disable_end(ctx);
