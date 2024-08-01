@@ -107,6 +107,7 @@ SDL_GameControllerButton nk_gamepad_sdl_map_button(int button) {
         case NK_GAMEPAD_BUTTON_RB: return SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
         case NK_GAMEPAD_BUTTON_BACK: return SDL_CONTROLLER_BUTTON_BACK;
         case NK_GAMEPAD_BUTTON_START: return SDL_CONTROLLER_BUTTON_START;
+        case NK_GAMEPAD_BUTTON_GUIDE: return SDL_CONTROLLER_BUTTON_GUIDE;
         default: return SDL_CONTROLLER_BUTTON_INVALID;
     }
 }

@@ -112,6 +112,7 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_LEFT] = NK_KEY_LEFT;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_RIGHT] = NK_KEY_RIGHT;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_BACKSPACE;
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_A] = NK_KEY_CTRL;
 
     // Text Buttons
     for (int i = 0; i < 256; i++) {
@@ -134,6 +135,8 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     nk_gamepad_keyboard_map_default.chars['!'] = NK_GAMEPAD_BUTTON_START;
     nk_gamepad_keyboard_map_default.chars['2'] = NK_GAMEPAD_BUTTON_BACK;
     nk_gamepad_keyboard_map_default.chars['@'] = NK_GAMEPAD_BUTTON_BACK;
+    nk_gamepad_keyboard_map_default.chars['`'] = NK_GAMEPAD_BUTTON_GUIDE;
+    nk_gamepad_keyboard_map_default.chars['~'] = NK_GAMEPAD_BUTTON_GUIDE;
 
     return nk_true;
 }

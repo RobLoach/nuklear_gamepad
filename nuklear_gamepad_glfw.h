@@ -45,6 +45,7 @@ int nk_gamepad_glfw_map_button(int button) {
         case NK_GAMEPAD_BUTTON_RB: return GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
         case NK_GAMEPAD_BUTTON_BACK: return GLFW_GAMEPAD_BUTTON_BACK;
         case NK_GAMEPAD_BUTTON_START: return GLFW_GAMEPAD_BUTTON_START;
+        case NK_GAMEPAD_BUTTON_GUIDE: return GLFW_GAMEPAD_BUTTON_GUIDE;
         default: return -1;
     }
 }
