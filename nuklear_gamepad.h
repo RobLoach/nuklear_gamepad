@@ -420,7 +420,7 @@ NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gam
         gamepads->gamepads[num].buttons |= NK_GAMEPAD_BUTTON_FLAG(button);
     }
     else {
-        gamepads->gamepads[num].buttons &= ~NK_GAMEPAD_BUTTON_FLAG(button);
+        gamepads->gamepads[num].buttons &= (unsigned int)~NK_GAMEPAD_BUTTON_FLAG(button);
     }
 }
 
