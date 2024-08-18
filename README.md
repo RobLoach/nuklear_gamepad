@@ -60,17 +60,18 @@ nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 
 ## Configuration
 
-| Define | Description |
-| ------ | ----------- |
-| `NK_GAMEPAD_NONE`   | When set, will avoid detecting which platform to use |
-| `NK_GAMEPAD_SDL`    | Use [SDL](https://www.libsdl.org/) |
-| `NK_GAMEPAD_GLFW`   | Use [glfw](https://www.glfw.org/) |
-| `NK_GAMEPAD_RAYLIB` | Use [raylib](https://github.com/raysan5/raylib) |
-| `NK_GAMEPAD_PNTR`   | Use [pntr_app](https://github.com/robloach/pntr_app) |
-| `NK_GAMEPAD_INIT`   | Callback used to initialize gamepads |
-| `NK_GAMEPAD_UPDATE` | Callback used to update all gamepad states |
-| `NK_GAMEPAD_NAME`   | Callback used to get a controller's name |
-| `NK_GAMEPAD_FREE`   | Callback used to disconnect the controllers |
+| Define | Description  |
+| ------ | ------------ |
+| `NK_GAMEPAD_NONE`     | When set, will avoid detecting which platform to use |
+| `NK_GAMEPAD_SDL`      | Use [SDL](https://www.libsdl.org/) |
+| `NK_GAMEPAD_GLFW`     | Use [glfw](https://www.glfw.org/) |
+| `NK_GAMEPAD_RAYLIB`   | Use [raylib](https://github.com/raysan5/raylib) |
+| `NK_GAMEPAD_PNTR`     | Use [pntr_app](https://github.com/robloach/pntr_app) |
+| `NK_GAMEPAD_KEYBOARD` | Use Nuklear's keyboard interface to emulate gamepad input |
+| `NK_GAMEPAD_INIT`     | Callback used to initialize gamepads |
+| `NK_GAMEPAD_UPDATE`   | Callback used to update all gamepad states |
+| `NK_GAMEPAD_NAME`     | Callback used to get a controller's name |
+| `NK_GAMEPAD_FREE`     | Callback used to disconnect the controllers |
 
 ## License
 
