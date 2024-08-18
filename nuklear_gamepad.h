@@ -56,12 +56,12 @@
 
 enum nk_gamepad_input_source_type {
     NK_GAMEPAD_INPUT_SOURCE_UNKNOWN = 0,
-    NK_GAMEPAD_INPUT_SOURCE_NONE,
-    NK_GAMEPAD_INPUT_SOURCE_SDL,
-    NK_GAMEPAD_INPUT_SOURCE_GLFW,
-    NK_GAMEPAD_INPUT_SOURCE_RAYLIB,
-    NK_GAMEPAD_INPUT_SOURCE_PNTR,
-    NK_GAMEPAD_INPUT_SOURCE_KEYBOARD,
+    NK_GAMEPAD_INPUT_SOURCE_NONE, // A gamepad input source which provides no callbacks. @see nk_gamepad_none_input_source()
+    NK_GAMEPAD_INPUT_SOURCE_SDL, // A gamepad input source which uses SDL to retrieve its input. @see nk_gamepad_sdl_input_source()
+    NK_GAMEPAD_INPUT_SOURCE_GLFW, // A gamepad input source which uses GLFW to retrieve its input. @see nk_gamepad_glfw_input_source()
+    NK_GAMEPAD_INPUT_SOURCE_RAYLIB, // A gamepad input source which uses raylib to retrieve its input. @see nk_gamepad_raylib_input_source()
+    NK_GAMEPAD_INPUT_SOURCE_PNTR, // A gamepad input source which uses pntr to retrieve its input. @see nk_gamepad_pntr_input_source()
+    NK_GAMEPAD_INPUT_SOURCE_KEYBOARD, // A gamepad input source which uses nuklear's keyboard interface to retrieve its input. @see nuklear_gamepad_keyboard_input_source()
 };
 
 enum nk_gamepad_button {
@@ -89,6 +89,15 @@ typedef nk_bool (*nk_gamepad_init_fn)(struct nk_gamepads *gamepads, void* user_d
 typedef void (*nk_gamepad_update_fn)(struct nk_gamepads *gamepads, void* user_data);
 typedef void (*nk_gamepad_free_fn)(struct nk_gamepads *gamepads, void* user_data);
 typedef const char *(*nk_gamepad_name_fn)(struct nk_gamepads *gamepads, int num, void* user_data);
+
+/**
+ * A function to retrieve an input source definition.
+ *
+ * @param user_data Any user data to pass through to the input source.
+ * @return The input source.
+ *
+ * @see nuklear_gamepad_none_input_source()
+ */
 typedef struct nk_gamepad_input_source (*nk_gamepad_input_source_fn)(void* user_data);
 
 struct nk_gamepad_input_source {
@@ -96,9 +105,9 @@ struct nk_gamepad_input_source {
     nk_gamepad_init_fn init;
     nk_gamepad_update_fn update;
     nk_gamepad_free_fn free;
-    nk_gamepad_name_fn name;
-    const char* input_source_name;
-    enum nk_gamepad_input_source_type id;
+    nk_gamepad_name_fn name; // Callback to get the name of a plugged in controller.
+    const char* input_source_name; // The human-readable name of the input source.
+    enum nk_gamepad_input_source_type id; // A unique identifier of the input source.
 };
 
 struct nk_gamepad {
@@ -119,8 +128,6 @@ struct nk_gamepads {
 extern "C" {
 #endif
 
-NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
-
 /**
  * Initialize a Nuklear Gamepad system with a default input source.
  *
@@ -128,6 +135,8 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
  * @param ctx The Nuklear context.
  * @param user_data Any user data to pass through to the default input source.
  * @return True if the gamepads were initialized properly, false otherwise.
+ *
+ * @see NK_GAMEPAD_DEFAULT_INPUT_SOURCE
  */
 NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data);
 
@@ -284,6 +293,11 @@ NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepad
  */
 NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_gamepad_input_source input_source);
 
+/**
+ * An null-terminated array of the available compiled gamepad input sources.
+ */
+NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
+
 #ifdef __cplusplus
 }
 #endif
@@ -357,9 +371,12 @@ extern "C" {
 
 #ifndef NK_GAMEPAD_DEFAULT_INPUT_SOURCE
 /**
- * The default input source to use for the gamepad.
+ * The default input source to use for the gamepad when using nk_gamepad_init().
  *
- * @see nk_gamepad_init_with_source()
+ * When not explicitly set, will be the first available input source.
+ *
+ * @see nk_gamepad_init()
+ * @see nk_gamepad_input_sources
  */
 #define NK_GAMEPAD_DEFAULT_INPUT_SOURCE nk_gamepad_input_sources[0]
 #endif

@@ -9,6 +9,9 @@
 extern "C" {
 #endif
 
+/**
+ * A gamepad input source that does not provide any callbacks.
+ */
 NK_API struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_data);
 
 #ifdef __cplusplus

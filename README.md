@@ -12,6 +12,7 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 //#define NK_GAMEPAD_GLFW
 //#define NK_GAMEPAD_RAYLIB
 //#define NK_GAMEPAD_PNTR
+//#define NK_GAMEPAD_KEYBOARD
 //#define NK_GAMEPAD_NONE
 #include "nuklear_gamepad.h"
 
@@ -40,9 +41,11 @@ nk_gamepad_free(&gamepads);
 
 ``` c
 nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* ctx, void* user_data);
+nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct nk_context* ctx, struct nk_gamepad_input_source input_source);
 void nk_gamepad_free(struct nk_gamepads* gamepads);
 void nk_gamepad_update(struct nk_gamepads* gamepads);
 nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num);
+void nk_gamepad_set_available(struct nk_gamepads* gamepads, int num, nk_bool available);
 nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
@@ -50,7 +53,9 @@ nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int
 void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down);
 int nk_gamepad_count(struct nk_gamepads* gamepads);
 const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
-void* nk_gamepad_user_data(struct nk_gamepads* gamepads);
+struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepads* gamepads);
+nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_gamepad_input_source input_source);
+nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 ```
 
 ## Configuration
