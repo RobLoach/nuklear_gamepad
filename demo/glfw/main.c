@@ -26,6 +26,7 @@
 #include "../../vendor/nuklear/demo/glfw_opengl3/nuklear_glfw_gl3.h"
 
 #define NK_GAMEPAD_GLFW
+#define NK_GAMEPAD_KEYBOARD
 #define NK_GAMEPAD_IMPLEMENTATION
 #include "../../nuklear_gamepad.h"
 
@@ -104,7 +105,7 @@ int main(void)
         nk_glfw3_new_frame(&glfw);
 
         /* Render the gamepad demo */
-        nuklear_gamepad_demo(ctx, &gamepads);
+        nuklear_gamepad_demo(ctx, &gamepads, NULL);
 
         /* ----------------------------------------- */
 

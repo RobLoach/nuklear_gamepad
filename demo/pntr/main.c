@@ -7,6 +7,7 @@
 #include "pntr_nuklear.h"
 
 #define NK_GAMEPAD_PNTR
+#define NK_GAMEPAD_KEYBOARD
 #define NK_GAMEPAD_IMPLEMENTATION
 #include "../../nuklear_gamepad.h"
 
@@ -49,7 +50,7 @@ bool Update(pntr_app* app, pntr_image* screen) {
     pntr_clear_background(screen, PNTR_BLACK);
 
     // Update the context
-    nuklear_gamepad_demo(ctx, &appData->gamepads);
+    nuklear_gamepad_demo(ctx, &appData->gamepads, app);
 
     // Draw it on the screen
     pntr_draw_nuklear(screen, ctx);

@@ -69,7 +69,7 @@ int main(void)
         nk_gamepad_update(&gamepads);
 
         // Render the gamepad demo
-        nuklear_gamepad_demo(ctx, &gamepads);
+        nuklear_gamepad_demo(ctx, &gamepads, NULL);
 
         // Draw
         //----------------------------------------------------------------------------------

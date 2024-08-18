@@ -168,6 +168,15 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads);
 NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num);
 
 /**
+ * Set whether or not the given gamepad number is available.
+ *
+ * @param gamepads The gamepad system.
+ * @param num Which gamepad to set as available or not. -1 will set all gamepads.
+ * @param available True or false depending on whether or not the gamepad is available.
+ */
+NK_API void nk_gamepad_set_available(struct nk_gamepads* gamepads, int num, nk_bool available);
+
+/**
  * Checks whether the specified button of the given gamepad is currently down.
  *
  * @param gamepads The associated gamepad system.
@@ -371,9 +380,6 @@ NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct 
 
     // Set the default state for all gamepads.
     for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
-        // Available
-        gamepads->gamepads[i].available = nk_true;
-
         // Name
         int j;
         const char* name_prefix = NK_GAMEPAD_NAME_PREFIX;
@@ -385,8 +391,15 @@ NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct 
         nk_itoa(&gamepads->gamepads[i].name[j], (long)(i + 1));
     }
 
-    if (input_source.init && input_source.init(gamepads, input_source.user_data) == nk_false) {
-        return nk_false;
+    // Run the init() callback, or update() if it's not available.
+    if (input_source.init != NULL) {
+        if (input_source.init(gamepads, input_source.user_data) == nk_false) {
+            nk_zero(gamepads, sizeof(struct nk_gamepads));
+            return nk_false;
+        }
+    }
+    else if (gamepads->input_source.update != NULL) {
+        gamepads->input_source.update(gamepads, gamepads->input_source.user_data);
     }
 
     // Set all the states as the same as their previous states so that they don't trigger any events.
@@ -403,7 +416,7 @@ NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
     }
 
     // Tell the runner that we are freeing the gamepads.
-    if (gamepads->input_source.free) {
+    if (gamepads->input_source.free != NULL) {
         gamepads->input_source.free(gamepads, gamepads->input_source.user_data);
     }
 
@@ -437,7 +450,7 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
         gamepads->gamepads[i].buttons = 0;
     }
 
-    if (gamepads->input_source.update) {
+    if (gamepads->input_source.update != NULL) {
         gamepads->input_source.update(gamepads, gamepads->input_source.user_data);
     }
 }
@@ -527,6 +540,20 @@ NK_API int nk_gamepad_count(struct nk_gamepads* gamepads) {
     }
 
     return NK_GAMEPAD_MAX;
+}
+
+NK_API void nk_gamepad_set_available(struct nk_gamepads* gamepads, int num, nk_bool available) {
+    if (gamepads == NULL) {
+        return;
+    }
+
+    if (num < 0) {
+        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+            gamepads->gamepads[i].available = available;
+        }
+    } else if (num < NK_GAMEPAD_MAX) {
+        gamepads->gamepads[num].available = available;
+    }
 }
 
 NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {

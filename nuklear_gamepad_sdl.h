@@ -116,6 +116,15 @@ NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads, void* user_data)
         }
 
         SDL_GameController* controller = (SDL_GameController*)gamepads->gamepads[num].data;
+
+        // Check to make sure it's still attached.
+        if (SDL_GameControllerGetAttached(controller) == SDL_FALSE) {
+            gamepads->gamepads[num].available = nk_false;
+            SDL_GameControllerClose(controller);
+            gamepads->gamepads[num].data = NULL;
+            continue;
+        }
+
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (SDL_GameControllerGetButton(controller, nk_gamepad_sdl_map_button(i))) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);

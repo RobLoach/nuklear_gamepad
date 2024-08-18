@@ -54,8 +54,7 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
 
     GLFWgamepadstate state;
     for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
-        if ((glfwJoystickPresent(num) == GLFW_FALSE) ||
-            (glfwJoystickIsGamepad(num) == GLFW_FALSE) ||
+        if ((glfwJoystickIsGamepad(num) == GLFW_FALSE) ||
             (glfwGetGamepadState(num, &state) == GLFW_FALSE)) {
             gamepads->gamepads[num].available = nk_false;
             continue;
