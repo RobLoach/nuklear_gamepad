@@ -114,9 +114,9 @@ int main(int argc, char *argv[]) {
         nk_style_set_font(ctx, &font->handle);
     }
 
-    /* Override 'update' with a custom handler that swaps A and B buttons. In the real world more 
+    /* Override 'update' with a custom handler that swaps A and B buttons. In the real world more
        complex remapping logic could be added this way. */
-    struct nk_gamepad_input_source input_source = nk_gamepad_sdl_input_soure(NULL);
+    struct nk_gamepad_input_source input_source = nk_gamepad_sdl_input_source(NULL);
     input_source.update = &custom_sdl_update;
 
     /* Initialize the Gamepads */
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
         nk_input_end(ctx);
 
         /* Render the gamepad demo */
-        nuklear_gamepad_demo(ctx, &gamepads);
+        nuklear_gamepad_demo(ctx, &gamepads, NULL);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);

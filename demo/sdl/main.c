@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
         nk_input_end(ctx);
 
         /* Render the gamepad demo */
-        nuklear_gamepad_demo(ctx, &gamepads);
+        nuklear_gamepad_demo(ctx, &gamepads, NULL);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);

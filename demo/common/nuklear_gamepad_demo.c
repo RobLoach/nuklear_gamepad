@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 void nuklear_gamepad_button_style(struct nk_context* ctx, struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     // Apply a style to the button if it is pressed.
     if (nk_gamepad_is_button_down(gamepads, num, button)) {
@@ -10,24 +8,39 @@ void nuklear_gamepad_button_style(struct nk_context* ctx, struct nk_gamepads* ga
     }
 }
 
-void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) {
+void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads, void* user_data) {
     int padding = 25;
 
-    if (nk_gamepad_count(gamepads) == 0) {
-        struct nk_rect window_bounds = nk_rect(padding, padding, WINDOW_WIDTH - padding * 2, WINDOW_HEIGHT - padding * 2);
-        if (nk_begin(ctx, "nuklear_gamepad", window_bounds, NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_NO_SCROLLBAR)) {
-            nk_layout_row_dynamic(ctx, 0, 1);
-            nk_label(ctx, "No Gamepads Detected", NK_TEXT_CENTERED);
+    // Switch Gamepad Input Source
+    if (nk_begin(ctx, "Source", nk_rect(WINDOW_WIDTH - 200, 0, 200, 200), NK_WINDOW_MINIMIZABLE | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_MOVABLE | NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+        nk_layout_row_dynamic(ctx, 0, 1);
+
+        // Loop through the list of input sources
+        nk_gamepad_input_source_fn* input_source = nk_gamepad_input_sources;
+        while (*input_source != NULL) {
+            // Get the initial meta data for the source
+            struct nk_gamepad_input_source source = (*input_source)(NULL);
+
+            // Display a radio button for the source
+            if (nk_option_label(ctx, source.input_source_name, gamepads->input_source.id == source.id)) {
+                // Only trigger the change if the source is different
+                if (gamepads->input_source.id != source.id) {
+                    void* source_user_data = source.id == NK_GAMEPAD_INPUT_SOURCE_KEYBOARD ? NULL : user_data;
+                    nk_gamepad_set_input_source(gamepads, (*input_source)(source_user_data));
+                }
+            }
+            input_source++;
         }
-        nk_end(ctx);
-        return;
     }
+    nk_end(ctx);
 
     // Make a window for each gamepad
+    int count = 0;
     for (int i = 0; i < nk_gamepad_count(gamepads); i++) {
         if (nk_gamepad_is_available(gamepads, i) == nk_false) {
             continue;
         }
+        count++;
 
         // Make a unique name for the window.
         char name[32];
@@ -91,6 +104,15 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) 
 
             // Finish applying any disable styles.
             nk_widget_disable_end(ctx);
+        }
+        nk_end(ctx);
+    }
+
+    if (count == 0) {
+        struct nk_rect window_bounds = nk_rect(padding * 5, padding, WINDOW_WIDTH - padding * 18, WINDOW_HEIGHT - padding * 18);
+        if (nk_begin(ctx, "nuklear_gamepad", window_bounds, NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_NO_SCROLLBAR)) {
+            nk_layout_row_dynamic(ctx, 0, 1);
+            nk_label(ctx, "No Gamepads Detected", NK_TEXT_CENTERED);
         }
         nk_end(ctx);
     }
