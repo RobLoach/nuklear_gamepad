@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+int input_source_selected = 0;
+void* input_source_default_user_data = NULL;
+
 void nuklear_gamepad_button_style(struct nk_context* ctx, struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
     // Apply a style to the button if it is pressed.
     if (nk_gamepad_is_button_down(gamepads, num, button)) {
@@ -12,6 +15,22 @@ void nuklear_gamepad_button_style(struct nk_context* ctx, struct nk_gamepads* ga
 
 void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads) {
     int padding = 25;
+
+    // Switch Gamepad Input Source
+    if (nk_begin(ctx, "Input Source", nk_rect(0, 0, 200, WINDOW_HEIGHT), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+        nk_layout_row_dynamic(ctx, 0, 1);
+
+        nk_gamepad_input_source_fn input_source = nk_gamepad_input_sources;
+        while (*input_source != NULL) {
+            // struct nk_gamepad_input_source source = input_source(input_source_default_user_data);
+            // if (nk_button_label(ctx, source.input_source_name)) {
+            //     nk_gamepad_set_input_source(gamepads, source);
+            // }
+            input_source++;
+        }
+
+        nk_end(ctx);
+    }
 
     if (nk_gamepad_count(gamepads) == 0) {
         struct nk_rect window_bounds = nk_rect(padding, padding, WINDOW_WIDTH - padding * 2, WINDOW_HEIGHT - padding * 2);
