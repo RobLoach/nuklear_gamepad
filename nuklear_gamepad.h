@@ -667,6 +667,12 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
         return nk_false;
     }
 
+    // Copy button state over to the new gamepad system.
+    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        new_gamepads.gamepads[i].buttons = gamepads->gamepads[i].buttons;
+        new_gamepads.gamepads[i].buttons_prev = gamepads->gamepads[i].buttons_prev;
+    }
+
     // Since it was successful, free the old gamepad system.
     nk_gamepad_free(gamepads);
 
