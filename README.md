@@ -58,6 +58,37 @@ nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_game
 nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 ```
 
+## Custom Integration
+
+To define your own custom input source, use `NK_GAMEPAD_NONE` and pass in your own `struct nk_gamepad_input_source`...
+
+```c
+#define NK_GAMEPAD_NONE
+#define NK_GAMEPAD_IMPLEMENTATION
+#include "nk_gamepad.h"
+
+// Globals
+struct nk_gamepads gamepads;
+
+// Initialize the gamepad.
+struct nk_gamepad_input_source source = {
+    .user_data = NULL, // Optional user_data pointer
+    .init = NULL, // Function to initialize the input source
+    .update = &my_own_gamepad_update, // Function to update the status of the gamepad
+    .free = NULL, // Function used to free up the gamepad data
+    .name = NULL, // Function used to get the name of each gamepad
+    .input_source_name = "my_own_gamepad", // The optional name of the input source
+    .id = 1234, // Optional identification for the input source
+};
+nk_gamepad_init_with_source(&gamepads, ctx, struct nk_gamepad_input_source input_source);
+
+// Update the gamepad status
+nk_gamepad_update(&gamepads);
+
+// Free it
+nk_gamepad_free(&gamepads);
+```
+
 ## Configuration
 
 | Define | Description  |
