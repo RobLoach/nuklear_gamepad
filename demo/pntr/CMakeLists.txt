@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 project(nuklear_gamepad_pntr
     DESCRIPTION "nuklear_gamepad_pntr"
     HOMEPAGE_URL "https://github.com/robloach/nuklear_gamepad"
-    VERSION 0.0.1
+    VERSION 0.1.0
     LANGUAGES C
 )
 
