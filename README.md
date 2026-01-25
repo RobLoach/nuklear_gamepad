@@ -108,7 +108,7 @@ nk_gamepad_free(&gamepads);
 
 Unless stated otherwise, all works are:
 
-- Copyright (c) 2024 [Rob Loach](https://robloach.net)
+- Copyright (c) 2026 [Rob Loach](https://robloach.net)
 
 ... and licensed under:
 

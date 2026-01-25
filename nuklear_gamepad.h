@@ -1,12 +1,12 @@
 /**
- * nuklear_gamepad: Gamepad support for Nuklear GUI
+ * nuklear_gamepad: Gamepad API for Nuklear GUI
  * https://github.com/robloach/nuklear_gamepad
  *
  * @file nuklear_gamepad.h
  *
  * License:
  *
- * Copyright (c) 2024 Rob Loach (@RobLoach, https://robloach.net)
+ * Copyright (c) 2026 Rob Loach (@RobLoach, https://robloach.net)
  *
  * This software is provided "as-is", without any express or implied warranty. In no event
  * will the authors be held liable for any damages arising from the use of this software.
@@ -119,6 +119,7 @@ struct nk_gamepad {
 };
 
 struct nk_gamepads {
+    // TODO: Allow for infinite gamepads with a linked list, or similar.
     struct nk_gamepad gamepads[NK_GAMEPAD_MAX];
     struct nk_context* ctx;
     struct nk_gamepad_input_source input_source;
