@@ -9,6 +9,7 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 ``` c
 #define NK_GAMEPAD_IMPLEMENTATION
 #define NK_GAMEPAD_SDL
+//#define NK_GAMEPAD_SDL
 //#define NK_GAMEPAD_GLFW
 //#define NK_GAMEPAD_RAYLIB
 //#define NK_GAMEPAD_PNTR
@@ -31,7 +32,7 @@ nk_gamepad_free(&gamepads);
 
 ## Platform Support
 
-- [SDL](https://www.libsdl.org/)
+- [SDL](https://www.libsdl.org/) (2 or 3)
 - [GLFW](https://www.glfw.org/)
 - [raylib](https://www.raylib.com/)
 - [pntr](https://github.com/robloach/pntr) with [pntr_app](https://github.com/robloach/pntr_app)
@@ -95,6 +96,7 @@ nk_gamepad_free(&gamepads);
 | ------ | ------------ |
 | `NK_GAMEPAD_NONE`     | When set, will avoid detecting which platform to use |
 | `NK_GAMEPAD_SDL`      | Use [SDL](https://www.libsdl.org/) |
+| `NK_GAMEPAD_SDL3`      | Use [SDL3](https://www.libsdl.org/) |
 | `NK_GAMEPAD_GLFW`     | Use [glfw](https://www.glfw.org/) |
 | `NK_GAMEPAD_RAYLIB`   | Use [raylib](https://github.com/raysan5/raylib) |
 | `NK_GAMEPAD_PNTR`     | Use [pntr_app](https://github.com/robloach/pntr_app) |

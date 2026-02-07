@@ -62,6 +62,7 @@ enum nk_gamepad_input_source_type {
     NK_GAMEPAD_INPUT_SOURCE_RAYLIB, // A gamepad input source which uses raylib to retrieve its input. @see nk_gamepad_raylib_input_source()
     NK_GAMEPAD_INPUT_SOURCE_PNTR, // A gamepad input source which uses pntr to retrieve its input. @see nk_gamepad_pntr_input_source()
     NK_GAMEPAD_INPUT_SOURCE_KEYBOARD, // A gamepad input source which uses nuklear's keyboard interface to retrieve its input. @see nuklear_gamepad_keyboard_input_source()
+    NK_GAMEPAD_INPUT_SOURCE_SDL3, // A gamepad input source which uses SDL3 to retrieve its input. @see nk_gamepad_sdl3_input_source()
 };
 
 enum nk_gamepad_button {
@@ -313,6 +314,8 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 #if !defined(NK_GAMEPAD_SDL) && !defined(NK_GAMEPAD_GLFW) && !defined(NK_GAMEPAD_RAYLIB) && !defined(NK_GAMEPAD_PNTR) && !defined(NK_GAMEPAD_KEYBOARD) && !defined(NK_GAMEPAD_NONE)
     #if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
         #define NK_GAMEPAD_SDL
+    #elif defined(NK_SDL3_RENDERER_IMPLEMENTATION) || defined(NK_SDL3_GL2_IMPLEMENTATION) || defined(NK_SDL3_GL3_IMPLEMENTATION) || defined(NK_SDL3_GLES2_IMPLEMENTATION)
+        #define NK_GAMEPAD_SDL3
     #elif defined(NK_GLFW_RENDERER_IMPLEMENTATION) || defined(NK_GLFW_GL2_IMPLEMENTATION) || defined(NK_GLFW_GL3_IMPLEMENTATION) || defined(GLFW_INCLUDE_VULKAN)
         #define NK_GAMEPAD_GLFW
     #elif defined(RAYLIB_NUKLEAR_IMPLEMENTATION) || defined(NK_RAYLIB_IMPLEMENTATION)
@@ -325,6 +328,9 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 // Include all the enabled platform-specific implementations.
 #ifdef NK_GAMEPAD_SDL
 #include "nuklear_gamepad_sdl.h"
+#endif
+#ifdef NK_GAMEPAD_SDL3
+#include "nuklear_gamepad_sdl3.h"
 #endif
 #ifdef NK_GAMEPAD_GLFW
 #include "nuklear_gamepad_glfw.h"
@@ -345,6 +351,9 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 nk_gamepad_input_source_fn nk_gamepad_input_sources[] = {
 #ifdef NK_GAMEPAD_SDL
     &nk_gamepad_sdl_input_source,
+#endif
+#ifdef NK_GAMEPAD_SDL3
+    &nk_gamepad_sdl3_input_source,
 #endif
 #ifdef NK_GAMEPAD_GLFW
     &nk_gamepad_glfw_input_source,
