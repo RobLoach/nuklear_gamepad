@@ -40,11 +40,17 @@ NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event 
             break;
         }
         case SDL_CONTROLLERDEVICEREMOVED: {
-            int which = event->cdevice.which;
-            if (which < NK_GAMEPAD_MAX && gamepads->gamepads[which].data) {
-                SDL_GameControllerClose(gamepads->gamepads[which].data);
-                gamepads->gamepads[which].data = NULL;
-                gamepads->gamepads[which].available = nk_false;
+            SDL_GameController* controller = SDL_GameControllerFromInstanceID(event->cdevice.which);
+            if (controller == NULL) {
+                break;
+            }
+            for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+                if (gamepads->gamepads[i].data == controller) {
+                    SDL_GameControllerClose(controller);
+                    gamepads->gamepads[i].data = NULL;
+                    gamepads->gamepads[i].available = nk_false;
+                    break;
+                }
             }
             break;
         }
