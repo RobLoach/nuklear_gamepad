@@ -58,6 +58,8 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
+
+        // TODO: Add gamepad axes to pntr
     }
 }
 

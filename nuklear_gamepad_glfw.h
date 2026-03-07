@@ -67,6 +67,14 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
+
+        // Axes: GLFW sticks are -1..1, triggers are reported as -1..1 and remapped to 0..1
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X,       state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y,       state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X,      state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_Y,      state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y]);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER,  (state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]  + 1.0f) * 0.5f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] + 1.0f) * 0.5f);
     }
 }
 

@@ -60,6 +60,14 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads, void* user_data) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
+
+        // Axes: raylib returns -1..1 for sticks and 0..1 for triggers
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X,       GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_X));
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y,       GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_Y));
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X,      GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_X));
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_Y,      GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_Y));
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER,  GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_TRIGGER));
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_TRIGGER));
     }
 }
 

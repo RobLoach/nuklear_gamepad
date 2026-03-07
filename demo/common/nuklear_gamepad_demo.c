@@ -102,8 +102,21 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads, 
             nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_START);
             nk_button_symbol(ctx, NK_SYMBOL_PLUS);
 
-            // Finish applying any disable styles.
+            // Axes
             nk_widget_disable_end(ctx);
+            nk_layout_row_dynamic(ctx, 0, 2);
+            nk_label(ctx, "Left Stick X", NK_TEXT_LEFT);
+            nk_prog(ctx, (nk_size)((nk_gamepad_get_axis(gamepads, i, NK_GAMEPAD_AXIS_LEFT_X) + 1.0f) * 50.0f), 100, nk_false);
+            nk_label(ctx, "Left Stick Y", NK_TEXT_LEFT);
+            nk_prog(ctx, (nk_size)((nk_gamepad_get_axis(gamepads, i, NK_GAMEPAD_AXIS_LEFT_Y) + 1.0f) * 50.0f), 100, nk_false);
+            nk_label(ctx, "Right Stick X", NK_TEXT_LEFT);
+            nk_prog(ctx, (nk_size)((nk_gamepad_get_axis(gamepads, i, NK_GAMEPAD_AXIS_RIGHT_X) + 1.0f) * 50.0f), 100, nk_false);
+            nk_label(ctx, "Right Stick Y", NK_TEXT_LEFT);
+            nk_prog(ctx, (nk_size)((nk_gamepad_get_axis(gamepads, i, NK_GAMEPAD_AXIS_RIGHT_Y) + 1.0f) * 50.0f), 100, nk_false);
+            nk_label(ctx, "Left Trigger", NK_TEXT_LEFT);
+            nk_prog(ctx, (nk_size)(nk_gamepad_get_axis(gamepads, i, NK_GAMEPAD_AXIS_LEFT_TRIGGER) * 100.0f), 100, nk_false);
+            nk_label(ctx, "Right Trigger", NK_TEXT_LEFT);
+            nk_prog(ctx, (nk_size)(nk_gamepad_get_axis(gamepads, i, NK_GAMEPAD_AXIS_RIGHT_TRIGGER) * 100.0f), 100, nk_false);
         }
         nk_end(ctx);
     }

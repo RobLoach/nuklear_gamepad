@@ -130,6 +130,14 @@ NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads, void* user_data)
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
+
+        // Axes: SDL returns Sint16 in range -32768..32767 (sticks) or 0..32767 (triggers)
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X,       SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX)        / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y,       SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY)        / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X,      SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX)       / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_Y,      SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY)       / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER,  SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT)  / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / 32767.0f);
     }
 }
 

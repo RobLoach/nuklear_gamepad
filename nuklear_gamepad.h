@@ -65,6 +65,18 @@ enum nk_gamepad_input_source_type {
     NK_GAMEPAD_INPUT_SOURCE_SDL3, // A gamepad input source which uses SDL3 to retrieve its input. @see nk_gamepad_sdl3_input_source()
 };
 
+enum nk_gamepad_axis {
+    NK_GAMEPAD_AXIS_INVALID = -1,
+    NK_GAMEPAD_AXIS_FIRST = 0,
+    NK_GAMEPAD_AXIS_LEFT_X = 0,
+    NK_GAMEPAD_AXIS_LEFT_Y,
+    NK_GAMEPAD_AXIS_RIGHT_X,
+    NK_GAMEPAD_AXIS_RIGHT_Y,
+    NK_GAMEPAD_AXIS_LEFT_TRIGGER,
+    NK_GAMEPAD_AXIS_RIGHT_TRIGGER,
+    NK_GAMEPAD_AXIS_LAST
+};
+
 enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_INVALID = -1,
     NK_GAMEPAD_BUTTON_FIRST = 0,
@@ -115,6 +127,7 @@ struct nk_gamepad {
     nk_bool available;
     unsigned int buttons;
     unsigned int buttons_prev;
+    float axes[NK_GAMEPAD_AXIS_LAST];
     char name[NK_GAMEPAD_NAME_SIZE];
     void* data;
 };
@@ -253,6 +266,27 @@ NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int n
  * @param down True to indicate a button press, false to indicate a button release.
  */
 NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down);
+
+/**
+ * Set the value of an axis for the specified gamepad.
+ *
+ * @param gamepads The associated gamepad system.
+ * @param num The gamepad number.
+ * @param axis The axis to set.
+ * @param value The axis value. Sticks range from -1.0 to 1.0, triggers from 0.0 to 1.0.
+ */
+NK_API void nk_gamepad_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis, float value);
+
+/**
+ * Get the current value of an axis for the specified gamepad.
+ *
+ * @param gamepads The associated gamepad system.
+ * @param num The gamepad number. -1 will return the first non-zero value across all available gamepads.
+ * @param axis The axis to query.
+ *
+ * @return The axis value. Sticks range from -1.0 to 1.0, triggers from 0.0 to 1.0. Returns 0.0 if unavailable.
+ */
+NK_API float nk_gamepad_get_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis);
 
 /**
  * Returns the amount of gamepads that could become available.
@@ -464,6 +498,37 @@ NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gam
     }
 }
 
+NK_API void nk_gamepad_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis, float value) {
+    if (gamepads == NULL || num < 0 || num >= NK_GAMEPAD_MAX || axis < 0 || axis >= NK_GAMEPAD_AXIS_LAST) {
+        return;
+    }
+    if (gamepads->gamepads[num].available == nk_false) {
+        return;
+    }
+    gamepads->gamepads[num].axes[axis] = value;
+}
+
+NK_API float nk_gamepad_get_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis) {
+    if (gamepads == NULL || axis < 0 || axis >= NK_GAMEPAD_AXIS_LAST) {
+        return 0.0f;
+    }
+
+    if (num < 0) {
+        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+            if (gamepads->gamepads[i].available && gamepads->gamepads[i].axes[axis] != 0.0f) {
+                return gamepads->gamepads[i].axes[axis];
+            }
+        }
+        return 0.0f;
+    }
+
+    if (num >= NK_GAMEPAD_MAX || gamepads->gamepads[num].available == nk_false) {
+        return 0.0f;
+    }
+
+    return gamepads->gamepads[num].axes[axis];
+}
+
 NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
     if (gamepads == NULL) {
         return;
@@ -475,6 +540,7 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
         }
         gamepads->gamepads[i].buttons_prev = gamepads->gamepads[i].buttons;
         gamepads->gamepads[i].buttons = 0;
+        nk_zero(gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
     }
 
     if (gamepads->input_source.update != NULL) {
@@ -677,10 +743,11 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
         return nk_false;
     }
 
-    // Copy button state over to the new gamepad system.
+    // Copy button and axis state over to the new gamepad system.
     for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
         new_gamepads.gamepads[i].buttons = gamepads->gamepads[i].buttons;
         new_gamepads.gamepads[i].buttons_prev = gamepads->gamepads[i].buttons_prev;
+        NK_MEMCPY(new_gamepads.gamepads[i].axes, gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
     }
 
     // Since it was successful, free the old gamepad system.
