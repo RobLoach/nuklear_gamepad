@@ -36,6 +36,7 @@ nk_gamepad_free(&gamepads);
 - [GLFW](https://www.glfw.org/)
 - [raylib](https://www.raylib.com/)
 - [pntr](https://github.com/robloach/pntr) with [pntr_app](https://github.com/robloach/pntr_app)
+- [Custom](#custom-integration)
 - [Add more!](https://github.com/RobLoach/nuklear_gamepad/issues)
 
 ## API
