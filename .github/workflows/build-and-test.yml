@@ -10,6 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Update Submodules
+        run: git submodule update --init --recursive
+
       - name: Configure
         run: cmake -B build
 
