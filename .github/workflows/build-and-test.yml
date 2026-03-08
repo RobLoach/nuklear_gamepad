@@ -19,4 +19,4 @@ jobs:
         run: cmake --build build
 
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --output-on-failure --verbose
