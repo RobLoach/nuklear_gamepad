@@ -2,7 +2,7 @@
 add_executable(nuklear_gamepad_test nuklear_gamepad_test.c)
 
 # C99 Standard
-set_property(TARGET nuklear_gamepad_test PROPERTY C_STANDARD 99)
+set_property(TARGET nuklear_gamepad_test PROPERTY C_STANDARD 90)
 set_property(TARGET nuklear_gamepad_test PROPERTY C_STANDARD_REQUIRED TRUE)
 
 # Strict Warnings and Errors

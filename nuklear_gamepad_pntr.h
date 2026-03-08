@@ -3,7 +3,7 @@
 
 #ifndef NK_GAMEPAD_MAX
 #define NK_GAMEPAD_MAX PNTR_APP_MAX_GAMEPADS
-#endif  // NK_GAMEPAD_MAX
+#endif
 
 
 #ifdef __cplusplus

@@ -3,7 +3,7 @@
 
 #if !defined(NK_GAMEPAD_MAX) && defined(GLFW_JOYSTICK_LAST)
 #define NK_GAMEPAD_MAX GLFW_JOYSTICK_LAST
-#endif  // NK_GAMEPAD_MAX
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,28 +47,35 @@ int nk_gamepad_glfw_map_button(int button) {
 }
 
 void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
+    GLFWgamepadstate state;
+    int num, i;
     NK_UNUSED(user_data);
     if (!gamepads) {
         return;
     }
 
-    GLFWgamepadstate state;
-    for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
-        if ((glfwJoystickIsGamepad(num) == GLFW_FALSE) ||
-            (glfwGetGamepadState(num, &state) == GLFW_FALSE)) {
+    for (num = 0; num < NK_GAMEPAD_MAX; num++) {
+        /* Make sure it's available. */
+        if (glfwJoystickIsGamepad(num) == GLFW_FALSE) {
+            gamepads->gamepads[num].available = nk_false;
+            continue;
+        }
+
+        /* Grab the state. */
+        if (glfwGetGamepadState(num, &state) == GLFW_FALSE) {
             gamepads->gamepads[num].available = nk_false;
             continue;
         }
 
         gamepads->gamepads[num].available = nk_true;
-        for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
+        for (i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             int glfwButton = nk_gamepad_glfw_map_button(i);
             if (glfwButton >= 0 && state.buttons[glfwButton]) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
 
-        // Axes: GLFW sticks are -1..1, triggers are reported as -1..1 and remapped to 0..1
+        /* Axes: GLFW sticks are -1..1, triggers are reported as -1..1 and remapped to 0..1 */
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X,       state.axes[GLFW_GAMEPAD_AXIS_LEFT_X]);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y,       state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X,      state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X]);
@@ -79,8 +86,9 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
 }
 
 const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num, void* user_data) {
+    const char* name;
     NK_UNUSED(user_data);
-    const char* name = glfwGetGamepadName(num);
+    name = glfwGetGamepadName(num);
     if (name == NULL || name[0] == '\0') {
         return gamepads->gamepads[num].name;
     }
@@ -89,15 +97,14 @@ const char* nk_gamepad_glfw_name(struct nk_gamepads* gamepads, int num, void* us
 }
 
 NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_source(void* user_data) {
-    struct nk_gamepad_input_source source = {
-        .user_data = user_data,
-        .init = NULL,
-        .update = &nk_gamepad_glfw_update,
-        .free = NULL,
-        .name = &nk_gamepad_glfw_name,
-        .input_source_name = "glfw",
-        .id = NK_GAMEPAD_INPUT_SOURCE_GLFW,
-    };
+    struct nk_gamepad_input_source source;
+    source.user_data = user_data;
+    source.init = NULL;
+    source.update = &nk_gamepad_glfw_update;
+    source.free = NULL;
+    source.name = &nk_gamepad_glfw_name;
+    source.input_source_name = "glfw";
+    source.id = NK_GAMEPAD_INPUT_SOURCE_GLFW;
     return source;
 }
 

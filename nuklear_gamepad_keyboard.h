@@ -3,7 +3,7 @@
 
 #ifndef NK_GAMEPAD_MAX
 #define NK_GAMEPAD_MAX 1
-#endif  // NK_GAMEPAD_MAX
+#endif
 
 /**
  * Keyboard mapping to gamepad buttons.
@@ -56,29 +56,33 @@ extern "C" {
 static struct nk_gamepad_keyboard_map nk_gamepad_keyboard_map_default;
 
 NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_data) {
+    int i;
+    enum nk_gamepad_button button;
+    struct nk_gamepad_keyboard_map* map;
     if (!gamepads) {
         return;
     }
 
-    // Grab the keyboard mapping.
-    struct nk_gamepad_keyboard_map* map = (user_data == NULL) ? &nk_gamepad_keyboard_map_default : (struct nk_gamepad_keyboard_map*)user_data;
+    /* Grab the keyboard mapping. */
+    map = (user_data == NULL) ? &nk_gamepad_keyboard_map_default : (struct nk_gamepad_keyboard_map*)user_data;
 
-    // Keys
-    for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
-        enum nk_keys key = map->keys[i];
+    /* Keys */
+    for (button = NK_GAMEPAD_BUTTON_FIRST; button < NK_GAMEPAD_BUTTON_LAST; button++) {
+        enum nk_keys key = map->keys[button];
         if (key != NK_KEY_NONE) {
-            nk_gamepad_button(gamepads, 0, (enum nk_gamepad_button)i, nk_input_is_key_down(&gamepads->ctx->input, key));
+            nk_gamepad_button(gamepads, 0, button, nk_input_is_key_down(&gamepads->ctx->input, key));
         }
     }
 
-    // Text Buffer
-    for (int i = 0; i < gamepads->ctx->input.keyboard.text_len; i++) {
-        // Error correction.
+    /* Text Buffer */
+    for (i = 0; i < gamepads->ctx->input.keyboard.text_len; i++) {
+        int character;
+        /* Error correction. */
         if (gamepads->ctx->input.keyboard.text[i] == '\0') {
             break;
         }
 
-        int character = gamepads->ctx->input.keyboard.text[i];
+        character = gamepads->ctx->input.keyboard.text[i];
         if (map->chars[character] != NK_GAMEPAD_BUTTON_INVALID) {
             nk_gamepad_button(gamepads, 0, map->chars[character], nk_true);
         }
@@ -86,21 +90,22 @@ NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_
 }
 
 NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user_data) {
+    int i;
     if (!gamepads) {
         return nk_false;
     }
     NK_UNUSED(user_data);
 
-    // Only one keyboard is available.
+    /* Only one keyboard is available. */
     gamepads->gamepads[0].available = nk_true;
-    for (int num = 1; num < NK_GAMEPAD_MAX; num++) {
-        gamepads->gamepads[num].available = nk_false;
+    for (i = 1; i < NK_GAMEPAD_MAX; i++) {
+        gamepads->gamepads[i].available = nk_false;
     }
 
-    // Initialize the default keyboard mapping.
+    /* Initialize the default keyboard mapping. */
     nk_zero(&nk_gamepad_keyboard_map_default, sizeof(nk_gamepad_keyboard_map_default));
 
-    // Keys
+    /* Keys */
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_START] = NK_KEY_ENTER;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_BACK] = NK_KEY_SHIFT;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_UP] = NK_KEY_UP;
@@ -110,8 +115,8 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_BACKSPACE;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_A] = NK_KEY_CTRL;
 
-    // Text Buttons
-    for (int i = 0; i < 256; i++) {
+    /* Text Buttons */
+    for (i = 0; i < 256; i++) {
         nk_gamepad_keyboard_map_default.chars[i] = NK_GAMEPAD_BUTTON_INVALID;
     }
     nk_gamepad_keyboard_map_default.chars['Z'] = NK_GAMEPAD_BUTTON_A;
@@ -138,14 +143,13 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
 }
 
 NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* user_data) {
-    struct nk_gamepad_input_source source = {
-        .user_data = user_data,
-        .init = &nk_gamepad_keyboard_init,
-        .update = &nk_gamepad_keyboard_update,
-        .name = &nk_gamepad_keyboard_name,
-        .input_source_name = "Keyboard",
-        .id = NK_GAMEPAD_INPUT_SOURCE_KEYBOARD,
-    };
+    struct nk_gamepad_input_source source;
+    source.user_data = user_data;
+    source.init = nk_gamepad_keyboard_init;
+    source.update = nk_gamepad_keyboard_update;
+    source.name = nk_gamepad_keyboard_name;
+    source.input_source_name = "Keyboard";
+    source.id = NK_GAMEPAD_INPUT_SOURCE_KEYBOARD;
     return source;
 }
 

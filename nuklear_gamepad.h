@@ -32,21 +32,21 @@
  * The maximum amount of gamepads that can be supported.
  */
 #define NK_GAMEPAD_MAX 4
-#endif  // NK_GAMEPAD_MAX
+#endif
 
 #ifndef NK_GAMEPAD_NAME_PREFIX
 /**
  * The prefix to use for the default gamepad names.
  */
 #define NK_GAMEPAD_NAME_PREFIX "Controller "
-#endif  // NK_GAMEPAD_NAME_PREFIX
+#endif
 
 #ifndef NK_GAMEPAD_NAME_SIZE
 /**
  * The maximum string size of gamepad names.
  */
 #define NK_GAMEPAD_NAME_SIZE 16
-#endif  // NK_GAMEPAD_NAME_SIZE
+#endif
 
 /**
  * Create a flag for the specified button.
@@ -56,25 +56,14 @@
 
 enum nk_gamepad_input_source_type {
     NK_GAMEPAD_INPUT_SOURCE_UNKNOWN = 0,
-    NK_GAMEPAD_INPUT_SOURCE_NONE, // A gamepad input source which provides no callbacks. @see nk_gamepad_none_input_source()
-    NK_GAMEPAD_INPUT_SOURCE_SDL, // A gamepad input source which uses SDL to retrieve its input. @see nk_gamepad_sdl_input_source()
-    NK_GAMEPAD_INPUT_SOURCE_GLFW, // A gamepad input source which uses GLFW to retrieve its input. @see nk_gamepad_glfw_input_source()
-    NK_GAMEPAD_INPUT_SOURCE_RAYLIB, // A gamepad input source which uses raylib to retrieve its input. @see nk_gamepad_raylib_input_source()
-    NK_GAMEPAD_INPUT_SOURCE_PNTR, // A gamepad input source which uses pntr to retrieve its input. @see nk_gamepad_pntr_input_source()
-    NK_GAMEPAD_INPUT_SOURCE_KEYBOARD, // A gamepad input source which uses nuklear's keyboard interface to retrieve its input. @see nuklear_gamepad_keyboard_input_source()
-    NK_GAMEPAD_INPUT_SOURCE_SDL3, // A gamepad input source which uses SDL3 to retrieve its input. @see nk_gamepad_sdl3_input_source()
-};
-
-enum nk_gamepad_axis {
-    NK_GAMEPAD_AXIS_INVALID = -1,
-    NK_GAMEPAD_AXIS_FIRST = 0,
-    NK_GAMEPAD_AXIS_LEFT_X = 0,
-    NK_GAMEPAD_AXIS_LEFT_Y,
-    NK_GAMEPAD_AXIS_RIGHT_X,
-    NK_GAMEPAD_AXIS_RIGHT_Y,
-    NK_GAMEPAD_AXIS_LEFT_TRIGGER,
-    NK_GAMEPAD_AXIS_RIGHT_TRIGGER,
-    NK_GAMEPAD_AXIS_LAST
+    NK_GAMEPAD_INPUT_SOURCE_NONE, /* A gamepad input source which provides no callbacks. @see nk_gamepad_none_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_SDL, /* A gamepad input source which uses SDL to retrieve its input. @see nk_gamepad_sdl_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_GLFW, /* A gamepad input source which uses GLFW to retrieve its input. @see nk_gamepad_glfw_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_RAYLIB, /* A gamepad input source which uses raylib to retrieve its input. @see nk_gamepad_raylib_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_PNTR, /* A gamepad input source which uses pntr to retrieve its input. @see nk_gamepad_pntr_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_KEYBOARD, /* A gamepad input source which uses nuklear's keyboard interface to retrieve its input. @see nuklear_gamepad_keyboard_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_SDL3, /* A gamepad input source which uses SDL3 to retrieve its input. @see nk_gamepad_sdl3_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_LAST
 };
 
 enum nk_gamepad_button {
@@ -94,6 +83,18 @@ enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_START,
     NK_GAMEPAD_BUTTON_GUIDE,
     NK_GAMEPAD_BUTTON_LAST
+};
+
+enum nk_gamepad_axis {
+    NK_GAMEPAD_AXIS_INVALID = -1,
+    NK_GAMEPAD_AXIS_FIRST = 0,
+    NK_GAMEPAD_AXIS_LEFT_X = 0,
+    NK_GAMEPAD_AXIS_LEFT_Y,
+    NK_GAMEPAD_AXIS_RIGHT_X,
+    NK_GAMEPAD_AXIS_RIGHT_Y,
+    NK_GAMEPAD_AXIS_LEFT_TRIGGER,
+    NK_GAMEPAD_AXIS_RIGHT_TRIGGER,
+    NK_GAMEPAD_AXIS_LAST
 };
 
 struct nk_gamepads;
@@ -118,9 +119,9 @@ struct nk_gamepad_input_source {
     nk_gamepad_init_fn init;
     nk_gamepad_update_fn update;
     nk_gamepad_free_fn free;
-    nk_gamepad_name_fn name; // Callback to get the name of a plugged in controller.
-    const char* input_source_name; // The human-readable name of the input source.
-    enum nk_gamepad_input_source_type id; // A unique identifier of the input source.
+    nk_gamepad_name_fn name; /* Callback to get the name of a plugged in controller. */
+    const char* input_source_name; /* The human-readable name of the input source. */
+    enum nk_gamepad_input_source_type id; /* A unique identifier of the input source. */
 };
 
 struct nk_gamepad {
@@ -133,7 +134,7 @@ struct nk_gamepad {
 };
 
 struct nk_gamepads {
-    // TODO: Allow for infinite gamepads with a linked list, or similar.
+    /* TODO: Allow for infinite gamepads with a linked list, or similar. */
     struct nk_gamepad gamepads[NK_GAMEPAD_MAX];
     struct nk_context* ctx;
     struct nk_gamepad_input_source input_source;
@@ -344,8 +345,14 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 #ifndef NK_GAMEPAD_IMPLEMENTATION_ONCE
 #define NK_GAMEPAD_IMPLEMENTATION_ONCE
 
-// Platform detection.
-#if !defined(NK_GAMEPAD_SDL) && !defined(NK_GAMEPAD_GLFW) && !defined(NK_GAMEPAD_RAYLIB) && !defined(NK_GAMEPAD_PNTR) && !defined(NK_GAMEPAD_KEYBOARD) && !defined(NK_GAMEPAD_NONE)
+/* Platform detection. */
+#if !defined(NK_GAMEPAD_SDL) && \
+    !defined(NK_GAMEPAD_SDL3) && \
+    !defined(NK_GAMEPAD_GLFW) && \
+    !defined(NK_GAMEPAD_RAYLIB) && \
+    !defined(NK_GAMEPAD_PNTR) && \
+    !defined(NK_GAMEPAD_KEYBOARD) && \
+    !defined(NK_GAMEPAD_NONE)
     #if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
         #define NK_GAMEPAD_SDL
     #elif defined(NK_SDL3_RENDERER_IMPLEMENTATION) || defined(NK_SDL3_GL2_IMPLEMENTATION) || defined(NK_SDL3_GL3_IMPLEMENTATION) || defined(NK_SDL3_GLES2_IMPLEMENTATION)
@@ -359,7 +366,7 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
     #endif
 #endif
 
-// Include all the enabled platform-specific implementations.
+/* Include all the enabled platform-specific implementations. */
 #ifdef NK_GAMEPAD_SDL
 #include "nuklear_gamepad_sdl.h"
 #endif
@@ -379,7 +386,7 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 #include "nuklear_gamepad_keyboard.h"
 #endif
 
-// None Gamepad Source
+/* Gamepad Source: None - Always available */
 #include "nuklear_gamepad_none.h"
 
 nk_gamepad_input_source_fn nk_gamepad_input_sources[] = {
@@ -402,10 +409,10 @@ nk_gamepad_input_source_fn nk_gamepad_input_sources[] = {
     &nk_gamepad_keyboard_input_source,
 #endif
 
-    // Dummy Gamepad Source
+    /* Dummy Gamepad Source */
     &nk_gamepad_none_input_source,
 
-    // Null terminator.
+    /* NULL terminator */
     NULL,
 };
 
@@ -430,29 +437,30 @@ NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* 
 }
 
 NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct nk_context* ctx, struct nk_gamepad_input_source input_source) {
+    int i;
     if (gamepads == NULL) {
         return nk_false;
     }
 
-    // Initialize the gamepads as a default state.
+    /* Initialize the gamepads as a default state. */
     nk_zero(gamepads, sizeof(struct nk_gamepads));
     gamepads->ctx = ctx;
     gamepads->input_source = input_source;
 
-    // Set the default state for all gamepads.
-    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
-        // Name
+    /* Set the default state for all gamepads. */
+    for (i = 0; i < NK_GAMEPAD_MAX; i++) {
+        /* Name */
         int j;
         const char* name_prefix = NK_GAMEPAD_NAME_PREFIX;
         for (j = 0; j < nk_strlen(name_prefix); j++) {
             gamepads->gamepads[i].name[j] = name_prefix[j];
         }
 
-        // Add the # of the controller to the name.
+        /* Add the # of the controller to the name. */
         nk_itoa(&gamepads->gamepads[i].name[j], (long)(i + 1));
     }
 
-    // Run the init() callback, or update() if it's not available.
+    /* Run the init() callback, or update() if it's not available. */
     if (input_source.init != NULL) {
         if (input_source.init(gamepads, input_source.user_data) == nk_false) {
             nk_zero(gamepads, sizeof(struct nk_gamepads));
@@ -463,8 +471,8 @@ NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct 
         gamepads->input_source.update(gamepads, gamepads->input_source.user_data);
     }
 
-    // Set all the states as the same as their previous states so that they don't trigger any events.
-    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+    /* Set all the states as the same as their previous states so that they don't trigger any events. */
+    for (i = 0; i < NK_GAMEPAD_MAX; i++) {
         gamepads->gamepads[i].buttons_prev = gamepads->gamepads[i].buttons;
     }
 
@@ -476,12 +484,12 @@ NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
         return;
     }
 
-    // Tell the runner that we are freeing the gamepads.
+    /* Tell the runner that we are freeing the gamepads. */
     if (gamepads->input_source.free != NULL) {
         gamepads->input_source.free(gamepads, gamepads->input_source.user_data);
     }
 
-    // Reset the default state of the gamepad data.
+    /* Reset the default state of the gamepad data. */
     nk_zero(gamepads, sizeof(struct nk_gamepads));
 }
 
@@ -509,12 +517,13 @@ NK_API void nk_gamepad_axis(struct nk_gamepads* gamepads, int num, enum nk_gamep
 }
 
 NK_API float nk_gamepad_get_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis) {
+    int i;
     if (gamepads == NULL || axis < 0 || axis >= NK_GAMEPAD_AXIS_LAST) {
         return 0.0f;
     }
 
     if (num < 0) {
-        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        for (i = 0; i < NK_GAMEPAD_MAX; i++) {
             if (gamepads->gamepads[i].available && gamepads->gamepads[i].axes[axis] != 0.0f) {
                 return gamepads->gamepads[i].axes[axis];
             }
@@ -530,11 +539,12 @@ NK_API float nk_gamepad_get_axis(struct nk_gamepads* gamepads, int num, enum nk_
 }
 
 NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
+    int i;
     if (gamepads == NULL) {
         return;
     }
 
-    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+    for (i = 0; i < NK_GAMEPAD_MAX; i++) {
         if (gamepads->gamepads[i].available == nk_false) {
             continue;
         }
@@ -549,12 +559,13 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
 }
 
 NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
+    int i;
     if (gamepads == NULL) {
         return nk_false;
     }
 
     if (num < 0) {
-        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        for (i = 0; i < NK_GAMEPAD_MAX; i++) {
             if (gamepads->gamepads[i].available == nk_false) {
                 continue;
             }
@@ -574,12 +585,13 @@ NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, 
 }
 
 NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
+    int i;
     if (gamepads == NULL) {
         return nk_false;
     }
 
     if (num < 0) {
-        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        for (i = 0; i < NK_GAMEPAD_MAX; i++) {
             if (gamepads->gamepads[i].available == nk_false) {
                 continue;
             }
@@ -601,12 +613,13 @@ NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int nu
 }
 
 NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
+    int i;
     if (gamepads == NULL) {
         return nk_false;
     }
 
     if (num < 0) {
-        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        for (i = 0; i < NK_GAMEPAD_MAX; i++) {
             if (gamepads->gamepads[i].available == nk_false) {
                 continue;
             }
@@ -636,12 +649,13 @@ NK_API int nk_gamepad_count(struct nk_gamepads* gamepads) {
 }
 
 NK_API void nk_gamepad_set_available(struct nk_gamepads* gamepads, int num, nk_bool available) {
+    int i;
     if (gamepads == NULL) {
         return;
     }
 
     if (num < 0) {
-        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        for (i = 0; i < NK_GAMEPAD_MAX; i++) {
             gamepads->gamepads[i].available = available;
         }
     } else if (num < NK_GAMEPAD_MAX) {
@@ -670,13 +684,14 @@ NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepad
 }
 
 NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button) {
+    int button, i;
     if (gamepads == NULL || num >= NK_GAMEPAD_MAX) {
         return nk_false;
     }
 
     if (num < 0) {
         for (num = 0; num < NK_GAMEPAD_MAX; num++) {
-            for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
+            for (i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
                 if (nk_gamepad_is_button_pressed(gamepads, num, (enum nk_gamepad_button)i)) {
                     if (out_num != NULL) {
                         *out_num = num;
@@ -696,7 +711,7 @@ NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int n
         return nk_false;
     }
 
-    for (int button = NK_GAMEPAD_BUTTON_FIRST; button < NK_GAMEPAD_BUTTON_LAST; button++) {
+    for (button = NK_GAMEPAD_BUTTON_FIRST; button < NK_GAMEPAD_BUTTON_LAST; button++) {
         if (nk_gamepad_is_button_pressed(gamepads, num, (enum nk_gamepad_button)button)) {
             if (out_num != NULL) {
                 *out_num = num;
@@ -712,12 +727,13 @@ NK_API nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int n
 }
 
 NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num) {
+    int i;
     if (gamepads == NULL) {
         return nk_false;
     }
 
     if (num < 0) {
-        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        for (i = 0; i < NK_GAMEPAD_MAX; i++) {
             if (gamepads->gamepads[i].available) {
                 return nk_true;
             }
@@ -733,27 +749,28 @@ NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num) {
 }
 
 NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_gamepad_input_source input_source) {
+    int i;
+    struct nk_gamepads new_gamepads;
     if (gamepads == NULL) {
         return nk_false;
     }
 
-    // Initialize the new gamepad system.
-    struct nk_gamepads new_gamepads;
+    /* Initialize the new gamepad system. */
     if (nk_gamepad_init_with_source(&new_gamepads, gamepads->ctx, input_source) == nk_false) {
         return nk_false;
     }
 
-    // Copy button and axis state over to the new gamepad system.
-    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+    /* Copy button and axis state over to the new gamepad system. */
+    for (i = 0; i < NK_GAMEPAD_MAX; i++) {
         new_gamepads.gamepads[i].buttons = gamepads->gamepads[i].buttons;
         new_gamepads.gamepads[i].buttons_prev = gamepads->gamepads[i].buttons_prev;
         NK_MEMCPY(new_gamepads.gamepads[i].axes, gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
     }
 
-    // Since it was successful, free the old gamepad system.
+    /* Since it was successful, free the old gamepad system. */
     nk_gamepad_free(gamepads);
 
-    // Copy the new gamepad system over the old one.
+    /* Copy the new gamepad system over the old one. */
     NK_MEMCPY(gamepads, &new_gamepads, sizeof(struct nk_gamepads));
 
     return nk_true;
@@ -763,5 +780,5 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
 }
 #endif
 
-#endif  // NK_GAMEPAD_IMPLEMENTATION_ONCE
-#endif  // NK_GAMEPAD_IMPLEMENTATION
+#endif  /* NK_GAMEPAD_IMPLEMENTATION_ONCE */
+#endif  /* NK_GAMEPAD_IMPLEMENTATION */

@@ -131,11 +131,11 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
         }
 
         // Axes: SDL3 returns Sint16 in range -32768..32767 (sticks) or 0..32767 (triggers)
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X,       SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX)        / 32767.0f);
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y,       SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY)        / 32767.0f);
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X,      SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX)       / 32767.0f);
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_Y,      SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTY)       / 32767.0f);
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER,  SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER)  / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX) / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY) / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX) / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_Y, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTY) / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) / 32767.0f);
     }
 }
