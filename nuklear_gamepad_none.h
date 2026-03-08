@@ -3,7 +3,7 @@
 
 #if !defined(NK_GAMEPAD_MAX)
 #define NK_GAMEPAD_MAX 0
-#endif  // NK_GAMEPAD_MAX
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +18,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_da
 }
 #endif
 
-#endif  // NUKLEAR_GAMEPAD_NONE_H__
+#endif  /* NUKLEAR_GAMEPAD_NONE_H__ */
 
 #if defined(NK_GAMEPAD_IMPLEMENTATION) && !defined(NK_GAMEPAD_HEADER_ONLY)
 #ifndef NUKLEAR_GAMEPAD_NONE_IMPLEMENTATION_ONCE
@@ -29,15 +29,14 @@ extern "C" {
 #endif
 
 NK_API struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_data) {
-    struct nk_gamepad_input_source source = {
-        .user_data = user_data,
-        .init = NULL,
-        .update = NULL,
-        .free = NULL,
-        .name = NULL,
-        .input_source_name = "None",
-        .id = NK_GAMEPAD_INPUT_SOURCE_NONE,
-    };
+    struct nk_gamepad_input_source source;
+    source.user_data = user_data;
+    source.init = NULL;
+    source.update = NULL;
+    source.free = NULL;
+    source.name = NULL;
+    source.input_source_name = "None";
+    source.id = NK_GAMEPAD_INPUT_SOURCE_NONE;
     return source;
 }
 
@@ -45,5 +44,5 @@ NK_API struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_da
 }
 #endif
 
-#endif  // NUKLEAR_GAMEPAD_NONE_IMPLEMENTATION_ONCE
-#endif  // NK_GAMEPAD_IMPLEMENTATION
+#endif  /* NUKLEAR_GAMEPAD_NONE_IMPLEMENTATION_ONCE */
+#endif  /* NK_GAMEPAD_IMPLEMENTATION */

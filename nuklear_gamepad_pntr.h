@@ -3,7 +3,7 @@
 
 #ifndef NK_GAMEPAD_MAX
 #define NK_GAMEPAD_MAX PNTR_APP_MAX_GAMEPADS
-#endif  // NK_GAMEPAD_MAX
+#endif
 
 
 #ifdef __cplusplus
@@ -58,6 +58,8 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
+
+        // TODO: Add gamepad axis to pntr
     }
 }
 

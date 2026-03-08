@@ -1,4 +1,3 @@
-/* nuklear - 1.32.0 - public domain */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -83,9 +82,10 @@ int main(void)
     ctx = nk_glfw3_init(&glfw, win, NK_GLFW3_INSTALL_CALLBACKS);
     {
         struct nk_font_atlas *atlas;
-        nk_glfw3_font_stash_begin(&glfw, &atlas);
-        struct nk_font_config config = nk_font_config(0);
+        struct nk_font_config config;
         struct nk_font *font;
+        nk_glfw3_font_stash_begin(&glfw, &atlas);
+        config = nk_font_config(0);
         font = nk_font_atlas_add_default(atlas, 13 * font_scale, &config);
         nk_glfw3_font_stash_end(&glfw);
         nk_style_set_font(ctx, &font->handle);
@@ -118,7 +118,7 @@ int main(void)
         glfwSwapBuffers(win);
     }
 
-    // Terminate
+    /* Terminate */
     nk_gamepad_free(&gamepads);
 
     nk_glfw3_shutdown(&glfw);
