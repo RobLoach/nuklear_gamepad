@@ -45,7 +45,7 @@
 /**
  * The maximum string size of gamepad names.
  */
-#define NK_GAMEPAD_NAME_SIZE 16
+#define NK_GAMEPAD_NAME_SIZE 32
 #endif
 
 /**
