@@ -59,7 +59,7 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data) {
             }
         }
 
-        // TODO: Add gamepad axes to pntr
+        // TODO: Add gamepad axis to pntr
     }
 }
 
