@@ -7,6 +7,8 @@
 #include "../vendor/nuklear/nuklear.h"
 
 #define NK_GAMEPAD_IMPLEMENTATION
+#define NK_GAMEPAD_KEYBOARD
+#define NK_GAMEPAD_MOUSE
 #include "../nuklear_gamepad.h"
 
 int main() {
@@ -30,9 +32,9 @@ int main() {
 
     printf("nk_gamepad_is_available()\n");
     {
-        assert(nk_gamepad_is_available(&gamepads, 0) == nk_false);
+        assert(nk_gamepad_is_available(&gamepads, 0) == nk_true);
         assert(nk_gamepad_is_available(&gamepads, 1) == nk_false);
-        assert(nk_gamepad_is_available(&gamepads, -1) == nk_false);
+        assert(nk_gamepad_is_available(&gamepads, -1) == nk_true);
     }
 
     printf("nk_gamepad_set_available()\n");
@@ -49,13 +51,12 @@ int main() {
     {
         const char* controller_name = nk_gamepad_name(&gamepads, 0);
         assert(controller_name != NULL);
-        assert(strcmp(controller_name, "Controller 1") == 0);
+        assert(strcmp(controller_name, "Keyboard") == 0);
     }
 
     {
         const char* controller_name = nk_gamepad_name(&gamepads, 1);
-        assert(controller_name != NULL);
-        assert(strcmp(controller_name, "Controller 2") == 0);
+        assert(controller_name == NULL);
     }
 
     /* Update the state of the gamepads. */

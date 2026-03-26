@@ -147,6 +147,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* use
     source.user_data = user_data;
     source.init = nk_gamepad_keyboard_init;
     source.update = nk_gamepad_keyboard_update;
+    source.free = NULL;
     source.name = nk_gamepad_keyboard_name;
     source.input_source_name = "Keyboard";
     source.id = NK_GAMEPAD_INPUT_SOURCE_KEYBOARD;
