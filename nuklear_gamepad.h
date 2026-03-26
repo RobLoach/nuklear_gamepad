@@ -63,6 +63,7 @@ enum nk_gamepad_input_source_type {
     NK_GAMEPAD_INPUT_SOURCE_PNTR, /* A gamepad input source which uses pntr to retrieve its input. @see nk_gamepad_pntr_input_source() */
     NK_GAMEPAD_INPUT_SOURCE_KEYBOARD, /* A gamepad input source which uses nuklear's keyboard interface to retrieve its input. @see nuklear_gamepad_keyboard_input_source() */
     NK_GAMEPAD_INPUT_SOURCE_SDL3, /* A gamepad input source which uses SDL3 to retrieve its input. @see nk_gamepad_sdl3_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_MOUSE, /* A gamepad input source which uses nuklear's mouse interface to retrieve its input. @see nk_gamepad_mouse_input_source() */
     NK_GAMEPAD_INPUT_SOURCE_LAST
 };
 
@@ -385,6 +386,9 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 #ifdef NK_GAMEPAD_KEYBOARD
 #include "nuklear_gamepad_keyboard.h"
 #endif
+#ifdef NK_GAMEPAD_MOUSE
+#include "nuklear_gamepad_mouse.h"
+#endif
 
 /* Gamepad Source: None - Always available */
 #include "nuklear_gamepad_none.h"
@@ -407,6 +411,9 @@ nk_gamepad_input_source_fn nk_gamepad_input_sources[] = {
 #endif
 #ifdef NK_GAMEPAD_KEYBOARD
     &nk_gamepad_keyboard_input_source,
+#endif
+#ifdef NK_GAMEPAD_MOUSE
+    &nk_gamepad_mouse_input_source,
 #endif
 
     /* Dummy Gamepad Source */

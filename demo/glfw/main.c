@@ -26,6 +26,7 @@
 
 #define NK_GAMEPAD_GLFW
 #define NK_GAMEPAD_KEYBOARD
+#define NK_GAMEPAD_MOUSE
 #define NK_GAMEPAD_IMPLEMENTATION
 #include "../../nuklear_gamepad.h"
 
