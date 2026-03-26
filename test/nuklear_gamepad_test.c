@@ -15,6 +15,9 @@ int main() {
     printf("nuklear_gamepad_test\n");
     printf("--------------------\n");
 
+    /* NK_GAMEPAD_BUTTON is used with int flags, so we need it to be <32 */
+    assert(NK_GAMEPAD_BUTTON_LAST < (32 - 1));
+
     /* Initialize the Nuklear context */
     nk_init_default(&ctx, 0);
 

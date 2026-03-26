@@ -664,7 +664,7 @@ NK_API void nk_gamepad_set_available(struct nk_gamepads* gamepads, int num, nk_b
 }
 
 NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num) {
-    if (!gamepads || num < 0 || num >= NK_GAMEPAD_MAX || gamepads->gamepads[num].available == nk_false) {
+    if (gamepads == NULL || num < 0 || num >= NK_GAMEPAD_MAX || gamepads->gamepads[num].available == nk_false) {
         return NULL;
     }
 
