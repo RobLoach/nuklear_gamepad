@@ -67,6 +67,15 @@ enum nk_gamepad_input_source_type {
     NK_GAMEPAD_INPUT_SOURCE_LAST
 };
 
+/**
+ * The Gamepad Buttons.
+ *
+ * Represents the standard buttons found on most gamepads.
+ *
+ * @see nk_gamepad_is_button_down()
+ * @see nk_gamepad_is_button_pressed()
+ * @see nk_gamepad_is_button_released()
+ */
 enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_INVALID = -1,
     NK_GAMEPAD_BUTTON_FIRST = 0,
@@ -74,10 +83,10 @@ enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_DOWN,
     NK_GAMEPAD_BUTTON_LEFT,
     NK_GAMEPAD_BUTTON_RIGHT,
-    NK_GAMEPAD_BUTTON_A,
-    NK_GAMEPAD_BUTTON_B,
-    NK_GAMEPAD_BUTTON_X,
-    NK_GAMEPAD_BUTTON_Y,
+    NK_GAMEPAD_BUTTON_A, /** Bottom face button. */
+    NK_GAMEPAD_BUTTON_B, /** Right face button. */
+    NK_GAMEPAD_BUTTON_X, /** Left face button. */
+    NK_GAMEPAD_BUTTON_Y, /** Top face button. */
     NK_GAMEPAD_BUTTON_LB,
     NK_GAMEPAD_BUTTON_RB,
     NK_GAMEPAD_BUTTON_BACK,

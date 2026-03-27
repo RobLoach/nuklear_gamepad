@@ -4,6 +4,9 @@ glfw:
 sdl:
 	$(MAKE) -C demo/sdl test
 
+sdl3:
+	$(MAKE) -C demo/sdl3 test
+
 none:
 	$(MAKE) -C demo/none test
 

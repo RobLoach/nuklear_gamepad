@@ -59,6 +59,7 @@ NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_
     int i;
     enum nk_gamepad_button button;
     struct nk_gamepad_keyboard_map* map;
+    char character;
     if (!gamepads) {
         return;
     }
@@ -76,7 +77,6 @@ NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_
 
     /* Text Buffer */
     for (i = 0; i < gamepads->ctx->input.keyboard.text_len; i++) {
-        int character;
         /* Error correction. */
         if (gamepads->ctx->input.keyboard.text[i] == '\0') {
             break;
@@ -112,8 +112,8 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_DOWN] = NK_KEY_DOWN;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_LEFT] = NK_KEY_LEFT;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_RIGHT] = NK_KEY_RIGHT;
-    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_BACKSPACE;
-    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_A] = NK_KEY_CTRL;
+    /* nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_BACKSPACE; */
+    /* nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_A] = NK_KEY_CTRL; */
 
     /* Text Buttons */
     for (i = 0; i < 256; i++) {
@@ -155,11 +155,11 @@ NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* use
 }
 
 NK_API const char* nk_gamepad_keyboard_name(struct nk_gamepads* gamepads, int num, void* user_data) {
+    NK_UNUSED(gamepads);
+    NK_UNUSED(user_data);
     if (num == 0) {
         return "Keyboard";
     }
-    NK_UNUSED(gamepads);
-    NK_UNUSED(user_data);
     return NULL;
 }
 

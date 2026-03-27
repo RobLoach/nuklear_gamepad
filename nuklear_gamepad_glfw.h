@@ -3,6 +3,8 @@
 
 #if !defined(NK_GAMEPAD_MAX) && defined(GLFW_JOYSTICK_LAST)
 #define NK_GAMEPAD_MAX GLFW_JOYSTICK_LAST
+#elif !defined(NK_GAMEPAD_MAX)
+#define NK_GAMEPAD_MAX 4
 #endif
 
 #ifdef __cplusplus
