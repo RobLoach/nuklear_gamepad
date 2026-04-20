@@ -11,9 +11,15 @@
  * @see nk_gamepad_keyboard_map_default
  * @see nk_gamepad_keyboard_input_source()
  */
+struct nk_gamepad_keyboard_axis_entry {
+    enum nk_gamepad_axis axis; /** NK_GAMEPAD_AXIS_INVALID means no mapping. */
+    float value;               /** Axis value to apply when the char is pressed. */
+};
+
 struct nk_gamepad_keyboard_map {
     enum nk_keys keys[NK_GAMEPAD_BUTTON_LAST]; /** A mapping from an enum nk_gamepad_button to a enum nk_keys. */
     enum nk_gamepad_button chars[256]; /** Mapping between a char and a enum nk_gamepad_button. */
+    struct nk_gamepad_keyboard_axis_entry char_axes[256]; /** Mapping between a char and an axis value. */
 };
 
 #ifdef __cplusplus
@@ -83,8 +89,11 @@ NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_
         }
 
         character = gamepads->ctx->input.keyboard.text[i];
-        if (map->chars[character] != NK_GAMEPAD_BUTTON_INVALID) {
-            nk_gamepad_button(gamepads, 0, map->chars[character], nk_true);
+        if (map->chars[(unsigned char)character] != NK_GAMEPAD_BUTTON_INVALID) {
+            nk_gamepad_button(gamepads, 0, map->chars[(unsigned char)character], nk_true);
+        }
+        if (map->char_axes[(unsigned char)character].axis != NK_GAMEPAD_AXIS_INVALID) {
+            nk_gamepad_axis(gamepads, 0, map->char_axes[(unsigned char)character].axis, map->char_axes[(unsigned char)character].value);
         }
     }
 }
@@ -118,6 +127,8 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     /* Text Buttons */
     for (i = 0; i < 256; i++) {
         nk_gamepad_keyboard_map_default.chars[i] = NK_GAMEPAD_BUTTON_INVALID;
+        nk_gamepad_keyboard_map_default.char_axes[i].axis = NK_GAMEPAD_AXIS_INVALID;
+        nk_gamepad_keyboard_map_default.char_axes[i].value = 0.0f;
     }
     nk_gamepad_keyboard_map_default.chars['Z'] = NK_GAMEPAD_BUTTON_A;
     nk_gamepad_keyboard_map_default.chars['z'] = NK_GAMEPAD_BUTTON_A;
@@ -138,6 +149,24 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     nk_gamepad_keyboard_map_default.chars['@'] = NK_GAMEPAD_BUTTON_BACK;
     nk_gamepad_keyboard_map_default.chars['`'] = NK_GAMEPAD_BUTTON_GUIDE;
     nk_gamepad_keyboard_map_default.chars['~'] = NK_GAMEPAD_BUTTON_GUIDE;
+
+    /* Left axis: JKLI */
+    nk_gamepad_keyboard_map_default.char_axes['j'].axis = NK_GAMEPAD_AXIS_LEFT_X;
+    nk_gamepad_keyboard_map_default.char_axes['j'].value = -1.0f;
+    nk_gamepad_keyboard_map_default.char_axes['J'].axis = NK_GAMEPAD_AXIS_LEFT_X;
+    nk_gamepad_keyboard_map_default.char_axes['J'].value = -1.0f;
+    nk_gamepad_keyboard_map_default.char_axes['l'].axis = NK_GAMEPAD_AXIS_LEFT_X;
+    nk_gamepad_keyboard_map_default.char_axes['l'].value = 1.0f;
+    nk_gamepad_keyboard_map_default.char_axes['L'].axis = NK_GAMEPAD_AXIS_LEFT_X;
+    nk_gamepad_keyboard_map_default.char_axes['L'].value = 1.0f;
+    nk_gamepad_keyboard_map_default.char_axes['i'].axis = NK_GAMEPAD_AXIS_LEFT_Y;
+    nk_gamepad_keyboard_map_default.char_axes['i'].value = -1.0f;
+    nk_gamepad_keyboard_map_default.char_axes['I'].axis = NK_GAMEPAD_AXIS_LEFT_Y;
+    nk_gamepad_keyboard_map_default.char_axes['I'].value = -1.0f;
+    nk_gamepad_keyboard_map_default.char_axes['k'].axis = NK_GAMEPAD_AXIS_LEFT_Y;
+    nk_gamepad_keyboard_map_default.char_axes['k'].value = 1.0f;
+    nk_gamepad_keyboard_map_default.char_axes['K'].axis = NK_GAMEPAD_AXIS_LEFT_Y;
+    nk_gamepad_keyboard_map_default.char_axes['K'].value = 1.0f;
 
     return nk_true;
 }
