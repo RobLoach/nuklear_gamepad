@@ -59,7 +59,7 @@ NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_
     int i;
     enum nk_gamepad_button button;
     struct nk_gamepad_keyboard_map* map;
-    char character;
+    unsigned char character;
     if (!gamepads) {
         return;
     }
@@ -82,7 +82,7 @@ NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_
             break;
         }
 
-        character = gamepads->ctx->input.keyboard.text[i];
+        character = (unsigned char)gamepads->ctx->input.keyboard.text[i];
         if (map->chars[character] != NK_GAMEPAD_BUTTON_INVALID) {
             nk_gamepad_button(gamepads, 0, map->chars[character], nk_true);
         }

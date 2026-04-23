@@ -14,6 +14,7 @@
 int main() {
     struct nk_context ctx;
     struct nk_gamepads gamepads;
+    NK_UNUSED(nk_inv_sqrt); // Small fix for unused function
     printf("nuklear_gamepad_test\n");
     printf("--------------------\n");
 
