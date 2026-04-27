@@ -35,6 +35,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* use
 NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user_data);
 NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_data);
 NK_API const char* nk_gamepad_keyboard_name(struct nk_gamepads* gamepads, int num, void* user_data);
+NK_API const char* nk_gamepad_keyboard_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data);
 
 #ifdef __cplusplus
 }
@@ -142,13 +143,75 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     return nk_true;
 }
 
+NK_API const char* nk_gamepad_keyboard_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data) {
+    static char char_names[NK_GAMEPAD_BUTTON_LAST][2];
+    struct nk_gamepad_keyboard_map* map;
+    enum nk_keys key;
+    char best;
+    int i;
+    NK_UNUSED(gamepads);
+
+    if (button < NK_GAMEPAD_BUTTON_FIRST || button >= NK_GAMEPAD_BUTTON_LAST) {
+        return NULL;
+    }
+
+    map = (user_data == NULL) ? &nk_gamepad_keyboard_map_default : (struct nk_gamepad_keyboard_map*)user_data;
+
+    key = map->keys[button];
+    if (key != NK_KEY_NONE) {
+        switch (key) {
+            case NK_KEY_UP:        return "Up";
+            case NK_KEY_DOWN:      return "Down";
+            case NK_KEY_LEFT:      return "Left";
+            case NK_KEY_RIGHT:     return "Right";
+            case NK_KEY_ENTER:     return "Enter";
+            case NK_KEY_SHIFT:     return "Shift";
+            case NK_KEY_BACKSPACE: return "Backspace";
+            case NK_KEY_CTRL:      return "Ctrl";
+            case NK_KEY_DEL:       return "Delete";
+            case NK_KEY_TAB:       return "Tab";
+            case NK_KEY_COPY:      return "Copy";
+            case NK_KEY_CUT:       return "Cut";
+            case NK_KEY_PASTE:     return "Paste";
+            /* TODO: Add F1-F12, ALT */
+            default: break;
+        }
+    }
+
+    /* Find the most readable char bound to this button: uppercase > digit > other. */
+    best = 0;
+    for (i = 0; i < 256; i++) {
+        char c = (char)i;
+        if (map->chars[i] != button) {
+            continue;
+        }
+        if (best == 0) {
+            best = c;
+        } else if (c >= 'A' && c <= 'Z') {
+            best = c;
+            break;
+        } else if (c >= '0' && c <= '9' && !(best >= 'A' && best <= 'Z')) {
+            best = c;
+        }
+    }
+
+    if (best != 0) {
+        char_names[button][0] = best;
+        char_names[button][1] = '\0';
+        return char_names[button];
+    }
+
+    return nk_gamepad_button_name(NULL, button);
+}
+
 NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* user_data) {
     struct nk_gamepad_input_source source;
     source.user_data = user_data;
-    source.init = nk_gamepad_keyboard_init;
-    source.update = nk_gamepad_keyboard_update;
+    source.init = &nk_gamepad_keyboard_init;
+    source.update = &nk_gamepad_keyboard_update;
     source.free = NULL;
-    source.name = nk_gamepad_keyboard_name;
+    source.name = &nk_gamepad_keyboard_name;
+    source.button_name = &nk_gamepad_keyboard_button_name;
     source.input_source_name = "Keyboard";
     source.id = NK_GAMEPAD_INPUT_SOURCE_KEYBOARD;
     return source;

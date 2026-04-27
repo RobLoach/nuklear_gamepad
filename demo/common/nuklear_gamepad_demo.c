@@ -72,7 +72,7 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads, 
             nk_spacing(ctx, 1);
             nk_spacing(ctx, 1);
             nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_Y);
-            nk_button_label(ctx, "Y");
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_Y));
             nk_spacing(ctx, 1);
 
             /* Second Row */
@@ -83,10 +83,10 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads, 
             nk_button_symbol(ctx, NK_SYMBOL_TRIANGLE_RIGHT);
             nk_spacing(ctx, 1);
             nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_X);
-            nk_button_label(ctx, "X");
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_X));
             nk_spacing(ctx, 1);
             nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_B);
-            nk_button_label(ctx, "B");
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_B));
 
             /* Third Row */
             nk_spacing(ctx, 1);
@@ -96,7 +96,7 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads, 
             nk_spacing(ctx, 1);
             nk_spacing(ctx, 1);
             nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_A);
-            nk_button_label(ctx, "A");
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_A));
 
             /* Start/Back buttons */
             nk_layout_row_dynamic(ctx, 0, 5);

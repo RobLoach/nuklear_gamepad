@@ -105,6 +105,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_source(void* user_da
     source.update = &nk_gamepad_glfw_update;
     source.free = NULL;
     source.name = &nk_gamepad_glfw_name;
+    source.button_name = NULL;
     source.input_source_name = "glfw";
     source.id = NK_GAMEPAD_INPUT_SOURCE_GLFW;
     return source;

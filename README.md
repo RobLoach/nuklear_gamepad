@@ -52,11 +52,14 @@ nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk
 nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button);
 nk_bool nk_gamepad_any_button_pressed(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button);
+nk_bool nk_gamepad_any_button_released(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button);
+NK_API nk_bool nk_gamepad_any_button_down(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button);
 void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down);
 float nk_gamepad_get_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis);
 void nk_gamepad_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis, float value);
 int nk_gamepad_count(struct nk_gamepads* gamepads);
 const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
+const char* nk_gamepad_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button);
 struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepads* gamepads);
 nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_gamepad_input_source input_source);
 nk_gamepad_input_source_fn nk_gamepad_input_sources[];
@@ -81,6 +84,7 @@ struct nk_gamepad_input_source source = {
     .update = &my_own_gamepad_update, // Function to update the status of the gamepad
     .free = NULL, // Function used to free up the gamepad data
     .name = NULL, // Function used to get the name of each gamepad
+    .button_name = NULL, // Function used to get the label of a gamepad button
     .input_source_name = "my_own_gamepad", // The optional name of the input source
     .id = 1234, // Optional identification for the input source
 };

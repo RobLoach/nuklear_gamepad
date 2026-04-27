@@ -68,6 +68,7 @@ NK_API void nk_gamepad_mouse_update(struct nk_gamepads* gamepads, void* user_dat
  * @return "Mouse" for slot 0, NULL for any other slot.
  */
 NK_API const char* nk_gamepad_mouse_name(struct nk_gamepads* gamepads, int num, void* user_data);
+NK_API const char* nk_gamepad_mouse_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data);
 
 #ifdef __cplusplus
 }
@@ -167,13 +168,49 @@ NK_API nk_bool nk_gamepad_mouse_init(struct nk_gamepads* gamepads, void* user_da
     return nk_true;
 }
 
+NK_API const char* nk_gamepad_mouse_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data) {
+    struct nk_gamepad_mouse_map* map;
+    int i;
+    NK_UNUSED(gamepads);
+
+    /* D-pad directions are driven by mouse movement, not button clicks. */
+    switch (button) {
+        case NK_GAMEPAD_BUTTON_UP:    return "Move Up";
+        case NK_GAMEPAD_BUTTON_DOWN:  return "Move Down";
+        case NK_GAMEPAD_BUTTON_LEFT:  return "Move Left";
+        case NK_GAMEPAD_BUTTON_RIGHT: return "Move Right";
+        default: break;
+    }
+
+    map = (user_data == NULL) ? &nk_gamepad_mouse_map_default : (struct nk_gamepad_mouse_map*)user_data;
+
+    /* Reverse-lookup: find which nk_buttons maps to this gamepad button. */
+    for (i = 0; i < NK_BUTTON_MAX; i++) {
+        if (map->buttons[i] != button) {
+            continue;
+        }
+        switch ((enum nk_buttons)i) {
+            case NK_BUTTON_LEFT:   return "Left Click";
+            case NK_BUTTON_RIGHT:  return "Right Click";
+            case NK_BUTTON_MIDDLE: return "Middle Click";
+            case NK_BUTTON_DOUBLE: return "Double Click";
+            case NK_BUTTON_X1:     return "X1";
+            case NK_BUTTON_X2:     return "X2";
+            default: break;
+        }
+    }
+
+    return nk_gamepad_button_name(NULL, button);
+}
+
 NK_API struct nk_gamepad_input_source nk_gamepad_mouse_input_source(void* user_data) {
     struct nk_gamepad_input_source source;
     source.user_data = user_data;
-    source.init = nk_gamepad_mouse_init;
-    source.update = nk_gamepad_mouse_update;
+    source.init = &nk_gamepad_mouse_init;
+    source.update = &nk_gamepad_mouse_update;
     source.free = NULL;
-    source.name = nk_gamepad_mouse_name;
+    source.name = &nk_gamepad_mouse_name;
+    source.button_name = &nk_gamepad_mouse_button_name;
     source.input_source_name = "Mouse";
     source.id = NK_GAMEPAD_INPUT_SOURCE_MOUSE;
     return source;

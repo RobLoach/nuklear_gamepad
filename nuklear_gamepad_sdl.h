@@ -168,6 +168,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_source(void* user_dat
         .update = &nk_gamepad_sdl_update,
         .free = &nk_gamepad_sdl_free,
         .name = &nk_gamepad_sdl_name,
+        .button_name = NULL,
         .input_source_name = "SDL",
         .id = NK_GAMEPAD_INPUT_SOURCE_SDL,
     };

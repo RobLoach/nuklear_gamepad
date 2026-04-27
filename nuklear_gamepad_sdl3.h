@@ -61,6 +61,20 @@ NK_API void nk_gamepad_sdl3_free(struct nk_gamepads* gamepads, void* user_data);
 NK_API const char* nk_gamepad_sdl3_name(struct nk_gamepads* gamepads, int num, void* user_data);
 
 /**
+ * Get the human-readable name of a button for the connected SDL3 gamepad.
+ *
+ * Uses SDL_GetGamepadButtonLabel to return controller-specific face button
+ * labels (e.g. "Cross", "Circle", "Square", "Triangle" for PlayStation
+ * controllers), falling back to generic names for all other buttons.
+ *
+ * @param gamepads  The gamepads context.
+ * @param button    The button to name.
+ * @param user_data Unused; pass NULL.
+ * @return A pointer to the button name string, or NULL if invalid.
+ */
+NK_API const char* nk_gamepad_sdl3_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data);
+
+/**
  * Build and return the SDL3 input source descriptor.
  *
  * @param user_data Optional user data pointer forwarded to each callback.
@@ -234,6 +248,34 @@ NK_API const char* nk_gamepad_sdl3_name(struct nk_gamepads* gamepads, int num, v
     return name;
 }
 
+NK_API const char* nk_gamepad_sdl3_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data) {
+    NK_UNUSED(user_data);
+
+    SDL_GamepadButton sdl_button = nk_gamepad_sdl3_map_button(button);
+    if (sdl_button != SDL_GAMEPAD_BUTTON_INVALID && gamepads != NULL) {
+        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+            if (gamepads->gamepads[i].data != NULL) {
+                SDL_GamepadButtonLabel label = SDL_GetGamepadButtonLabel(
+                    (SDL_Gamepad*)gamepads->gamepads[i].data, sdl_button);
+                switch (label) {
+                    case SDL_GAMEPAD_BUTTON_LABEL_A:        return "A";
+                    case SDL_GAMEPAD_BUTTON_LABEL_B:        return "B";
+                    case SDL_GAMEPAD_BUTTON_LABEL_X:        return "X";
+                    case SDL_GAMEPAD_BUTTON_LABEL_Y:        return "Y";
+                    case SDL_GAMEPAD_BUTTON_LABEL_CROSS:    return "Cross";
+                    case SDL_GAMEPAD_BUTTON_LABEL_CIRCLE:   return "Circle";
+                    case SDL_GAMEPAD_BUTTON_LABEL_SQUARE:   return "Square";
+                    case SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE: return "Triangle";
+                    default: break;
+                }
+                break;
+            }
+        }
+    }
+
+    return nk_gamepad_button_name(NULL, button);
+}
+
 NK_API struct nk_gamepad_input_source nk_gamepad_sdl3_input_source(void* user_data) {
     struct nk_gamepad_input_source source = {
         .user_data = user_data,
@@ -241,6 +283,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_sdl3_input_source(void* user_da
         .update = &nk_gamepad_sdl3_update,
         .free = &nk_gamepad_sdl3_free,
         .name = &nk_gamepad_sdl3_name,
+        .button_name = &nk_gamepad_sdl3_button_name,
         .input_source_name = "SDL3",
         .id = NK_GAMEPAD_INPUT_SOURCE_SDL3,
     };

@@ -88,6 +88,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_raylib_input_source(void* user_
         .update = &nk_gamepad_raylib_update,
         .free = NULL,
         .name = &nk_gamepad_raylib_name,
+        .button_name = NULL,
         .input_source_name = "raylib",
         .id = NK_GAMEPAD_INPUT_SOURCE_RAYLIB,
     };

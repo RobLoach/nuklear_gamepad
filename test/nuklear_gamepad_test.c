@@ -14,7 +14,7 @@
 int main() {
     struct nk_context ctx;
     struct nk_gamepads gamepads;
-    NK_UNUSED(nk_inv_sqrt); // Small fix for unused function
+    NK_UNUSED(nk_inv_sqrt); /* Small fix for unused function */
     printf("nuklear_gamepad_test\n");
     printf("--------------------\n");
 
@@ -84,6 +84,27 @@ int main() {
         assert(num == 0);
         assert(button == NK_GAMEPAD_BUTTON_A);
     }
+
+    /* Update the state so that the release checks can be processed */
+    nk_gamepad_update(&gamepads);
+
+    /* nk_gamepad_any_button_released() */
+    {
+        int num = 9999;
+        enum nk_gamepad_button button = NK_GAMEPAD_BUTTON_B;
+        assert(!nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_A));
+        assert(nk_gamepad_is_button_released(&gamepads, -1, NK_GAMEPAD_BUTTON_A));
+        assert(!nk_gamepad_is_button_released(&gamepads, -1, NK_GAMEPAD_BUTTON_B));
+        assert(nk_gamepad_any_button_released(&gamepads, -1, &num, &button) == nk_true);
+        assert(num == 0);
+        assert(button == NK_GAMEPAD_BUTTON_A);
+    }
+
+    /* nk_gamepad_button_name() */
+    assert(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_B), "B") == 0);
+    assert(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_START), "Start") == 0);
+    assert(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_UP), "Up") == 0);
+    assert(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_A), "Z") == 0);
 
     printf("nk_gamepad_free()\n");
     nk_gamepad_free(&gamepads);

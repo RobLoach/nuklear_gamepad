@@ -70,6 +70,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_source(void* user_da
         .update = &nk_gamepad_pntr_update,
         .free = NULL,
         .name = NULL,
+        .button_name = NULL,
         .input_source_name = "pntr",
         .id = NK_GAMEPAD_INPUT_SOURCE_PNTR,
     };
