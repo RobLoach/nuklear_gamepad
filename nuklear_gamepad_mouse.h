@@ -162,8 +162,9 @@ NK_API nk_bool nk_gamepad_mouse_init(struct nk_gamepads* gamepads, void* user_da
     nk_gamepad_mouse_map_default.buttons[NK_BUTTON_LEFT]   = NK_GAMEPAD_BUTTON_A;
     nk_gamepad_mouse_map_default.buttons[NK_BUTTON_RIGHT]  = NK_GAMEPAD_BUTTON_B;
     nk_gamepad_mouse_map_default.buttons[NK_BUTTON_MIDDLE] = NK_GAMEPAD_BUTTON_X;
-    nk_gamepad_mouse_map_default.buttons[NK_BUTTON_X1] = NK_GAMEPAD_BUTTON_Y;
-    nk_gamepad_mouse_map_default.buttons[NK_BUTTON_X2] = NK_GAMEPAD_BUTTON_START;
+    nk_gamepad_mouse_map_default.buttons[NK_BUTTON_DOUBLE] = NK_GAMEPAD_BUTTON_Y;
+    nk_gamepad_mouse_map_default.buttons[NK_BUTTON_X1]     = NK_GAMEPAD_BUTTON_LB;
+    nk_gamepad_mouse_map_default.buttons[NK_BUTTON_X2]     = NK_GAMEPAD_BUTTON_RB;
 
     return nk_true;
 }
@@ -194,8 +195,8 @@ NK_API const char* nk_gamepad_mouse_button_name(struct nk_gamepads* gamepads, en
             case NK_BUTTON_RIGHT:  return "Right Click";
             case NK_BUTTON_MIDDLE: return "Middle Click";
             case NK_BUTTON_DOUBLE: return "Double Click";
-            case NK_BUTTON_X1:     return "X1";
-            case NK_BUTTON_X2:     return "X2";
+            case NK_BUTTON_X1:     return "Mouse X1";
+            case NK_BUTTON_X2:     return "Mouse X2";
             default: break;
         }
     }
