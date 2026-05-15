@@ -64,6 +64,7 @@ enum nk_gamepad_input_source_type {
     NK_GAMEPAD_INPUT_SOURCE_KEYBOARD, /* A gamepad input source which uses nuklear's keyboard interface to retrieve its input. @see nuklear_gamepad_keyboard_input_source() */
     NK_GAMEPAD_INPUT_SOURCE_SDL3, /* A gamepad input source which uses SDL3 to retrieve its input. @see nk_gamepad_sdl3_input_source() */
     NK_GAMEPAD_INPUT_SOURCE_MOUSE, /* A gamepad input source which uses nuklear's mouse interface to retrieve its input. @see nk_gamepad_mouse_input_source() */
+    NK_GAMEPAD_INPUT_SOURCE_X11, /* A gamepad input source which uses the Linux joystick API to retrieve its input. @see nk_gamepad_x11_input_source() */
     NK_GAMEPAD_INPUT_SOURCE_LAST
 };
 
@@ -421,6 +422,7 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
     !defined(NK_GAMEPAD_RAYLIB) && \
     !defined(NK_GAMEPAD_PNTR) && \
     !defined(NK_GAMEPAD_KEYBOARD) && \
+    !defined(NK_GAMEPAD_X11) && \
     !defined(NK_GAMEPAD_NONE)
     #if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
         #define NK_GAMEPAD_SDL
@@ -432,6 +434,8 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
         #define NK_GAMEPAD_RAYLIB
     #elif defined(PNTR_NUKLEAR_IMPLEMENTATION)
         #define NK_GAMEPAD_PNTR
+    #elif defined(__linux__) && defined(NK_X11_LOAD_OPENGL_EXTENSIONS)
+        #define NK_GAMEPAD_X11
     #endif
 #endif
 
@@ -456,6 +460,9 @@ NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 #endif
 #ifdef NK_GAMEPAD_MOUSE
 #include "nuklear_gamepad_mouse.h"
+#endif
+#ifdef NK_GAMEPAD_X11
+#include "nuklear_gamepad_x11.h"
 #endif
 
 /* Gamepad Source: None - Always available */
@@ -482,6 +489,9 @@ nk_gamepad_input_source_fn nk_gamepad_input_sources[] = {
 #endif
 #ifdef NK_GAMEPAD_MOUSE
     &nk_gamepad_mouse_input_source,
+#endif
+#ifdef NK_GAMEPAD_X11
+    &nk_gamepad_x11_input_source,
 #endif
 
     /* Dummy Gamepad Source */
