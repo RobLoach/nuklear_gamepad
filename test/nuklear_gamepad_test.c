@@ -106,6 +106,53 @@ int main() {
     assert(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_UP), "Up") == 0);
     assert(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_A), "Z") == 0);
 
+    /* nk_gamepad_mouse D-pad threshold */
+    printf("nk_gamepad_mouse D-pad threshold\n");
+    {
+        struct nk_gamepad_mouse_map map;
+        int j;
+
+        /* Custom map: default sensitivity, no button bindings */
+        nk_zero(&map, sizeof(map));
+        map.sensitivity = NK_GAMEPAD_MOUSE_SENSITIVITY;
+        for (j = 0; j < NK_BUTTON_MAX; j++) {
+            map.buttons[j] = NK_GAMEPAD_BUTTON_INVALID;
+        }
+
+        /* Full positive x-delta triggers RIGHT only */
+        nk_gamepad_update(&gamepads);
+        gamepads.ctx->input.mouse.delta.x = map.sensitivity;
+        gamepads.ctx->input.mouse.delta.y = 0.0f;
+        nk_gamepad_mouse_update(&gamepads, &map);
+        assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_RIGHT) == nk_true);
+        assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_LEFT)  == nk_false);
+
+        /* Full negative x-delta triggers LEFT only */
+        nk_gamepad_update(&gamepads);
+        gamepads.ctx->input.mouse.delta.x = -map.sensitivity;
+        gamepads.ctx->input.mouse.delta.y = 0.0f;
+        nk_gamepad_mouse_update(&gamepads, &map);
+        assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_LEFT)  == nk_true);
+        assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_RIGHT) == nk_false);
+
+        /* Half deflection does not trigger D-pad */
+        nk_gamepad_update(&gamepads);
+        gamepads.ctx->input.mouse.delta.x = map.sensitivity * 0.5f;
+        gamepads.ctx->input.mouse.delta.y = 0.0f;
+        nk_gamepad_mouse_update(&gamepads, &map);
+        assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_RIGHT) == nk_false);
+        assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_LEFT)  == nk_false);
+
+        /* Different sensitivity: delta equal to sensitivity triggers */
+        map.sensitivity = 6.0f;
+        nk_gamepad_update(&gamepads);
+        gamepads.ctx->input.mouse.delta.x = 6.0f;
+        gamepads.ctx->input.mouse.delta.y = 6.0f;
+        nk_gamepad_mouse_update(&gamepads, &map);
+        assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_RIGHT) == nk_true);
+        assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_DOWN)  == nk_true);
+    }
+
     printf("nk_gamepad_free()\n");
     nk_gamepad_free(&gamepads);
 
