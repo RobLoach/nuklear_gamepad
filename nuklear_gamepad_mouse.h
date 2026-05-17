@@ -12,6 +12,14 @@
 #define NK_GAMEPAD_MOUSE_SENSITIVITY 12.0f
 #endif
 
+#ifndef NK_GAMEPAD_MOUSE_DPAD_THRESHOLD
+/**
+ * Axis magnitude at or beyond which D-pad buttons are considered pressed (0.0 to 1.0).
+ * Using a threshold instead of exact equality avoids fragility with future sensitivity scaling.
+ */
+#define NK_GAMEPAD_MOUSE_DPAD_THRESHOLD 0.999f
+#endif
+
 /**
  * Mouse mapping to gamepad buttons and axes.
  *
@@ -119,11 +127,11 @@ NK_API void nk_gamepad_mouse_update(struct nk_gamepads* gamepads, void* user_dat
     nk_gamepad_axis(gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X, dx);
     nk_gamepad_axis(gamepads, 0, NK_GAMEPAD_AXIS_LEFT_Y, dy);
 
-    /* When axis reaches max, consider it a D-Pad press. */
-    nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_LEFT,  dx == -1.0f);
-    nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_RIGHT, dx ==  1.0f);
-    nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_UP,    dy == -1.0f);
-    nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_DOWN,  dy ==  1.0f);
+    /* When axis reaches threshold, consider it a D-Pad press. */
+    nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_LEFT,  dx <= -NK_GAMEPAD_MOUSE_DPAD_THRESHOLD);
+    nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_RIGHT, dx >=  NK_GAMEPAD_MOUSE_DPAD_THRESHOLD);
+    nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_UP,    dy <= -NK_GAMEPAD_MOUSE_DPAD_THRESHOLD);
+    nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_DOWN,  dy >=  NK_GAMEPAD_MOUSE_DPAD_THRESHOLD);
 
     /* Scroll maps to right stick axes */
     dx = mouse->scroll_delta.x / map->sensitivity;
