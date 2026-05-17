@@ -358,6 +358,46 @@ NK_API void nk_gamepad_axis(struct nk_gamepads* gamepads, int num, enum nk_gamep
  */
 NK_API float nk_gamepad_get_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis);
 
+#ifndef NK_GAMEPAD_DEFAULT_DEADZONE
+/**
+ * The default radial deadzone radius for stick axes.
+ */
+#define NK_GAMEPAD_DEFAULT_DEADZONE 0.15f
+#endif
+
+/**
+ * Get the current value of an axis with a per-axis deadzone applied.
+ *
+ * Values whose absolute magnitude is below the deadzone return 0.0. Values outside are
+ * rescaled so that deadzone maps to 0.0 and 1.0 maps to 1.0.
+ *
+ * @param gamepads The associated gamepad system.
+ * @param num The gamepad number. -1 will return the first non-zero value across all gamepads.
+ * @param axis The axis to query.
+ * @param deadzone Values below this magnitude are treated as zero (0.0 to 1.0).
+ *
+ * @return The axis value with deadzone applied, ranging -1.0 to 1.0.
+ */
+NK_API float nk_gamepad_get_axis_deadzone(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis, float deadzone);
+
+/**
+ * Get the left or right stick values with a radial deadzone applied.
+ *
+ * A radial deadzone avoids the diagonal-fast-axis bug present in per-axis deadzones.
+ * Stick vectors inside the deadzone circle return (0, 0). Vectors outside are rescaled
+ * to fill the unit circle.
+ *
+ * @param gamepads The associated gamepad system.
+ * @param num The gamepad number.
+ * @param side Which stick: 0 for left, 1 for right.
+ * @param deadzone Radial deadzone radius (0.0 to 1.0). Use NK_GAMEPAD_DEFAULT_DEADZONE for a sensible default.
+ * @param out_x Pointer to receive the X axis value (-1.0 to 1.0).
+ * @param out_y Pointer to receive the Y axis value (-1.0 to 1.0).
+ *
+ * @return nk_true on success, nk_false if gamepads or output pointers are NULL.
+ */
+NK_API nk_bool nk_gamepad_get_stick(struct nk_gamepads* gamepads, int num, int side, float deadzone, float* out_x, float* out_y);
+
 /**
  * Returns the amount of gamepads that could become available.
  *
@@ -611,6 +651,53 @@ NK_API float nk_gamepad_get_axis(struct nk_gamepads* gamepads, int num, enum nk_
     }
 
     return gamepads->gamepads[num].axes[axis];
+}
+
+#ifndef NK_GAMEPAD_SQRT
+#include <math.h>
+#define NK_GAMEPAD_SQRT(x) ((float)sqrt((double)(x)))
+#endif
+
+NK_API float nk_gamepad_get_axis_deadzone(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis, float deadzone) {
+    float value;
+    float abs_value;
+    float sign;
+    value = nk_gamepad_get_axis(gamepads, num, axis);
+    abs_value = value < 0.0f ? -value : value;
+    if (abs_value < deadzone) {
+        return 0.0f;
+    }
+    sign = value < 0.0f ? -1.0f : 1.0f;
+    return sign * (abs_value - deadzone) / (1.0f - deadzone);
+}
+
+NK_API nk_bool nk_gamepad_get_stick(struct nk_gamepads* gamepads, int num, int side, float deadzone, float* out_x, float* out_y) {
+    enum nk_gamepad_axis x_axis;
+    enum nk_gamepad_axis y_axis;
+    float x;
+    float y;
+    float len;
+    float scale;
+    if (gamepads == NULL || out_x == NULL || out_y == NULL) {
+        return nk_false;
+    }
+    x_axis = (side == 0) ? NK_GAMEPAD_AXIS_LEFT_X : NK_GAMEPAD_AXIS_RIGHT_X;
+    y_axis = (side == 0) ? NK_GAMEPAD_AXIS_LEFT_Y : NK_GAMEPAD_AXIS_RIGHT_Y;
+    x = nk_gamepad_get_axis(gamepads, num, x_axis);
+    y = nk_gamepad_get_axis(gamepads, num, y_axis);
+    len = NK_GAMEPAD_SQRT(x * x + y * y);
+    if (len < deadzone) {
+        *out_x = 0.0f;
+        *out_y = 0.0f;
+    } else {
+        scale = (len - deadzone) / (1.0f - deadzone) / len;
+        if (scale > 1.0f) {
+            scale = 1.0f;
+        }
+        *out_x = x * scale;
+        *out_y = y * scale;
+    }
+    return nk_true;
 }
 
 NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {

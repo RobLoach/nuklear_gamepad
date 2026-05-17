@@ -1,5 +1,6 @@
 # nuklear_gamepad_test
 add_executable(nuklear_gamepad_test nuklear_gamepad_test.c)
+target_link_libraries(nuklear_gamepad_test m)
 
 # C99 Standard
 set_property(TARGET nuklear_gamepad_test PROPERTY C_STANDARD 90)

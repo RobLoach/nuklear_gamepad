@@ -56,6 +56,8 @@ nk_bool nk_gamepad_any_button_released(struct nk_gamepads* gamepads, int num, in
 NK_API nk_bool nk_gamepad_any_button_down(struct nk_gamepads* gamepads, int num, int* out_num, enum nk_gamepad_button* out_button);
 void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down);
 float nk_gamepad_get_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis);
+float nk_gamepad_get_axis_deadzone(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis, float deadzone);
+nk_bool nk_gamepad_get_stick(struct nk_gamepads* gamepads, int num, int side, float deadzone, float* out_x, float* out_y);
 void nk_gamepad_axis(struct nk_gamepads* gamepads, int num, enum nk_gamepad_axis axis, float value);
 int nk_gamepad_count(struct nk_gamepads* gamepads);
 const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
@@ -101,6 +103,7 @@ nk_gamepad_free(&gamepads);
 
 | Define | Description  |
 | ------ | ------------ |
+| `NK_GAMEPAD_DEFAULT_DEADZONE` | Default radial deadzone radius (default: `0.15f`) |
 | `NK_GAMEPAD_NONE`     | When set, will avoid detecting which platform to use |
 | `NK_GAMEPAD_SDL`      | Use [SDL](https://www.libsdl.org/) |
 | `NK_GAMEPAD_SDL3`      | Use [SDL3](https://www.libsdl.org/) |
