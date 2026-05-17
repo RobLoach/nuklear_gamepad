@@ -102,7 +102,8 @@ NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event
             SDL_JoystickID which = event->gdevice.which;
             if (SDL_IsGamepad(which)) {
                 int first_free = -1;
-                for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+                int i;
+                for (i = 0; i < NK_GAMEPAD_MAX; i++) {
                     if (gamepads->gamepads[i].data != NULL &&
                         SDL_GetGamepadID((SDL_Gamepad*)gamepads->gamepads[i].data) == which) {
                         first_free = -1;
@@ -123,7 +124,8 @@ NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event
             break;
         }
         case SDL_EVENT_GAMEPAD_REMOVED: {
-            for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+            int i;
+            for (i = 0; i < NK_GAMEPAD_MAX; i++) {
                 if (gamepads->gamepads[i].data != NULL &&
                     SDL_GetGamepadID((SDL_Gamepad*)gamepads->gamepads[i].data) == event->gdevice.which) {
                     SDL_CloseGamepad((SDL_Gamepad*)gamepads->gamepads[i].data);
@@ -138,13 +140,15 @@ NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event
 }
 
 NK_API nk_bool nk_gamepad_sdl3_init(struct nk_gamepads* gamepads, void* user_data) {
+    int count;
+    SDL_JoystickID* joysticks;
     NK_UNUSED(user_data);
     if (gamepads == NULL) {
         return nk_false;
     }
 
-    int count = 0;
-    SDL_JoystickID* joysticks = SDL_GetGamepads(&count);
+    count = 0;
+    joysticks = SDL_GetGamepads(&count);
     if (joysticks) {
         int i;
         for (i = 0; i < count && i < NK_GAMEPAD_MAX; i++) {
@@ -161,12 +165,13 @@ NK_API nk_bool nk_gamepad_sdl3_init(struct nk_gamepads* gamepads, void* user_dat
 }
 
 NK_API void nk_gamepad_sdl3_free(struct nk_gamepads* gamepads, void* user_data) {
+    int i;
     NK_UNUSED(user_data);
     if (!gamepads) {
         return;
     }
 
-    for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+    for (i = 0; i < NK_GAMEPAD_MAX; i++) {
         if (gamepads->gamepads[i].data != NULL) {
             SDL_CloseGamepad((SDL_Gamepad*)gamepads->gamepads[i].data);
             gamepads->gamepads[i].data = NULL;
@@ -203,15 +208,18 @@ SDL_GamepadButton nk_gamepad_sdl3_map_button(int button) {
 }
 
 NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data) {
+    int num;
+    int i;
+    SDL_Gamepad* gamepad;
     NK_UNUSED(user_data);
-    for (int num = 0; num < NK_GAMEPAD_MAX; num++) {
+    for (num = 0; num < NK_GAMEPAD_MAX; num++) {
         if (gamepads->gamepads[num].data == NULL) {
             continue;
         }
 
-        SDL_Gamepad* gamepad = (SDL_Gamepad*)gamepads->gamepads[num].data;
+        gamepad = (SDL_Gamepad*)gamepads->gamepads[num].data;
 
-        // Check to make sure it's still attached.
+        /* Check to make sure it's still attached. */
         if (SDL_GetGamepadID(gamepad) == 0) {
             gamepads->gamepads[num].available = nk_false;
             SDL_CloseGamepad(gamepad);
@@ -219,13 +227,13 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
             continue;
         }
 
-        for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
+        for (i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (SDL_GetGamepadButton(gamepad, nk_gamepad_sdl3_map_button(i))) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
             }
         }
 
-        // Axes: SDL3 returns Sint16 in range -32768..32767 (sticks) or 0..32767 (triggers)
+        /* Axes: SDL3 returns Sint16 in range -32768..32767 (sticks) or 0..32767 (triggers) */
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX) / 32767.0f);
@@ -236,12 +244,13 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
 }
 
 NK_API const char* nk_gamepad_sdl3_name(struct nk_gamepads* gamepads, int num, void* user_data) {
+    const char* name;
     NK_UNUSED(user_data);
     if (gamepads->gamepads[num].data == NULL) {
         return NULL;
     }
 
-    const char* name = SDL_GetGamepadName((SDL_Gamepad*)gamepads->gamepads[num].data);
+    name = SDL_GetGamepadName((SDL_Gamepad*)gamepads->gamepads[num].data);
     if (name == NULL || name[0] == '\0') {
         return gamepads->gamepads[num].name;
     }
@@ -249,11 +258,13 @@ NK_API const char* nk_gamepad_sdl3_name(struct nk_gamepads* gamepads, int num, v
 }
 
 NK_API const char* nk_gamepad_sdl3_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data) {
+    SDL_GamepadButton sdl_button;
     NK_UNUSED(user_data);
 
-    SDL_GamepadButton sdl_button = nk_gamepad_sdl3_map_button(button);
+    sdl_button = nk_gamepad_sdl3_map_button(button);
     if (sdl_button != SDL_GAMEPAD_BUTTON_INVALID && gamepads != NULL) {
-        for (int i = 0; i < NK_GAMEPAD_MAX; i++) {
+        int i;
+        for (i = 0; i < NK_GAMEPAD_MAX; i++) {
             if (gamepads->gamepads[i].data != NULL) {
                 SDL_GamepadButtonLabel label = SDL_GetGamepadButtonLabel(
                     (SDL_Gamepad*)gamepads->gamepads[i].data, sdl_button);
@@ -277,16 +288,15 @@ NK_API const char* nk_gamepad_sdl3_button_name(struct nk_gamepads* gamepads, enu
 }
 
 NK_API struct nk_gamepad_input_source nk_gamepad_sdl3_input_source(void* user_data) {
-    struct nk_gamepad_input_source source = {
-        .user_data = user_data,
-        .init = &nk_gamepad_sdl3_init,
-        .update = &nk_gamepad_sdl3_update,
-        .free = &nk_gamepad_sdl3_free,
-        .name = &nk_gamepad_sdl3_name,
-        .button_name = &nk_gamepad_sdl3_button_name,
-        .input_source_name = "SDL3",
-        .id = NK_GAMEPAD_INPUT_SOURCE_SDL3,
-    };
+    struct nk_gamepad_input_source source;
+    source.user_data = user_data;
+    source.init = &nk_gamepad_sdl3_init;
+    source.update = &nk_gamepad_sdl3_update;
+    source.free = &nk_gamepad_sdl3_free;
+    source.name = &nk_gamepad_sdl3_name;
+    source.button_name = &nk_gamepad_sdl3_button_name;
+    source.input_source_name = "SDL3";
+    source.id = NK_GAMEPAD_INPUT_SOURCE_SDL3;
     return source;
 }
 
