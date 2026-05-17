@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NK_GAMEPAD_TEST_ASSERT(cond) \
+#define NK_ASSERT(cond) \
     do { \
         if (!(cond)) { \
             fprintf(stderr, "Assertion failed: %s (%s:%d)\n", #cond, __FILE__, __LINE__); \
@@ -27,7 +27,7 @@ int main() {
     printf("--------------------\n");
 
     /* NK_GAMEPAD_BUTTON is used with int flags, so we need it to be <32 */
-    NK_GAMEPAD_TEST_ASSERT(NK_GAMEPAD_BUTTON_LAST < (32 - 1));
+    NK_ASSERT(NK_GAMEPAD_BUTTON_LAST < (32 - 1));
 
     /* Initialize the Nuklear context */
     nk_init_default(&ctx, 0);
@@ -37,35 +37,35 @@ int main() {
     nk_gamepad_init(&gamepads, &ctx, NULL);
 
     printf("nk_gamepad_count()\n");
-    NK_GAMEPAD_TEST_ASSERT(nk_gamepad_count(&gamepads) == NK_GAMEPAD_MAX);
+    NK_ASSERT(nk_gamepad_count(&gamepads) == NK_GAMEPAD_MAX);
 
     printf("nk_gamepad_is_available()\n");
     {
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_available(&gamepads, 0) == nk_true);
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_available(&gamepads, 1) == nk_false);
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_available(&gamepads, -1) == nk_true);
+        NK_ASSERT(nk_gamepad_is_available(&gamepads, 0) == nk_true);
+        NK_ASSERT(nk_gamepad_is_available(&gamepads, 1) == nk_false);
+        NK_ASSERT(nk_gamepad_is_available(&gamepads, -1) == nk_true);
     }
 
     printf("nk_gamepad_set_available()\n");
     {
         nk_gamepad_set_available(&gamepads, 0, nk_true);
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_available(&gamepads, 0) == nk_true);
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_available(&gamepads, 1) == nk_false);
+        NK_ASSERT(nk_gamepad_is_available(&gamepads, 0) == nk_true);
+        NK_ASSERT(nk_gamepad_is_available(&gamepads, 1) == nk_false);
         nk_gamepad_set_available(&gamepads, -1, nk_true);
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_available(&gamepads, 0) == nk_true);
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_available(&gamepads, 1) == nk_true);
+        NK_ASSERT(nk_gamepad_is_available(&gamepads, 0) == nk_true);
+        NK_ASSERT(nk_gamepad_is_available(&gamepads, 1) == nk_true);
     }
 
     printf("nk_gamepad_name()\n");
     {
         const char* controller_name = nk_gamepad_name(&gamepads, 0);
-        NK_GAMEPAD_TEST_ASSERT(controller_name != NULL);
-        NK_GAMEPAD_TEST_ASSERT(strcmp(controller_name, "Keyboard") == 0);
+        NK_ASSERT(controller_name != NULL);
+        NK_ASSERT(strcmp(controller_name, "Keyboard") == 0);
     }
 
     {
         const char* controller_name = nk_gamepad_name(&gamepads, 1);
-        NK_GAMEPAD_TEST_ASSERT(controller_name == NULL);
+        NK_ASSERT(controller_name == NULL);
     }
 
     /* Update the state of the gamepads. */
@@ -73,24 +73,24 @@ int main() {
     nk_gamepad_update(&gamepads);
 
     /* Make sure the buttons are not pushed. */
-    NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_A) == nk_false);
-    NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_B) == nk_false);
+    NK_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_A) == nk_false);
+    NK_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_B) == nk_false);
 
     /* Manually state that a button was pushed. */
     printf("nk_gamepad_button()\n");
     nk_gamepad_button(&gamepads, 0, NK_GAMEPAD_BUTTON_A, nk_true);
-    NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_A) == nk_true);
-    NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_B) == nk_false);
-    NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_A) == nk_true);
-    NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_B) == nk_false);
+    NK_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_A) == nk_true);
+    NK_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_B) == nk_false);
+    NK_ASSERT(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_A) == nk_true);
+    NK_ASSERT(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_B) == nk_false);
 
     /* nk_gamepad_any_button_pressed() */
     {
         int num = 9999;
         enum nk_gamepad_button button = NK_GAMEPAD_BUTTON_B;
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_any_button_pressed(&gamepads, -1, &num, &button) == nk_true);
-        NK_GAMEPAD_TEST_ASSERT(num == 0);
-        NK_GAMEPAD_TEST_ASSERT(button == NK_GAMEPAD_BUTTON_A);
+        NK_ASSERT(nk_gamepad_any_button_pressed(&gamepads, -1, &num, &button) == nk_true);
+        NK_ASSERT(num == 0);
+        NK_ASSERT(button == NK_GAMEPAD_BUTTON_A);
     }
 
     /* Update the state so that the release checks can be processed */
@@ -100,19 +100,19 @@ int main() {
     {
         int num = 9999;
         enum nk_gamepad_button button = NK_GAMEPAD_BUTTON_B;
-        NK_GAMEPAD_TEST_ASSERT(!nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_A));
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_is_button_released(&gamepads, -1, NK_GAMEPAD_BUTTON_A));
-        NK_GAMEPAD_TEST_ASSERT(!nk_gamepad_is_button_released(&gamepads, -1, NK_GAMEPAD_BUTTON_B));
-        NK_GAMEPAD_TEST_ASSERT(nk_gamepad_any_button_released(&gamepads, -1, &num, &button) == nk_true);
-        NK_GAMEPAD_TEST_ASSERT(num == 0);
-        NK_GAMEPAD_TEST_ASSERT(button == NK_GAMEPAD_BUTTON_A);
+        NK_ASSERT(!nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_A));
+        NK_ASSERT(nk_gamepad_is_button_released(&gamepads, -1, NK_GAMEPAD_BUTTON_A));
+        NK_ASSERT(!nk_gamepad_is_button_released(&gamepads, -1, NK_GAMEPAD_BUTTON_B));
+        NK_ASSERT(nk_gamepad_any_button_released(&gamepads, -1, &num, &button) == nk_true);
+        NK_ASSERT(num == 0);
+        NK_ASSERT(button == NK_GAMEPAD_BUTTON_A);
     }
 
     /* nk_gamepad_button_name() */
-    NK_GAMEPAD_TEST_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_B), "B") == 0);
-    NK_GAMEPAD_TEST_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_START), "Start") == 0);
-    NK_GAMEPAD_TEST_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_UP), "Up") == 0);
-    NK_GAMEPAD_TEST_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_A), "Z") == 0);
+    NK_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_B), "B") == 0);
+    NK_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_START), "Start") == 0);
+    NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_UP), "Up") == 0);
+    NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_A), "Z") == 0);
 
     printf("nk_gamepad_free()\n");
     nk_gamepad_free(&gamepads);
