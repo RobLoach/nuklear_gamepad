@@ -7,9 +7,9 @@ set_property(TARGET nuklear_gamepad_test PROPERTY C_STANDARD_REQUIRED TRUE)
 
 # Strict Warnings and Errors
 if(MSVC)
-    target_compile_options(nuklear_gamepad_test PRIVATE /W4 /WX)
+    target_compile_options(nuklear_gamepad_test PRIVATE /W4 /WX /UNDEBUG)
 else()
-    target_compile_options(nuklear_gamepad_test PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(nuklear_gamepad_test PRIVATE -Wall -Wextra -Wpedantic -UNDEBUG)
 endif()
 
 # Set up the test
