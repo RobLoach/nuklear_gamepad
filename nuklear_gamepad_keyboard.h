@@ -173,7 +173,19 @@ NK_API const char* nk_gamepad_keyboard_button_name(struct nk_gamepads* gamepads,
             case NK_KEY_COPY:      return "Copy";
             case NK_KEY_CUT:       return "Cut";
             case NK_KEY_PASTE:     return "Paste";
-            /* TODO: Add F1-F12, ALT */
+            case NK_KEY_F1:        return "F1";
+            case NK_KEY_F2:        return "F2";
+            case NK_KEY_F3:        return "F3";
+            case NK_KEY_F4:        return "F4";
+            case NK_KEY_F5:        return "F5";
+            case NK_KEY_F6:        return "F6";
+            case NK_KEY_F7:        return "F7";
+            case NK_KEY_F8:        return "F8";
+            case NK_KEY_F9:        return "F9";
+            case NK_KEY_F10:       return "F10";
+            case NK_KEY_F11:       return "F11";
+            case NK_KEY_F12:       return "F12";
+            case NK_KEY_ALT:       return "Alt";
             default: break;
         }
     }

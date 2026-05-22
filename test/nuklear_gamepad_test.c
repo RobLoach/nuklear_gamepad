@@ -115,6 +115,19 @@ int main() {
     NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_UP), "Up") == 0);
     NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_A), "Z") == 0);
 
+    /* keyboard: F-key and Alt names */
+    {
+        struct nk_gamepad_keyboard_map fmap;
+        struct nk_gamepads kbd_gamepads;
+        nk_zero(&fmap, sizeof(fmap));
+        fmap.keys[NK_GAMEPAD_BUTTON_A] = NK_KEY_F5;
+        fmap.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_ALT;
+        nk_gamepad_init_with_source(&kbd_gamepads, &ctx, nk_gamepad_keyboard_input_source(&fmap));
+        NK_ASSERT(strcmp(nk_gamepad_button_name(&kbd_gamepads, NK_GAMEPAD_BUTTON_A), "F5") == 0);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(&kbd_gamepads, NK_GAMEPAD_BUTTON_B), "Alt") == 0);
+        nk_gamepad_free(&kbd_gamepads);
+    }
+
     /* nk_gamepad_mouse D-pad threshold */
     printf("nk_gamepad_mouse D-pad threshold\n");
     {
