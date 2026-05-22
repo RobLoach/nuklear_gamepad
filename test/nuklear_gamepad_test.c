@@ -43,6 +43,9 @@ int main() {
     printf("nk_gamepad_init()\n");
     nk_gamepad_init(&gamepads, &ctx, NULL);
 
+    printf("nk_gamepad_input_source_count()\n");
+    NK_ASSERT(nk_gamepad_input_source_count() >= 1);
+
     printf("nk_gamepad_count()\n");
     NK_ASSERT(nk_gamepad_count(&gamepads) == NK_GAMEPAD_MAX);
 

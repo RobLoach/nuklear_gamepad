@@ -409,6 +409,13 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
  */
 NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 
+/**
+ * Returns the number of available compiled gamepad input sources.
+ *
+ * @return The count of entries in nk_gamepad_input_sources[], not counting the NULL terminator.
+ */
+NK_API int nk_gamepad_input_source_count(void);
+
 #ifdef __cplusplus
 }
 #endif
@@ -920,6 +927,12 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
     NK_MEMCPY(gamepads, &new_gamepads, sizeof(struct nk_gamepads));
 
     return nk_true;
+}
+
+NK_API int nk_gamepad_input_source_count(void) {
+    int i = 0;
+    while (nk_gamepad_input_sources[i] != NULL) i++;
+    return i;
 }
 
 #ifdef __cplusplus
