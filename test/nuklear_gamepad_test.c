@@ -184,6 +184,15 @@ int main() {
         assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_DOWN)  == nk_true);
     }
 
+    /* nk_gamepad_axis() / nk_gamepad_get_axis() */
+    printf("nk_gamepad_axis()\n");
+    nk_gamepad_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X, 0.75f);
+    NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X) == 0.75f);
+    NK_ASSERT(nk_gamepad_get_axis(&gamepads, -1, NK_GAMEPAD_AXIS_LEFT_X) == 0.75f);
+    NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_INVALID) == 0.0f);
+    nk_gamepad_update(&gamepads);
+    NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X) == 0.0f);
+
     printf("nk_gamepad_free()\n");
     nk_gamepad_free(&gamepads);
 
