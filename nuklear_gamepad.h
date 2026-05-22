@@ -328,6 +328,15 @@ NK_API nk_bool nk_gamepad_any_button_down(struct nk_gamepads* gamepads, int num,
 NK_API const char* nk_gamepad_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button);
 
 /**
+ * Get the human-readable name of a gamepad axis.
+ *
+ * @param gamepads The associated gamepad system. Can be NULL to use built-in names.
+ * @param axis The axis to get the name for.
+ * @return The name of the axis, or NULL if the axis is invalid.
+ */
+NK_API const char* nk_gamepad_axis_name(struct nk_gamepads* gamepads, enum nk_gamepad_axis axis);
+
+/**
  * Invoke a button press or release event for the specified gamepad.
  *
  * @param gamepads The associated gamepad system.
@@ -865,6 +874,19 @@ NK_API const char* nk_gamepad_button_name(struct nk_gamepads* gamepads, enum nk_
         case NK_GAMEPAD_BUTTON_START: return "Start";
         case NK_GAMEPAD_BUTTON_GUIDE: return "Guide";
         default:                      return NULL;
+    }
+}
+
+NK_API const char* nk_gamepad_axis_name(struct nk_gamepads* gamepads, enum nk_gamepad_axis axis) {
+    (void)gamepads;
+    switch (axis) {
+        case NK_GAMEPAD_AXIS_LEFT_X:        return "Left Stick X";
+        case NK_GAMEPAD_AXIS_LEFT_Y:        return "Left Stick Y";
+        case NK_GAMEPAD_AXIS_RIGHT_X:       return "Right Stick X";
+        case NK_GAMEPAD_AXIS_RIGHT_Y:       return "Right Stick Y";
+        case NK_GAMEPAD_AXIS_LEFT_TRIGGER:  return "Left Trigger";
+        case NK_GAMEPAD_AXIS_RIGHT_TRIGGER: return "Right Trigger";
+        default:                            return NULL;
     }
 }
 
