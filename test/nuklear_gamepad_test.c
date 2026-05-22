@@ -28,9 +28,9 @@ int main() {
     printf("--------------------\n");
 
     /* NK_GAMEPAD_VERSION macros */
-    #if NK_GAMEPAD_VERSION_MAJOR >= 1
-    NK_ASSERT(NK_GAMEPAD_VERSION_MAJOR >= 1);
-    #endif
+    NK_ASSERT(NK_GAMEPAD_VERSION_MAJOR == 1);
+    NK_ASSERT(NK_GAMEPAD_VERSION_MINOR == 0);
+    NK_ASSERT(NK_GAMEPAD_VERSION_PATCH == 2);
     NK_ASSERT(strcmp(NK_GAMEPAD_VERSION, "1.0.2") == 0);
 
     /* NK_GAMEPAD_BUTTON is used with int flags, so we need it to be <32 */
