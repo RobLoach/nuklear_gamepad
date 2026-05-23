@@ -27,6 +27,12 @@ int main() {
     printf("nuklear_gamepad_test\n");
     printf("--------------------\n");
 
+    /* NK_GAMEPAD_VERSION macros */
+    NK_ASSERT(NK_GAMEPAD_VERSION_MAJOR == 1);
+    NK_ASSERT(NK_GAMEPAD_VERSION_MINOR == 0);
+    NK_ASSERT(NK_GAMEPAD_VERSION_PATCH == 2);
+    NK_ASSERT(strcmp(NK_GAMEPAD_VERSION, "1.0.2") == 0);
+
     /* NK_GAMEPAD_BUTTON is used with int flags, so we need it to be <32 */
     NK_ASSERT(NK_GAMEPAD_BUTTON_LAST < (32 - 1));
 
@@ -120,6 +126,19 @@ int main() {
     NK_ASSERT(strcmp(nk_gamepad_axis_name(NULL, NK_GAMEPAD_AXIS_RIGHT_TRIGGER), "Right Trigger") == 0);
     NK_ASSERT(strcmp(nk_gamepad_axis_name(&gamepads, NK_GAMEPAD_AXIS_LEFT_Y), "Left Stick Y") == 0);
     NK_ASSERT(nk_gamepad_axis_name(NULL, NK_GAMEPAD_AXIS_INVALID) == NULL);
+
+    /* keyboard: F-key and Alt names */
+    {
+        struct nk_gamepad_keyboard_map fmap;
+        struct nk_gamepads kbd_gamepads;
+        nk_zero(&fmap, sizeof(fmap));
+        fmap.keys[NK_GAMEPAD_BUTTON_A] = NK_KEY_F5;
+        fmap.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_ALT;
+        nk_gamepad_init_with_source(&kbd_gamepads, &ctx, nk_gamepad_keyboard_input_source(&fmap));
+        NK_ASSERT(strcmp(nk_gamepad_button_name(&kbd_gamepads, NK_GAMEPAD_BUTTON_A), "F5") == 0);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(&kbd_gamepads, NK_GAMEPAD_BUTTON_B), "Alt") == 0);
+        nk_gamepad_free(&kbd_gamepads);
+    }
 
     /* nk_gamepad_mouse D-pad threshold */
     printf("nk_gamepad_mouse D-pad threshold\n");

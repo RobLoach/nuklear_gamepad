@@ -27,6 +27,11 @@
 #ifndef NUKLEAR_GAMEPAD_H__
 #define NUKLEAR_GAMEPAD_H__
 
+#define NK_GAMEPAD_VERSION "1.0.2"
+#define NK_GAMEPAD_VERSION_MAJOR 1
+#define NK_GAMEPAD_VERSION_MINOR 0
+#define NK_GAMEPAD_VERSION_PATCH 2
+
 #ifndef NK_GAMEPAD_MAX
 /**
  * The maximum amount of gamepads that can be supported.
