@@ -119,6 +119,7 @@ typedef void (*nk_gamepad_update_fn)(struct nk_gamepads *gamepads, void* user_da
 typedef void (*nk_gamepad_free_fn)(struct nk_gamepads *gamepads, void* user_data);
 typedef const char *(*nk_gamepad_name_fn)(struct nk_gamepads *gamepads, int num, void* user_data);
 typedef const char *(*nk_gamepad_button_name_fn)(struct nk_gamepads *gamepads, enum nk_gamepad_button button, void* user_data);
+typedef const char *(*nk_gamepad_axis_name_fn)(struct nk_gamepads *gamepads, enum nk_gamepad_axis axis, void* user_data);
 
 /**
  * A function to retrieve an input source definition.
@@ -137,6 +138,7 @@ struct nk_gamepad_input_source {
     nk_gamepad_free_fn free;
     nk_gamepad_name_fn name; /* Callback to get the name of a plugged in controller. */
     nk_gamepad_button_name_fn button_name; /* Callback to get the name of a button. Falls back to built-in names if NULL. */
+    nk_gamepad_axis_name_fn axis_name; /* Callback to get the name of an axis. Falls back to built-in names if NULL. */
     const char* input_source_name; /* The human-readable name of the input source. */
     enum nk_gamepad_input_source_type id; /* A unique identifier of the input source. */
 };
@@ -331,6 +333,15 @@ NK_API nk_bool nk_gamepad_any_button_down(struct nk_gamepads* gamepads, int num,
  * @endcode
  */
 NK_API const char* nk_gamepad_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button);
+
+/**
+ * Get the human-readable name of a gamepad axis.
+ *
+ * @param gamepads The associated gamepad system. Can be NULL to use built-in names.
+ * @param axis The axis to get the name for.
+ * @return The name of the axis, or NULL if the axis is invalid.
+ */
+NK_API const char* nk_gamepad_axis_name(struct nk_gamepads* gamepads, enum nk_gamepad_axis axis);
 
 /**
  * Invoke a button press or release event for the specified gamepad.
@@ -877,6 +888,21 @@ NK_API const char* nk_gamepad_button_name(struct nk_gamepads* gamepads, enum nk_
         case NK_GAMEPAD_BUTTON_START: return "Start";
         case NK_GAMEPAD_BUTTON_GUIDE: return "Guide";
         default:                      return NULL;
+    }
+}
+
+NK_API const char* nk_gamepad_axis_name(struct nk_gamepads* gamepads, enum nk_gamepad_axis axis) {
+    if (gamepads != NULL && gamepads->input_source.axis_name != NULL) {
+        return gamepads->input_source.axis_name(gamepads, axis, gamepads->input_source.user_data);
+    }
+    switch (axis) {
+        case NK_GAMEPAD_AXIS_LEFT_X:        return "Left Stick X";
+        case NK_GAMEPAD_AXIS_LEFT_Y:        return "Left Stick Y";
+        case NK_GAMEPAD_AXIS_RIGHT_X:       return "Right Stick X";
+        case NK_GAMEPAD_AXIS_RIGHT_Y:       return "Right Stick Y";
+        case NK_GAMEPAD_AXIS_LEFT_TRIGGER:  return "Left Trigger";
+        case NK_GAMEPAD_AXIS_RIGHT_TRIGGER: return "Right Trigger";
+        default:                            return NULL;
     }
 }
 

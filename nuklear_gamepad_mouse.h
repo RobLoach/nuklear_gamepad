@@ -220,6 +220,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_mouse_input_source(void* user_d
     source.free = NULL;
     source.name = &nk_gamepad_mouse_name;
     source.button_name = &nk_gamepad_mouse_button_name;
+    source.axis_name = NULL;
     source.input_source_name = "Mouse";
     source.id = NK_GAMEPAD_INPUT_SOURCE_MOUSE;
     return source;

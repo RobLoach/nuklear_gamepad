@@ -124,6 +124,12 @@ int main() {
     NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_UP), "Up") == 0);
     NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_A), "Z") == 0);
 
+    /* nk_gamepad_axis_name() */
+    NK_ASSERT(strcmp(nk_gamepad_axis_name(NULL, NK_GAMEPAD_AXIS_LEFT_X), "Left Stick X") == 0);
+    NK_ASSERT(strcmp(nk_gamepad_axis_name(NULL, NK_GAMEPAD_AXIS_RIGHT_TRIGGER), "Right Trigger") == 0);
+    NK_ASSERT(strcmp(nk_gamepad_axis_name(&gamepads, NK_GAMEPAD_AXIS_LEFT_Y), "Left Stick Y") == 0);
+    NK_ASSERT(nk_gamepad_axis_name(NULL, NK_GAMEPAD_AXIS_INVALID) == NULL);
+
     /* keyboard: F-key and Alt names */
     {
         struct nk_gamepad_keyboard_map fmap;
