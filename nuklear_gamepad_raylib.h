@@ -92,6 +92,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_raylib_input_source(void* user_
     source.free = NULL;
     source.name = &nk_gamepad_raylib_name;
     source.button_name = NULL;
+    source.axis_name = NULL;
     source.input_source_name = "raylib";
     source.id = NK_GAMEPAD_INPUT_SOURCE_RAYLIB;
     return source;
