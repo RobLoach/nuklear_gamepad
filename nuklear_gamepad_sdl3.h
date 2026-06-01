@@ -243,9 +243,9 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) / 32767.0f);
 
-        /* L2/R2: synthesized from trigger axes (active when axis > 50%) */
-        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 16383 ? nk_true : nk_false);
-        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 16383 ? nk_true : nk_false);
+        /* L2 / R2 */
+        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > (16383 + 100) ? nk_true : nk_false);
+        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > (16383 + 100) ? nk_true : nk_false);
     }
 }
 

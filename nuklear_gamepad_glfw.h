@@ -87,9 +87,9 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER,  (state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]  + 1.0f) * 0.5f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] + 1.0f) * 0.5f);
 
-        /* L2/R2: synthesized from trigger axes (active when axis > 0 after remapping from -1..1 to 0..1) */
-        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]  > 0.0f ? nk_true : nk_false);
-        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.0f ? nk_true : nk_false);
+        /* L2 / R2 */
+        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]  > 0.1f ? nk_true : nk_false);
+        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.1f ? nk_true : nk_false);
     }
 }
 
