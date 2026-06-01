@@ -92,11 +92,15 @@ enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_B, /** Right face button. */
     NK_GAMEPAD_BUTTON_X, /** Left face button. */
     NK_GAMEPAD_BUTTON_Y, /** Top face button. */
-    NK_GAMEPAD_BUTTON_LB,
-    NK_GAMEPAD_BUTTON_RB,
-    NK_GAMEPAD_BUTTON_BACK,
-    NK_GAMEPAD_BUTTON_START,
-    NK_GAMEPAD_BUTTON_GUIDE,
+    NK_GAMEPAD_BUTTON_LB, /** Left Bumper. */
+    NK_GAMEPAD_BUTTON_RB, /** Right Bumper. */
+    NK_GAMEPAD_BUTTON_BACK, /** Select. */
+    NK_GAMEPAD_BUTTON_START, /** Start. */
+    NK_GAMEPAD_BUTTON_GUIDE, /** The Menu button. */
+    NK_GAMEPAD_BUTTON_L2, /** Left trigger pressed as a digital button. */
+    NK_GAMEPAD_BUTTON_R2, /** Right trigger pressed as a digital button. */
+    NK_GAMEPAD_BUTTON_L3, /** Left thumbstick. */
+    NK_GAMEPAD_BUTTON_R3, /** Right thumbstick. */
     NK_GAMEPAD_BUTTON_LAST
 };
 
@@ -887,6 +891,10 @@ NK_API const char* nk_gamepad_button_name(struct nk_gamepads* gamepads, enum nk_
         case NK_GAMEPAD_BUTTON_BACK:  return "Back";
         case NK_GAMEPAD_BUTTON_START: return "Start";
         case NK_GAMEPAD_BUTTON_GUIDE: return "Guide";
+        case NK_GAMEPAD_BUTTON_L2:    return "L2";
+        case NK_GAMEPAD_BUTTON_R2:    return "R2";
+        case NK_GAMEPAD_BUTTON_L3:    return "L3";
+        case NK_GAMEPAD_BUTTON_R3:    return "R3";
         default:                      return NULL;
     }
 }
