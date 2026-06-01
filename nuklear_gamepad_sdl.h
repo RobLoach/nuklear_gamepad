@@ -114,6 +114,8 @@ SDL_GameControllerButton nk_gamepad_sdl_map_button(int button) {
         case NK_GAMEPAD_BUTTON_BACK: return SDL_CONTROLLER_BUTTON_BACK;
         case NK_GAMEPAD_BUTTON_START: return SDL_CONTROLLER_BUTTON_START;
         case NK_GAMEPAD_BUTTON_GUIDE: return SDL_CONTROLLER_BUTTON_GUIDE;
+        case NK_GAMEPAD_BUTTON_L3: return SDL_CONTROLLER_BUTTON_LEFTSTICK;
+        case NK_GAMEPAD_BUTTON_R3: return SDL_CONTROLLER_BUTTON_RIGHTSTICK;
         default: return SDL_CONTROLLER_BUTTON_INVALID;
     }
 }
@@ -151,6 +153,10 @@ NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads, void* user_data)
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_Y, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / 32767.0f);
+
+        /* L2/R2: synthesized from trigger axes (active when axis > 50%) */
+        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 16383 ? nk_true : nk_false);
+        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 16383 ? nk_true : nk_false);
     }
 }
 
