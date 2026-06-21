@@ -67,6 +67,14 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads, void* user_data) {
             }
         }
 
+        /* L2/R2: convert analog trigger axis to digital button */
+        if (GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5f) {
+            nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, nk_true);
+        }
+        if (GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_TRIGGER) > 0.5f) {
+            nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, nk_true);
+        }
+
         /* Axes: raylib returns -1..1 for sticks and 0..1 for triggers */
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X,       GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_X));
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y,       GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_Y));
