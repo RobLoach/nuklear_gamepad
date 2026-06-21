@@ -122,7 +122,7 @@ int main() {
     NK_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_B), "B") == 0);
     NK_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_START), "Start") == 0);
     NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_UP), "Up") == 0);
-    NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_A), "Z") == 0);
+    NK_ASSERT(strcmp(nk_gamepad_button_name(&gamepads, NK_GAMEPAD_BUTTON_A), "Ctrl") == 0);
 
     /* nk_gamepad_axis_name() */
     NK_ASSERT(strcmp(nk_gamepad_axis_name(NULL, NK_GAMEPAD_AXIS_LEFT_X), "Left Stick X") == 0);
