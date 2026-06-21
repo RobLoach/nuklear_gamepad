@@ -23,7 +23,7 @@ extern "C" {
 /**
  * Keyboard input source for the gamepad.
  *
- * Since Nuklear's text buffer is cleared every frame, this only captures button presses, not holds.
+ * Buttons mapped via nk_keys support holds. Char-mapped buttons only detect single-frame presses.
  *
  * @param user_data [nk_gamepad_keyboard_map] A custom keyboard map. If NULL, the default keyboard map is used.
  *
@@ -113,8 +113,8 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_DOWN] = NK_KEY_DOWN;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_LEFT] = NK_KEY_LEFT;
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_RIGHT] = NK_KEY_RIGHT;
-    /* nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_BACKSPACE; */
-    /* nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_A] = NK_KEY_CTRL; */
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_A] = NK_KEY_CTRL;
+    nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_BACKSPACE;
 
     /* Text Buttons */
     for (i = 0; i < 256; i++) {
