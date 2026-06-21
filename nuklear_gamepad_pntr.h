@@ -59,11 +59,16 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data) {
     app = (pntr_app*)gamepads->input_source.user_data;
 
     for (int num = 0; num < PNTR_APP_MAX_GAMEPADS; num++) {
-        nk_bool has_activity = (app->gamepadButtonState[num] != 0 || app->gamepadButtonStatePrevious[num] != 0) ? nk_true : nk_false;
-        gamepads->gamepads[num].available = has_activity;
-        if (!has_activity) {
-            continue;
+        // pntr has no gamepad connect/disconnect events, so detect availability
+        // via button presses (state transitions). Once detected, the gamepad
+        // stays available since there is no way to detect disconnection.
+        if (!gamepads->gamepads[num].available) {
+            if ((app->gamepadButtonState[num] & ~app->gamepadButtonStatePrevious[num]) == 0) {
+                continue;
+            }
+            gamepads->gamepads[num].available = nk_true;
         }
+
         for (int i = NK_GAMEPAD_BUTTON_FIRST; i < NK_GAMEPAD_BUTTON_LAST; i++) {
             if (pntr_app_gamepad_button_down(app, num, nk_gamepad_pntr_map_button(i))) {
                 nk_gamepad_button(gamepads, num, (enum nk_gamepad_button)i, nk_true);
