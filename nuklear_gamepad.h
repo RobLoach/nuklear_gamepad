@@ -615,6 +615,13 @@ NK_API void nk_gamepad_axis(struct nk_gamepads* gamepads, int num, enum nk_gamep
     if (gamepads->gamepads[num].available == nk_false) {
         return;
     }
+    if (axis == NK_GAMEPAD_AXIS_LEFT_TRIGGER || axis == NK_GAMEPAD_AXIS_RIGHT_TRIGGER) {
+        if (value < 0.0f) value = 0.0f;
+        else if (value > 1.0f) value = 1.0f;
+    } else {
+        if (value < -1.0f) value = -1.0f;
+        else if (value > 1.0f) value = 1.0f;
+    }
     gamepads->gamepads[num].axes[axis] = value;
 }
 
