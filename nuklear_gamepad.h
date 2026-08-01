@@ -596,7 +596,10 @@ NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
 }
 
 NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down) {
-    if (gamepads == NULL || num < 0 || num >= NK_GAMEPAD_MAX || gamepads->gamepads[num].available == nk_false) {
+    if (gamepads == NULL || num < 0 || num >= NK_GAMEPAD_MAX || button < 0 || button >= NK_GAMEPAD_BUTTON_LAST) {
+        return;
+    }
+    if (gamepads->gamepads[num].available == nk_false) {
         return;
     }
 
@@ -668,7 +671,7 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
 }
 
 NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
-    if (gamepads == NULL) {
+    if (gamepads == NULL || button < 0 || button >= NK_GAMEPAD_BUTTON_LAST) {
         return nk_false;
     }
 
@@ -689,7 +692,7 @@ NK_API nk_bool nk_gamepad_is_button_down(struct nk_gamepads* gamepads, int num, 
 }
 
 NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
-    if (gamepads == NULL) {
+    if (gamepads == NULL || button < 0 || button >= NK_GAMEPAD_BUTTON_LAST) {
         return nk_false;
     }
 
@@ -711,7 +714,7 @@ NK_API nk_bool nk_gamepad_is_button_pressed(struct nk_gamepads* gamepads, int nu
 }
 
 NK_API nk_bool nk_gamepad_is_button_released(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button) {
-    if (gamepads == NULL) {
+    if (gamepads == NULL || button < 0 || button >= NK_GAMEPAD_BUTTON_LAST) {
         return nk_false;
     }
 
