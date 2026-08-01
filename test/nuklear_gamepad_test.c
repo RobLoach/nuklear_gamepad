@@ -78,6 +78,14 @@ int main() {
         NK_ASSERT(controller_name == NULL);
     }
 
+    /* Make sure the default controller names are generated correctly. */
+    printf("default controller names\n");
+    {
+        NK_ASSERT(strcmp(gamepads.gamepads[1].name, "Controller 2") == 0);
+        NK_ASSERT(strcmp(gamepads.gamepads[2].name, "Controller 3") == 0);
+        NK_ASSERT((int)strlen(gamepads.gamepads[1].name) < NK_GAMEPAD_NAME_SIZE);
+    }
+
     /* Update the state of the gamepads. */
     printf("nk_gamepad_update()\n");
     nk_gamepad_update(&gamepads);

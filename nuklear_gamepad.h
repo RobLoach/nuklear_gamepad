@@ -538,8 +538,45 @@ NK_API nk_bool nk_gamepad_init(struct nk_gamepads* gamepads, struct nk_context* 
     return nk_gamepad_init_with_source(gamepads, ctx, NK_GAMEPAD_DEFAULT_INPUT_SOURCE(user_data));
 }
 
+/**
+ * Writes the given non-negative number to the buffer as a string.
+ *
+ * Avoids nuklear's nk_itoa, which is not available when NK_GAMEPAD_IMPLEMENTATION
+ * is defined in a translation unit without NK_IMPLEMENTATION.
+ *
+ * @param buffer The buffer to write to, which must hold at least 12 characters.
+ * @param number The non-negative number to write.
+ *
+ * @return The length of the written string, excluding the NUL terminator.
+ *
+ * @internal
+ */
+NK_INTERN int nk_gamepad_int_to_string(char* buffer, int number) {
+    int length = 0;
+    int j;
+    char temp;
+
+    /* Write out the digits in reverse order. */
+    do {
+        buffer[length++] = (char)('0' + (number % 10));
+        number /= 10;
+    } while (number > 0);
+
+    /* Reverse the digits into place. */
+    for (j = 0; j < length / 2; j++) {
+        temp = buffer[j];
+        buffer[j] = buffer[length - 1 - j];
+        buffer[length - 1 - j] = temp;
+    }
+
+    buffer[length] = '\0';
+    return length;
+}
+
 NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct nk_context* ctx, struct nk_gamepad_input_source input_source) {
     int i;
+    const char* name_prefix = NK_GAMEPAD_NAME_PREFIX;
+    int name_prefix_length = nk_strlen(NK_GAMEPAD_NAME_PREFIX);
     if (gamepads == NULL) {
         return nk_false;
     }
@@ -553,13 +590,26 @@ NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct 
     for (i = 0; i < NK_GAMEPAD_MAX; i++) {
         /* Name */
         int j;
-        const char* name_prefix = NK_GAMEPAD_NAME_PREFIX;
-        for (j = 0; j < nk_strlen(name_prefix); j++) {
+        char number[12];
+        int number_length = nk_gamepad_int_to_string(number, i + 1);
+
+        /* Truncate the prefix so the # and NUL terminator always fit. */
+        int prefix_length = name_prefix_length;
+        if (prefix_length + number_length + 1 > NK_GAMEPAD_NAME_SIZE) {
+            prefix_length = NK_GAMEPAD_NAME_SIZE - number_length - 1;
+            if (prefix_length < 0) {
+                prefix_length = 0;
+            }
+        }
+        for (j = 0; j < prefix_length; j++) {
             gamepads->gamepads[i].name[j] = name_prefix[j];
         }
 
         /* Add the # of the controller to the name. */
-        nk_itoa(&gamepads->gamepads[i].name[j], (long)(i + 1));
+        for (j = 0; j < number_length && prefix_length + j + 1 < NK_GAMEPAD_NAME_SIZE; j++) {
+            gamepads->gamepads[i].name[prefix_length + j] = number[j];
+        }
+        gamepads->gamepads[i].name[prefix_length + j] = '\0';
     }
 
     /* Run the init() callback, or update() if it's not available. */
