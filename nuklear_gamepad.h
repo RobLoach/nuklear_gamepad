@@ -422,7 +422,7 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
 /**
  * An null-terminated array of the available compiled gamepad input sources.
  */
-NK_API nk_gamepad_input_source_fn nk_gamepad_input_sources[];
+extern nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 
 /**
  * Returns the number of available compiled gamepad input sources.
