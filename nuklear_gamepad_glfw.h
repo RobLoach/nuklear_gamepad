@@ -1,12 +1,6 @@
 #ifndef NUKLEAR_GAMEPAD_GLFW_H__
 #define NUKLEAR_GAMEPAD_GLFW_H__
 
-#if !defined(NK_GAMEPAD_MAX) && defined(GLFW_JOYSTICK_LAST)
-#define NK_GAMEPAD_MAX GLFW_JOYSTICK_LAST
-#elif !defined(NK_GAMEPAD_MAX)
-#define NK_GAMEPAD_MAX 4
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -58,7 +52,7 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
         return;
     }
 
-    for (num = 0; num < NK_GAMEPAD_MAX; num++) {
+    for (num = 0; num < NK_GAMEPAD_MAX && num <= GLFW_JOYSTICK_LAST; num++) {
         /* Make sure it's available. */
         if (glfwJoystickIsGamepad(num) == GLFW_FALSE) {
             gamepads->gamepads[num].available = nk_false;

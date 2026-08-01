@@ -1,10 +1,6 @@
 #ifndef NUKLEAR_GAMEPAD_NONE_H__
 #define NUKLEAR_GAMEPAD_NONE_H__
 
-#if !defined(NK_GAMEPAD_MAX)
-#define NK_GAMEPAD_MAX 0
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

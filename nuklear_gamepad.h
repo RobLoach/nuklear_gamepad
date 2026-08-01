@@ -35,6 +35,8 @@
 #ifndef NK_GAMEPAD_MAX
 /**
  * The maximum amount of gamepads that can be supported.
+ *
+ * Define this before including nuklear_gamepad.h to change the amount.
  */
 #define NK_GAMEPAD_MAX 4
 #endif
