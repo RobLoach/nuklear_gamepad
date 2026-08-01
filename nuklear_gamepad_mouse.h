@@ -1,10 +1,6 @@
 #ifndef NUKLEAR_GAMEPAD_MOUSE_H__
 #define NUKLEAR_GAMEPAD_MOUSE_H__
 
-#ifndef NK_GAMEPAD_MAX
-#define NK_GAMEPAD_MAX 1
-#endif
-
 #ifndef NK_GAMEPAD_MOUSE_SENSITIVITY
 /**
  * Default mouse sensitivity: Pixels of delta per frame to reach full axis.

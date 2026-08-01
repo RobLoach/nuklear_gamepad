@@ -1,11 +1,6 @@
 #ifndef NUKLEAR_GAMEPAD_PNTR_H__
 #define NUKLEAR_GAMEPAD_PNTR_H__
 
-#ifndef NK_GAMEPAD_MAX
-#define NK_GAMEPAD_MAX PNTR_APP_MAX_GAMEPADS
-#endif
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -58,7 +53,7 @@ void nk_gamepad_pntr_update(struct nk_gamepads* gamepads, void* user_data) {
 
     app = (pntr_app*)gamepads->input_source.user_data;
 
-    for (int num = 0; num < PNTR_APP_MAX_GAMEPADS; num++) {
+    for (int num = 0; num < NK_GAMEPAD_MAX && num < PNTR_APP_MAX_GAMEPADS; num++) {
         // pntr has no gamepad connect/disconnect events, so detect availability
         // via button presses (state transitions). Once detected, the gamepad
         // stays available since there is no way to detect disconnection.
