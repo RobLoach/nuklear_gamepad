@@ -94,6 +94,21 @@ int main() {
     NK_ASSERT(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_A) == nk_true);
     NK_ASSERT(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_B) == nk_false);
 
+    /* Invalid button values are safely rejected. */
+    printf("invalid button values\n");
+    {
+        nk_gamepad_button(&gamepads, 0, NK_GAMEPAD_BUTTON_INVALID, nk_true);
+        nk_gamepad_button(&gamepads, 0, NK_GAMEPAD_BUTTON_LAST, nk_true);
+        NK_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_INVALID) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_LAST) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_down(&gamepads, -1, NK_GAMEPAD_BUTTON_INVALID) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_pressed(&gamepads, 0, NK_GAMEPAD_BUTTON_INVALID) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_pressed(&gamepads, 0, NK_GAMEPAD_BUTTON_LAST) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_pressed(&gamepads, -1, NK_GAMEPAD_BUTTON_LAST) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_released(&gamepads, 0, NK_GAMEPAD_BUTTON_INVALID) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_released(&gamepads, 0, NK_GAMEPAD_BUTTON_LAST) == nk_false);
+    }
+
     /* nk_gamepad_any_button_pressed() */
     {
         int num = 9999;
