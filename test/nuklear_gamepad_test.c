@@ -205,6 +205,25 @@ int main() {
         assert(nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_DOWN)  == nk_true);
     }
 
+    /* nk_gamepad_mouse zero-initialized map falls back to default sensitivity */
+    printf("nk_gamepad_mouse zero-initialized map\n");
+    {
+        struct nk_gamepad_mouse_map zmap;
+        float ax, ay;
+        nk_zero(&zmap, sizeof(zmap));
+
+        nk_gamepad_update(&gamepads);
+        gamepads.ctx->input.mouse.delta.x = NK_GAMEPAD_MOUSE_SENSITIVITY * 0.5f;
+        gamepads.ctx->input.mouse.delta.y = -NK_GAMEPAD_MOUSE_SENSITIVITY;
+        nk_gamepad_mouse_update(&gamepads, &zmap);
+        ax = nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X);
+        ay = nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_Y);
+        /* ax == ax rejects NaN without requiring math.h */
+        assert(ax == ax && ay == ay);
+        assert(ax == 0.5f);
+        assert(ay == -1.0f);
+    }
+
     /* nk_gamepad_axis() / nk_gamepad_get_axis() */
     printf("nk_gamepad_axis()\n");
     nk_gamepad_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X, 0.75f);
