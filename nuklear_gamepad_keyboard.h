@@ -100,7 +100,7 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     }
 
     /* Initialize the default keyboard mapping. */
-    nk_zero(&nk_gamepad_keyboard_map_default, sizeof(nk_gamepad_keyboard_map_default));
+    nk_gamepad_zero(&nk_gamepad_keyboard_map_default, sizeof(nk_gamepad_keyboard_map_default));
 
     /* Keys */
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_START] = NK_KEY_ENTER;
