@@ -97,7 +97,7 @@ NK_API void nk_gamepad_mouse_update(struct nk_gamepads* gamepads, void* user_dat
     int i;
     struct nk_gamepad_mouse_map* map;
     struct nk_mouse* mouse;
-    float dx, dy;
+    float dx, dy, sensitivity;
 
     if (gamepads == NULL || gamepads->ctx == NULL) {
         return;
@@ -105,6 +105,9 @@ NK_API void nk_gamepad_mouse_update(struct nk_gamepads* gamepads, void* user_dat
 
     map = (user_data == NULL) ? &nk_gamepad_mouse_map_default : (struct nk_gamepad_mouse_map*)user_data;
     mouse = &gamepads->ctx->input.mouse;
+
+    /* A zero-initialized user map has no sensitivity set; fall back to the default. */
+    sensitivity = (map->sensitivity == 0.0f) ? NK_GAMEPAD_MOUSE_SENSITIVITY : map->sensitivity;
 
     /* Mouse buttons */
     for (i = 0; i < NK_BUTTON_MAX; i++) {
@@ -114,8 +117,8 @@ NK_API void nk_gamepad_mouse_update(struct nk_gamepads* gamepads, void* user_dat
     }
 
     /* Mouse delta maps to left stick axes */
-    dx = mouse->delta.x / map->sensitivity;
-    dy = mouse->delta.y / map->sensitivity;
+    dx = mouse->delta.x / sensitivity;
+    dy = mouse->delta.y / sensitivity;
     if (dx >  1.0f) dx =  1.0f;
     if (dx < -1.0f) dx = -1.0f;
     if (dy >  1.0f) dy =  1.0f;
@@ -130,8 +133,8 @@ NK_API void nk_gamepad_mouse_update(struct nk_gamepads* gamepads, void* user_dat
     nk_gamepad_button(gamepads, 0, NK_GAMEPAD_BUTTON_DOWN,  dy >=  NK_GAMEPAD_MOUSE_DPAD_THRESHOLD);
 
     /* Scroll maps to right stick axes */
-    dx = mouse->scroll_delta.x / map->sensitivity;
-    dy = mouse->scroll_delta.y / map->sensitivity;
+    dx = mouse->scroll_delta.x / sensitivity;
+    dy = mouse->scroll_delta.y / sensitivity;
     if (dx >  1.0f) dx =  1.0f;
     if (dx < -1.0f) dx = -1.0f;
     if (dy >  1.0f) dy =  1.0f;

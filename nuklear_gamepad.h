@@ -450,6 +450,7 @@ NK_API int nk_gamepad_input_source_count(void);
     !defined(NK_GAMEPAD_RAYLIB) && \
     !defined(NK_GAMEPAD_PNTR) && \
     !defined(NK_GAMEPAD_KEYBOARD) && \
+    !defined(NK_GAMEPAD_MOUSE) && \
     !defined(NK_GAMEPAD_NONE)
     #if defined(NK_SDL_RENDERER_IMPLEMENTATION) || defined(NK_SDL_GL2_IMPLEMENTATION) || defined(NK_SDL_GL3_IMPLEMENTATION) || defined(NK_SDL_GLES2_IMPLEMENTATION)
         #define NK_GAMEPAD_SDL
