@@ -29,26 +29,39 @@ extern "C" {
 NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event *event) {
     switch (event->type) {
         case SDL_CONTROLLERDEVICEADDED: {
+            /* For SDL_CONTROLLERDEVICEADDED, cdevice.which is a device index. */
             int which = event->cdevice.which;
-            if (which < NK_GAMEPAD_MAX && SDL_IsGameController(which)) {
-                SDL_GameController* controller = SDL_GameControllerOpen(which);
-                if (controller) {
-                    gamepads->gamepads[which].data = controller;
-                    gamepads->gamepads[which].available = nk_true;
+            if (SDL_IsGameController(which)) {
+                SDL_JoystickID instance_id = SDL_JoystickGetDeviceInstanceID(which);
+                int first_free = -1;
+                int i;
+                for (i = 0; i < NK_GAMEPAD_MAX; i++) {
+                    if (gamepads->gamepads[i].data != NULL &&
+                        SDL_JoystickInstanceID(SDL_GameControllerGetJoystick((SDL_GameController*)gamepads->gamepads[i].data)) == instance_id) {
+                        first_free = -1;
+                        break;
+                    }
+                    if (first_free < 0 && gamepads->gamepads[i].data == NULL) {
+                        first_free = i;
+                    }
+                }
+                if (first_free >= 0) {
+                    SDL_GameController* controller = SDL_GameControllerOpen(which);
+                    if (controller) {
+                        gamepads->gamepads[first_free].data = controller;
+                        gamepads->gamepads[first_free].available = nk_true;
+                    }
                 }
             }
             break;
         }
         case SDL_CONTROLLERDEVICEREMOVED: {
+            /* For SDL_CONTROLLERDEVICEREMOVED, cdevice.which is a joystick instance id. */
             int i;
-            SDL_GameController* controller;
-            controller = SDL_GameControllerFromInstanceID(event->cdevice.which);
-            if (controller == NULL) {
-                break;
-            }
             for (i = 0; i < NK_GAMEPAD_MAX; i++) {
-                if (gamepads->gamepads[i].data == controller) {
-                    SDL_GameControllerClose(controller);
+                if (gamepads->gamepads[i].data != NULL &&
+                    SDL_JoystickInstanceID(SDL_GameControllerGetJoystick((SDL_GameController*)gamepads->gamepads[i].data)) == event->cdevice.which) {
+                    SDL_GameControllerClose((SDL_GameController*)gamepads->gamepads[i].data);
                     gamepads->gamepads[i].data = NULL;
                     gamepads->gamepads[i].available = nk_false;
                     break;

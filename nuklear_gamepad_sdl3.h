@@ -222,7 +222,7 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
         gamepad = (SDL_Gamepad*)gamepads->gamepads[num].data;
 
         /* Check to make sure it's still attached. */
-        if (SDL_GetGamepadID(gamepad) == 0) {
+        if (!SDL_GamepadConnected(gamepad)) {
             gamepads->gamepads[num].available = nk_false;
             SDL_CloseGamepad(gamepad);
             gamepads->gamepads[num].data = NULL;
