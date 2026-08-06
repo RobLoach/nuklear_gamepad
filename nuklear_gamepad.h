@@ -27,6 +27,11 @@
 #ifndef NUKLEAR_GAMEPAD_H__
 #define NUKLEAR_GAMEPAD_H__
 
+/* nuklear.h is expected to be included prior to nuklear_gamepad.h. */
+#ifndef NK_NUKLEAR_H_
+#error "Include nuklear.h before nuklear_gamepad.h"
+#endif
+
 #define NK_GAMEPAD_VERSION "1.0.2"
 #define NK_GAMEPAD_VERSION_MAJOR 1
 #define NK_GAMEPAD_VERSION_MINOR 0
@@ -471,26 +476,14 @@ NK_INTERN void nk_gamepad_zero(void* ptr, nk_size size) {
     }
 }
 
-/**
- * Copies the given amount of bytes of memory from src to dst.
- *
- * Avoids nuklear's NK_MEMCPY, which is not available when NK_GAMEPAD_IMPLEMENTATION
- * is defined in a translation unit without NK_IMPLEMENTATION.
- *
- * @param dst The destination memory, which must not overlap with src.
- * @param src The source memory to copy from.
- * @param size The amount of bytes to copy.
- *
- * @internal
+/*
+ * NK_MEMCPY is only defined when NK_IMPLEMENTATION is in the same translation
+ * unit; fall back to memcpy for stand-alone NK_GAMEPAD_IMPLEMENTATION builds.
  */
-NK_INTERN void nk_gamepad_memcopy(void* dst, const void* src, nk_size size) {
-    char* destination = (char*)dst;
-    const char* source = (const char*)src;
-    nk_size i;
-    for (i = 0; i < size; i++) {
-        destination[i] = source[i];
-    }
-}
+#ifndef NK_MEMCPY
+#include <string.h>
+#define NK_MEMCPY memcpy
+#endif
 
 /* Platform detection. */
 #if !defined(NK_GAMEPAD_SDL) && \
@@ -1047,14 +1040,14 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
     for (i = 0; i < NK_GAMEPAD_MAX; i++) {
         new_gamepads.gamepads[i].buttons = gamepads->gamepads[i].buttons;
         new_gamepads.gamepads[i].buttons_prev = gamepads->gamepads[i].buttons_prev;
-        nk_gamepad_memcopy(new_gamepads.gamepads[i].axes, gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
+        NK_MEMCPY(new_gamepads.gamepads[i].axes, gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
     }
 
     /* Since it was successful, free the old gamepad system. */
     nk_gamepad_free(gamepads);
 
     /* Copy the new gamepad system over the old one. */
-    nk_gamepad_memcopy(gamepads, &new_gamepads, sizeof(struct nk_gamepads));
+    NK_MEMCPY(gamepads, &new_gamepads, sizeof(struct nk_gamepads));
 
     return nk_true;
 }

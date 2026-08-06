@@ -7,6 +7,8 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 ## Example
 
 ``` c
+#include "nuklear.h"
+
 #define NK_GAMEPAD_IMPLEMENTATION
 #define NK_GAMEPAD_SDL
 //#define NK_GAMEPAD_SDL3
