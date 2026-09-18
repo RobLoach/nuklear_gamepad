@@ -30,6 +30,15 @@ if (nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_A)) {
 nk_gamepad_free(&gamepads);
 ```
 
+When using SDL, pass your events through so that controllers plugged in or unplugged while running are picked up:
+
+``` c
+while (SDL_PollEvent(&event)) {
+    nk_gamepad_sdl3_handle_event(&gamepads, &event);
+    /* With SDL2, use nk_gamepad_sdl_handle_event(&gamepads, &event) instead. */
+}
+```
+
 ## Platform Support
 
 - [SDL](https://www.libsdl.org/) (2 or 3)

@@ -18,6 +18,10 @@ extern "C" {
  * SDL_EVENT_GAMEPAD_REMOVED events, keeping the gamepads state in sync with
  * connected hardware.
  *
+ * This is a no-op unless the SDL3 input source is the active input source of
+ * the given gamepads context, so it remains safe to call unconditionally from
+ * the event loop after nk_gamepad_set_input_source() switched to another one.
+ *
  * @param gamepads The gamepads context to update.
  * @param event The SDL_Event to process.
  */
@@ -26,8 +30,12 @@ NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event
 /**
  * Initialize the SDL3 gamepad backend.
  *
+ * Initializes SDL's gamepad subsystem with SDL_InitSubSystem(), so the
+ * application does not have to do so itself. The reference count is released
+ * again by nk_gamepad_sdl3_free().
+ *
  * @param gamepads The gamepads context to initialize.
- * @param user_data Unused; pass NULL.
+ * @param user_data User data from the input source; unused by this backend.
  * @return nk_true on success, nk_false on failure.
  */
 NK_API nk_bool nk_gamepad_sdl3_init(struct nk_gamepads* gamepads, void* user_data);
@@ -36,7 +44,7 @@ NK_API nk_bool nk_gamepad_sdl3_init(struct nk_gamepads* gamepads, void* user_dat
  * Update button and axis state for all connected SDL3 gamepads.
  *
  * @param gamepads The gamepads context to update.
- * @param user_data Unused; pass NULL.
+ * @param user_data User data from the input source; unused by this backend.
  */
 NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data);
 
@@ -44,18 +52,23 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
  * Close all open SDL3 gamepad handles.
  *
  * Called automatically by nk_gamepad_free() when using the SDL3 input source.
+ * Also releases the SDL gamepad subsystem reference taken by
+ * nk_gamepad_sdl3_init().
  *
  * @param gamepads  The gamepads context to free.
- * @param user_data Unused; pass NULL.
+ * @param user_data User data from the input source; unused by this backend.
  */
 NK_API void nk_gamepad_sdl3_free(struct nk_gamepads* gamepads, void* user_data);
 
 /**
  * Retrieve the name of the given SDL3 gamepad.
  *
+ * The returned string is a copy owned by the gamepads context, truncated to
+ * NK_GAMEPAD_NAME_SIZE, so it stays valid after the gamepad is closed.
+ *
  * @param gamepads The gamepads context.
  * @param num Zero-indexed gamepad slot.
- * @param user_data Unused; pass NULL.
+ * @param user_data User data from the input source; unused by this backend.
  * @return A pointer to the gamepad name string, or NULL if the slot is empty.
  */
 NK_API const char* nk_gamepad_sdl3_name(struct nk_gamepads* gamepads, int num, void* user_data);
@@ -67,9 +80,13 @@ NK_API const char* nk_gamepad_sdl3_name(struct nk_gamepads* gamepads, int num, v
  * labels (e.g. "Cross", "Circle", "Square", "Triangle" for PlayStation
  * controllers), falling back to generic names for all other buttons.
  *
+ * The nk_gamepad_button_name_fn signature carries no gamepad index, so the
+ * labels are taken from the first connected gamepad. In a mixed-controller
+ * setup the labels follow whichever pad occupies the lowest slot.
+ *
  * @param gamepads  The gamepads context.
  * @param button    The button to name.
- * @param user_data Unused; pass NULL.
+ * @param user_data User data from the input source; unused by this backend.
  * @return A pointer to the button name string, or NULL if invalid.
  */
 NK_API const char* nk_gamepad_sdl3_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data);
@@ -96,7 +113,62 @@ NK_API struct nk_gamepad_input_source nk_gamepad_sdl3_input_source(void* user_da
 extern "C" {
 #endif
 
+/**
+ * Clear the cached button and axis state of a gamepad slot.
+ *
+ * Without this, unplugging a controller while a button is held leaves that
+ * bit set in `buttons`, so re-connecting into the same slot reports a
+ * button release the user never performed.
+ *
+ * @param gamepads The gamepads context.
+ * @param num The zero-indexed gamepad slot to reset.
+ * @internal
+ */
+static void nk_gamepad_sdl3_reset_state(struct nk_gamepads* gamepads, int num) {
+    gamepads->gamepads[num].buttons = 0;
+    gamepads->gamepads[num].buttons_prev = 0;
+    nk_zero(gamepads->gamepads[num].axes, sizeof(gamepads->gamepads[num].axes));
+}
+
+/**
+ * Copy the SDL3 gamepad name into the slot's durable name buffer.
+ *
+ * SDL owns the string returned by SDL_GetGamepadName() and only keeps it
+ * alive while the gamepad is open, so it is copied into the gamepad's own
+ * NK_GAMEPAD_NAME_SIZE buffer. The default "Controller #" name is kept
+ * when SDL has no name to report. Longer names are truncated.
+ *
+ * @param gamepads The gamepads context.
+ * @param num The zero-indexed gamepad slot to name.
+ * @internal
+ */
+static void nk_gamepad_sdl3_copy_name(struct nk_gamepads* gamepads, int num) {
+    const char* name;
+    int i;
+
+    name = SDL_GetGamepadName((SDL_Gamepad*)gamepads->gamepads[num].data);
+    if (name == NULL || name[0] == '\0') {
+        return;
+    }
+
+    for (i = 0; i < NK_GAMEPAD_NAME_SIZE - 1 && name[i] != '\0'; i++) {
+        gamepads->gamepads[num].name[i] = name[i];
+    }
+    gamepads->gamepads[num].name[i] = '\0';
+}
+
 NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event *event) {
+    if (gamepads == NULL || event == NULL) {
+        return;
+    }
+
+    /* Only act when the SDL3 input source owns the gamepad slots. Otherwise an
+     * SDL_Gamepad* would be stored in a slot belonging to another input source,
+     * which would never close it. */
+    if (gamepads->input_source.id != NK_GAMEPAD_INPUT_SOURCE_SDL3) {
+        return;
+    }
+
     switch (event->type) {
         case SDL_EVENT_GAMEPAD_ADDED: {
             SDL_JoystickID which = event->gdevice.which;
@@ -118,6 +190,8 @@ NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event
                     if (gamepad) {
                         gamepads->gamepads[first_free].data = gamepad;
                         gamepads->gamepads[first_free].available = nk_true;
+                        nk_gamepad_sdl3_reset_state(gamepads, first_free);
+                        nk_gamepad_sdl3_copy_name(gamepads, first_free);
                     }
                 }
             }
@@ -131,6 +205,7 @@ NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event
                     SDL_CloseGamepad((SDL_Gamepad*)gamepads->gamepads[i].data);
                     gamepads->gamepads[i].data = NULL;
                     gamepads->gamepads[i].available = nk_false;
+                    nk_gamepad_sdl3_reset_state(gamepads, i);
                     break;
                 }
             }
@@ -147,6 +222,13 @@ NK_API nk_bool nk_gamepad_sdl3_init(struct nk_gamepads* gamepads, void* user_dat
         return nk_false;
     }
 
+    /* SDL_GetGamepads() silently returns NULL when the gamepad subsystem was
+     * never initialized. SDL_InitSubSystem() is reference counted, and is
+     * released again by nk_gamepad_sdl3_free(). */
+    if (!SDL_InitSubSystem(SDL_INIT_GAMEPAD)) {
+        return nk_false;
+    }
+
     count = 0;
     joysticks = SDL_GetGamepads(&count);
     if (joysticks) {
@@ -156,6 +238,8 @@ NK_API nk_bool nk_gamepad_sdl3_init(struct nk_gamepads* gamepads, void* user_dat
             if (gamepad != NULL) {
                 gamepads->gamepads[i].data = gamepad;
                 gamepads->gamepads[i].available = nk_true;
+                nk_gamepad_sdl3_reset_state(gamepads, i);
+                nk_gamepad_sdl3_copy_name(gamepads, i);
             }
         }
         SDL_free(joysticks);
@@ -178,6 +262,11 @@ NK_API void nk_gamepad_sdl3_free(struct nk_gamepads* gamepads, void* user_data) 
             gamepads->gamepads[i].available = nk_false;
         }
     }
+
+    /* Reference counted, so this only pairs with the SDL_InitSubSystem() call
+     * made by nk_gamepad_sdl3_init() and will not shut the subsystem down
+     * under an application that initialized it itself. */
+    SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
 }
 
 /**
@@ -188,7 +277,7 @@ NK_API void nk_gamepad_sdl3_free(struct nk_gamepads* gamepads, void* user_data) 
  *         @p button has no SDL3 equivalent.
  * @internal
  */
-SDL_GamepadButton nk_gamepad_sdl3_map_button(int button) {
+static SDL_GamepadButton nk_gamepad_sdl3_map_button(int button) {
     switch (button) {
         case NK_GAMEPAD_BUTTON_UP: return SDL_GAMEPAD_BUTTON_DPAD_UP;
         case NK_GAMEPAD_BUTTON_DOWN: return SDL_GAMEPAD_BUTTON_DPAD_DOWN;
@@ -214,6 +303,15 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
     int i;
     SDL_Gamepad* gamepad;
     NK_UNUSED(user_data);
+    if (gamepads == NULL) {
+        return;
+    }
+
+    /* SDL3 only refreshes gamepad state while pumping events, so an application
+     * that does not pump SDL events on a given frame, or that called
+     * SDL_SetGamepadEventsEnabled(false), would otherwise read stale input. */
+    SDL_UpdateGamepads();
+
     for (num = 0; num < NK_GAMEPAD_MAX; num++) {
         if (gamepads->gamepads[num].data == NULL) {
             continue;
@@ -226,6 +324,7 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
             gamepads->gamepads[num].available = nk_false;
             SDL_CloseGamepad(gamepad);
             gamepads->gamepads[num].data = NULL;
+            nk_gamepad_sdl3_reset_state(gamepads, num);
             continue;
         }
 
@@ -250,17 +349,16 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
 }
 
 NK_API const char* nk_gamepad_sdl3_name(struct nk_gamepads* gamepads, int num, void* user_data) {
-    const char* name;
     NK_UNUSED(user_data);
+    if (gamepads == NULL || num < 0 || num >= NK_GAMEPAD_MAX) {
+        return NULL;
+    }
+
     if (gamepads->gamepads[num].data == NULL) {
         return NULL;
     }
 
-    name = SDL_GetGamepadName((SDL_Gamepad*)gamepads->gamepads[num].data);
-    if (name == NULL || name[0] == '\0') {
-        return gamepads->gamepads[num].name;
-    }
-    return name;
+    return gamepads->gamepads[num].name;
 }
 
 NK_API const char* nk_gamepad_sdl3_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button, void* user_data) {
