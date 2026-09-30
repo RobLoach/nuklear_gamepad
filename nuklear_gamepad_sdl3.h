@@ -31,8 +31,9 @@ NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event
  * Initialize the SDL3 gamepad backend.
  *
  * Initializes SDL's gamepad subsystem with SDL_InitSubSystem(), so the
- * application does not have to do so itself. The reference count is released
- * again by nk_gamepad_sdl3_free().
+ * application does not have to do so itself. The reference is only recorded,
+ * and so only released again by nk_gamepad_sdl3_free(), when
+ * SDL_InitSubSystem() actually succeeds.
  *
  * @param gamepads The gamepads context to initialize.
  * @param user_data User data from the input source; unused by this backend.
@@ -52,8 +53,10 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
  * Close all open SDL3 gamepad handles.
  *
  * Called automatically by nk_gamepad_free() when using the SDL3 input source.
- * Also releases the SDL gamepad subsystem reference taken by
- * nk_gamepad_sdl3_init().
+ * Also releases one SDL gamepad subsystem reference, but only when
+ * nk_gamepad_sdl3_init() successfully took one. A free that is not paired with
+ * a successful init, including a second free in a row, leaves the subsystem
+ * alone so that an application's own SDL_INIT_GAMEPAD reference survives.
  *
  * @param gamepads  The gamepads context to free.
  * @param user_data User data from the input source; unused by this backend.
@@ -112,6 +115,18 @@ NK_API struct nk_gamepad_input_source nk_gamepad_sdl3_input_source(void* user_da
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * How many SDL gamepad subsystem references this backend currently holds.
+ *
+ * SDL_QuitSubSystem() decrements SDL's reference count, so quitting on a free
+ * that never had a matching successful init would consume a reference belonging
+ * to an application that initialized SDL_INIT_GAMEPAD itself. A count rather
+ * than a flag, so two gamepads contexts release exactly the two they took.
+ *
+ * @internal
+ */
+static int nk_gamepad_sdl3_subsystem_refs = 0;
 
 /**
  * Clear the cached button and axis state of a gamepad slot.
@@ -223,11 +238,13 @@ NK_API nk_bool nk_gamepad_sdl3_init(struct nk_gamepads* gamepads, void* user_dat
     }
 
     /* SDL_GetGamepads() silently returns NULL when the gamepad subsystem was
-     * never initialized. SDL_InitSubSystem() is reference counted, and is
-     * released again by nk_gamepad_sdl3_free(). */
+     * never initialized. SDL_InitSubSystem() is reference counted, so the
+     * reference is recorded only once it has been granted, letting
+     * nk_gamepad_sdl3_free() release exactly the references taken here. */
     if (!SDL_InitSubSystem(SDL_INIT_GAMEPAD)) {
         return nk_false;
     }
+    nk_gamepad_sdl3_subsystem_refs++;
 
     count = 0;
     joysticks = SDL_GetGamepads(&count);
@@ -263,10 +280,14 @@ NK_API void nk_gamepad_sdl3_free(struct nk_gamepads* gamepads, void* user_data) 
         }
     }
 
-    /* Reference counted, so this only pairs with the SDL_InitSubSystem() call
-     * made by nk_gamepad_sdl3_init() and will not shut the subsystem down
-     * under an application that initialized it itself. */
-    SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
+    /* Give back a reference only if nk_gamepad_sdl3_init() took one.
+     * SDL_QuitSubSystem() decrements SDL's reference count, so quitting on an
+     * unpaired free, or on a second free in a row, would consume a reference
+     * belonging to an application that initialized the subsystem itself. */
+    if (nk_gamepad_sdl3_subsystem_refs > 0) {
+        nk_gamepad_sdl3_subsystem_refs--;
+        SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
+    }
 }
 
 /**
