@@ -163,6 +163,7 @@ struct nk_gamepads {
     struct nk_gamepad gamepads[NK_GAMEPAD_MAX];
     struct nk_context* ctx;
     struct nk_gamepad_input_source input_source;
+    nk_bool owns_subsystem; /* nk_true when the input source's init() started an external subsystem that its free() must shut down. Owned by the input source. */
 };
 
 #ifdef __cplusplus
