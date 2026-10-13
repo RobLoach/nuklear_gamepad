@@ -35,6 +35,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_none_input_source(void* user_da
     source.axis_name = NULL;
     source.input_source_name = "None";
     source.id = NK_GAMEPAD_INPUT_SOURCE_NONE;
+    source.capabilities = 0;
     return source;
 }
 

@@ -233,6 +233,44 @@ int main() {
     nk_gamepad_update(&gamepads);
     NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X) == 0.0f);
 
+    /* nk_gamepad_input_source_supports() */
+    printf("nk_gamepad_input_source_supports()\n");
+    {
+        /* The keyboard names its own buttons, but has no axes and no hotplug. */
+        NK_ASSERT(nk_gamepad_input_source_supports(&gamepads, NK_GAMEPAD_CAP_BUTTON_NAMES) == nk_true);
+        NK_ASSERT(nk_gamepad_input_source_supports(&gamepads, NK_GAMEPAD_CAP_AXES) == nk_false);
+        NK_ASSERT(nk_gamepad_input_source_supports(&gamepads, NK_GAMEPAD_CAP_HOTPLUG) == nk_false);
+        NK_ASSERT(nk_gamepad_input_source_supports(&gamepads, NK_GAMEPAD_CAP_RUMBLE) == nk_false);
+
+        /* Invalid queries are rejected. */
+        NK_ASSERT(nk_gamepad_input_source_supports(NULL, NK_GAMEPAD_CAP_AXES) == nk_false);
+        NK_ASSERT(nk_gamepad_input_source_supports(&gamepads, 0) == nk_false);
+    }
+
+    /* The mouse reports axes as well as button names. */
+    {
+        struct nk_gamepads mouse_gamepads;
+        nk_gamepad_init_with_source(&mouse_gamepads, &ctx, nk_gamepad_mouse_input_source(NULL));
+        NK_ASSERT(nk_gamepad_input_source_supports(&mouse_gamepads, NK_GAMEPAD_CAP_AXES) == nk_true);
+        NK_ASSERT(nk_gamepad_input_source_supports(&mouse_gamepads, NK_GAMEPAD_CAP_BUTTON_NAMES) == nk_true);
+        /* All requested capabilities must be present for the query to pass. */
+        NK_ASSERT(nk_gamepad_input_source_supports(&mouse_gamepads,
+            NK_GAMEPAD_CAP_AXES | NK_GAMEPAD_CAP_BUTTON_NAMES) == nk_true);
+        NK_ASSERT(nk_gamepad_input_source_supports(&mouse_gamepads,
+            NK_GAMEPAD_CAP_AXES | NK_GAMEPAD_CAP_HOTPLUG) == nk_false);
+        nk_gamepad_free(&mouse_gamepads);
+    }
+
+    /* The "none" input source supports nothing at all. */
+    {
+        struct nk_gamepads none_gamepads;
+        nk_gamepad_init_with_source(&none_gamepads, &ctx, nk_gamepad_none_input_source(NULL));
+        NK_ASSERT(nk_gamepad_input_source_supports(&none_gamepads, NK_GAMEPAD_CAP_AXES) == nk_false);
+        NK_ASSERT(nk_gamepad_input_source_supports(&none_gamepads, NK_GAMEPAD_CAP_HOTPLUG) == nk_false);
+        NK_ASSERT(nk_gamepad_input_source_supports(&none_gamepads, NK_GAMEPAD_CAP_BUTTON_NAMES) == nk_false);
+        nk_gamepad_free(&none_gamepads);
+    }
+
     printf("nk_gamepad_free()\n");
     nk_gamepad_free(&gamepads);
 
