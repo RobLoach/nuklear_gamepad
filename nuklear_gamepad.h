@@ -55,6 +55,16 @@
 #define NK_GAMEPAD_NAME_SIZE 32
 #endif
 
+#ifndef NK_GAMEPAD_TRIGGER_THRESHOLD
+/**
+ * How far an analog trigger has to travel, from 0.0f to 1.0f, before it reports as L2/R2.
+ *
+ * @see NK_GAMEPAD_BUTTON_L2
+ * @see NK_GAMEPAD_BUTTON_R2
+ */
+#define NK_GAMEPAD_TRIGGER_THRESHOLD 0.5f
+#endif
+
 /**
  * Create a flag for the specified button.
  * @internal

@@ -49,6 +49,8 @@ int nk_gamepad_raylib_map_button(int button) {
 void nk_gamepad_raylib_update(struct nk_gamepads* gamepads, void* user_data) {
     int num;
     int i;
+    float leftTrigger;
+    float rightTrigger;
     NK_UNUSED(user_data);
     if (!gamepads) {
         return;
@@ -67,21 +69,26 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads, void* user_data) {
             }
         }
 
-        /* L2/R2: convert analog trigger axis to digital button */
-        if (GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_TRIGGER) > 0.5f) {
-            nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, nk_true);
-        }
-        if (GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_TRIGGER) > 0.5f) {
-            nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, nk_true);
-        }
+        /* raylib reports the triggers as -1..1, where -1 is released, so remap them to 0..1 */
+        leftTrigger  = (GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_TRIGGER)  + 1.0f) * 0.5f;
+        rightTrigger = (GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_TRIGGER) + 1.0f) * 0.5f;
 
-        /* Axes: raylib returns -1..1 for sticks and 0..1 for triggers */
+        /* Axes: raylib sticks are -1..1 */
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X,       GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_X));
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y,       GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_Y));
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X,      GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_X));
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_Y,      GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_Y));
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER,  GetGamepadAxisMovement(num, GAMEPAD_AXIS_LEFT_TRIGGER));
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, GetGamepadAxisMovement(num, GAMEPAD_AXIS_RIGHT_TRIGGER));
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER,  leftTrigger);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, rightTrigger);
+
+        /* L2/R2: the button loop above covers platforms that report the triggers as digital
+         * buttons, so only ever add to it from the analog axis, never clear it. */
+        if (leftTrigger > NK_GAMEPAD_TRIGGER_THRESHOLD) {
+            nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, nk_true);
+        }
+        if (rightTrigger > NK_GAMEPAD_TRIGGER_THRESHOLD) {
+            nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, nk_true);
+        }
     }
 }
 
