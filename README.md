@@ -8,8 +8,7 @@ Gamepad API for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 
 ``` c
 #define NK_GAMEPAD_IMPLEMENTATION
-#define NK_GAMEPAD_SDL
-//#define NK_GAMEPAD_SDL3
+#define NK_GAMEPAD_SDL3
 //#define NK_GAMEPAD_GLFW
 //#define NK_GAMEPAD_RAYLIB
 //#define NK_GAMEPAD_PNTR
@@ -28,15 +27,6 @@ if (nk_gamepad_is_button_down(&gamepads, 0, NK_GAMEPAD_BUTTON_A)) {
 
 // Clear the gamepad state.
 nk_gamepad_free(&gamepads);
-```
-
-When using SDL, pass your events through so that controllers plugged in or unplugged while running are picked up:
-
-``` c
-while (SDL_PollEvent(&event)) {
-    nk_gamepad_sdl3_handle_event(&gamepads, &event);
-    /* With SDL2, use nk_gamepad_sdl_handle_event(&gamepads, &event) instead. */
-}
 ```
 
 ## Platform Support
@@ -74,6 +64,22 @@ nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_game
 nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 ```
 
+## Configuration
+
+| Define | Description  |
+| ------ | ------------ |
+| `NK_GAMEPAD_NONE`     | When set, will avoid detecting which platform to use |
+| `NK_GAMEPAD_SDL`      | Use [SDL](https://www.libsdl.org/) |
+| `NK_GAMEPAD_SDL3`      | Use [SDL3](https://www.libsdl.org/) |
+| `NK_GAMEPAD_GLFW`     | Use [glfw](https://www.glfw.org/) |
+| `NK_GAMEPAD_RAYLIB`   | Use [raylib](https://github.com/raysan5/raylib) |
+| `NK_GAMEPAD_PNTR`     | Use [pntr_app](https://github.com/robloach/pntr_app) |
+| `NK_GAMEPAD_KEYBOARD` | Use Nuklear's keyboard interface to emulate gamepad input |
+| `NK_GAMEPAD_INIT`     | Callback used to initialize gamepads |
+| `NK_GAMEPAD_UPDATE`   | Callback used to update all gamepad states |
+| `NK_GAMEPAD_NAME`     | Callback used to get a controller's name |
+| `NK_GAMEPAD_FREE`     | Callback used to disconnect the controllers |
+
 ## Custom Integration
 
 To define your own custom input source, use `NK_GAMEPAD_NONE` and pass in your own `struct nk_gamepad_input_source`...
@@ -106,21 +112,15 @@ nk_gamepad_update(&gamepads);
 nk_gamepad_free(&gamepads);
 ```
 
-## Configuration
+## Platform Quirks
 
-| Define | Description  |
-| ------ | ------------ |
-| `NK_GAMEPAD_NONE`     | When set, will avoid detecting which platform to use |
-| `NK_GAMEPAD_SDL`      | Use [SDL](https://www.libsdl.org/) |
-| `NK_GAMEPAD_SDL3`      | Use [SDL3](https://www.libsdl.org/) |
-| `NK_GAMEPAD_GLFW`     | Use [glfw](https://www.glfw.org/) |
-| `NK_GAMEPAD_RAYLIB`   | Use [raylib](https://github.com/raysan5/raylib) |
-| `NK_GAMEPAD_PNTR`     | Use [pntr_app](https://github.com/robloach/pntr_app) |
-| `NK_GAMEPAD_KEYBOARD` | Use Nuklear's keyboard interface to emulate gamepad input |
-| `NK_GAMEPAD_INIT`     | Callback used to initialize gamepads |
-| `NK_GAMEPAD_UPDATE`   | Callback used to update all gamepad states |
-| `NK_GAMEPAD_NAME`     | Callback used to get a controller's name |
-| `NK_GAMEPAD_FREE`     | Callback used to disconnect the controllers |
+When using SDL, pass your events through so that controllers plugged in or unplugged while running are picked up:
+
+``` c
+while (SDL_PollEvent(&event)) {
+    nk_gamepad_sdl3_handle_event(&gamepads, &event);
+}
+```
 
 ## License
 
