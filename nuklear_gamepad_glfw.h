@@ -109,6 +109,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_glfw_input_source(void* user_da
     source.axis_name = NULL;
     source.input_source_name = "glfw";
     source.id = NK_GAMEPAD_INPUT_SOURCE_GLFW;
+    source.capabilities = NK_GAMEPAD_CAP_AXES | NK_GAMEPAD_CAP_HOTPLUG;
     return source;
 }
 
