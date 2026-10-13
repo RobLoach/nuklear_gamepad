@@ -116,6 +116,22 @@ enum nk_gamepad_button {
     NK_GAMEPAD_BUTTON_LAST
 };
 
+/**
+ * The features an input source can provide.
+ *
+ * Input sources advertise what they support through
+ * struct nk_gamepad_input_source::capabilities, so applications can adapt at
+ * runtime instead of guessing per backend.
+ *
+ * @see nk_gamepad_input_source_supports()
+ */
+enum nk_gamepad_capability {
+    NK_GAMEPAD_CAP_AXES = (1 << 0), /** Reports analog axis values through nk_gamepad_get_axis(). */
+    NK_GAMEPAD_CAP_HOTPLUG = (1 << 1), /** Detects gamepads connecting and disconnecting while running. */
+    NK_GAMEPAD_CAP_BUTTON_NAMES = (1 << 2), /** Provides its own button names rather than the built-in ones. */
+    NK_GAMEPAD_CAP_RUMBLE = (1 << 3) /** Supports haptic rumble. Not yet used by any input source. */
+};
+
 enum nk_gamepad_axis {
     NK_GAMEPAD_AXIS_INVALID = -1,
     NK_GAMEPAD_AXIS_FIRST = 0,
@@ -157,6 +173,7 @@ struct nk_gamepad_input_source {
     nk_gamepad_axis_name_fn axis_name; /* Callback to get the name of an axis. Falls back to built-in names if NULL. */
     const char* input_source_name; /* The human-readable name of the input source. */
     enum nk_gamepad_input_source_type id; /* A unique identifier of the input source. */
+    unsigned int capabilities; /* A bitmask of enum nk_gamepad_capability flags the input source supports. */
 };
 
 struct nk_gamepad {
@@ -431,6 +448,28 @@ NK_API struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepad
  * @return True if the input source was set, false otherwise.
  */
 NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_gamepad_input_source input_source);
+
+/**
+ * Check whether the active input source supports the given capabilities.
+ *
+ * Lets an application discover at runtime what its backend can do, instead of
+ * hard-coding the differences between them. For example, pntr reports no axes,
+ * and only SDL3 provides per-controller button names.
+ *
+ * @param gamepads The associated gamepad system.
+ * @param capabilities A bitmask of one or more enum nk_gamepad_capability flags.
+ *
+ * @return True if the input source supports *every* requested capability, false otherwise.
+ *
+ * @code
+ * if (nk_gamepad_input_source_supports(&gamepads, NK_GAMEPAD_CAP_AXES)) {
+ *   float x = nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X);
+ * }
+ * @endcode
+ *
+ * @see enum nk_gamepad_capability
+ */
+NK_API nk_bool nk_gamepad_input_source_supports(struct nk_gamepads* gamepads, unsigned int capabilities);
 
 /**
  * An null-terminated array of the available compiled gamepad input sources.
@@ -985,6 +1024,14 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
     NK_MEMCPY(gamepads, &new_gamepads, sizeof(struct nk_gamepads));
 
     return nk_true;
+}
+
+NK_API nk_bool nk_gamepad_input_source_supports(struct nk_gamepads* gamepads, unsigned int capabilities) {
+    if (gamepads == NULL || capabilities == 0) {
+        return nk_false;
+    }
+
+    return (gamepads->input_source.capabilities & capabilities) == capabilities ? nk_true : nk_false;
 }
 
 NK_API int nk_gamepad_input_source_count(void) {

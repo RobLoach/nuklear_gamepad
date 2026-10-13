@@ -421,6 +421,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_sdl3_input_source(void* user_da
     source.axis_name = NULL;
     source.input_source_name = "SDL3";
     source.id = NK_GAMEPAD_INPUT_SOURCE_SDL3;
+    source.capabilities = NK_GAMEPAD_CAP_AXES | NK_GAMEPAD_CAP_HOTPLUG | NK_GAMEPAD_CAP_BUTTON_NAMES;
     return source;
 }
 

@@ -85,6 +85,8 @@ NK_API struct nk_gamepad_input_source nk_gamepad_pntr_input_source(void* user_da
         .axis_name = NULL,
         .input_source_name = "pntr",
         .id = NK_GAMEPAD_INPUT_SOURCE_PNTR,
+        /* pntr provides no axes and has no connect/disconnect events. */
+        .capabilities = 0,
     };
     return source;
 }

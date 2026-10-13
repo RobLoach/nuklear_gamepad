@@ -61,8 +61,28 @@ const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 const char* nk_gamepad_button_name(struct nk_gamepads* gamepads, enum nk_gamepad_button button);
 struct nk_gamepad_input_source* nk_gamepad_input_source(struct nk_gamepads* gamepads);
 nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_gamepad_input_source input_source);
+nk_bool nk_gamepad_input_source_supports(struct nk_gamepads* gamepads, unsigned int capabilities);
 nk_gamepad_input_source_fn nk_gamepad_input_sources[];
 ```
+
+### Capabilities
+
+Not every platform provides every feature, so input sources advertise what they
+support. Use `nk_gamepad_input_source_supports()` to check at runtime; it only
+returns true when *every* requested capability is available.
+
+``` c
+if (nk_gamepad_input_source_supports(&gamepads, NK_GAMEPAD_CAP_AXES)) {
+    float x = nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X);
+}
+```
+
+| Capability | Description | Supported by |
+| ---------- | ----------- | ------------ |
+| `NK_GAMEPAD_CAP_AXES` | Reports analog axis values through `nk_gamepad_get_axis()` | SDL, SDL3, GLFW, raylib, Mouse |
+| `NK_GAMEPAD_CAP_HOTPLUG` | Detects gamepads connecting and disconnecting while running | SDL, SDL3, GLFW, raylib |
+| `NK_GAMEPAD_CAP_BUTTON_NAMES` | Provides its own button names rather than the built-in ones | SDL3, Keyboard, Mouse |
+| `NK_GAMEPAD_CAP_RUMBLE` | Supports haptic rumble | None yet |
 
 ## Configuration
 
@@ -102,6 +122,7 @@ struct nk_gamepad_input_source source = {
     .button_name = NULL, // Function used to get the label of a gamepad button
     .input_source_name = "my_own_gamepad", // The optional name of the input source
     .id = 1234, // Optional identification for the input source
+    .capabilities = NK_GAMEPAD_CAP_AXES, // Optional bitmask of the features the source provides
 };
 nk_gamepad_init_with_source(&gamepads, ctx, struct nk_gamepad_input_source input_source);
 

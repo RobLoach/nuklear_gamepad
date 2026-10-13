@@ -204,6 +204,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_sdl_input_source(void* user_dat
     source.axis_name = NULL;
     source.input_source_name = "SDL";
     source.id = NK_GAMEPAD_INPUT_SOURCE_SDL;
+    source.capabilities = NK_GAMEPAD_CAP_AXES | NK_GAMEPAD_CAP_HOTPLUG;
     return source;
 }
 

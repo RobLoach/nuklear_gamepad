@@ -114,6 +114,7 @@ NK_API struct nk_gamepad_input_source nk_gamepad_raylib_input_source(void* user_
     source.axis_name = NULL;
     source.input_source_name = "raylib";
     source.id = NK_GAMEPAD_INPUT_SOURCE_RAYLIB;
+    source.capabilities = NK_GAMEPAD_CAP_AXES | NK_GAMEPAD_CAP_HOTPLUG;
     return source;
 }
 
