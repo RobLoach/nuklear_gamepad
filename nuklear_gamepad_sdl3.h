@@ -212,6 +212,7 @@ SDL_GamepadButton nk_gamepad_sdl3_map_button(int button) {
 NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data) {
     int num;
     int i;
+    float leftTrigger, rightTrigger;
     SDL_Gamepad* gamepad;
     NK_UNUSED(user_data);
     for (num = 0; num < NK_GAMEPAD_MAX; num++) {
@@ -235,17 +236,21 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
             }
         }
 
-        /* Axes: SDL3 returns Sint16 in range -32768..32767 (sticks) or 0..32767 (triggers) */
+        /* SDL3 reports the triggers as 0..32767, where 0 is released */
+        leftTrigger  = SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) / 32767.0f;
+        rightTrigger = SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) / 32767.0f;
+
+        /* Axes: SDL3 returns Sint16 in range -32768..32767 (sticks) */
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_X, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_Y, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_X, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX) / 32767.0f);
         nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_Y, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTY) / 32767.0f);
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) / 32767.0f);
-        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) / 32767.0f);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_LEFT_TRIGGER, leftTrigger);
+        nk_gamepad_axis(gamepads, num, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, rightTrigger);
 
         /* L2 / R2 */
-        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > (16383 + 100) ? nk_true : nk_false);
-        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > (16383 + 100) ? nk_true : nk_false);
+        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_L2, leftTrigger  > NK_GAMEPAD_TRIGGER_THRESHOLD ? nk_true : nk_false);
+        nk_gamepad_button(gamepads, num, NK_GAMEPAD_BUTTON_R2, rightTrigger > NK_GAMEPAD_TRIGGER_THRESHOLD ? nk_true : nk_false);
     }
 }
 

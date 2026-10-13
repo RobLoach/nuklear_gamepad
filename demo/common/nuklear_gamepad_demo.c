@@ -109,6 +109,21 @@ void nuklear_gamepad_demo(struct nk_context* ctx, struct nk_gamepads* gamepads, 
             nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_START);
             nk_button_symbol(ctx, NK_SYMBOL_PLUS);
 
+            /* Shoulders, triggers and thumbstick clicks */
+            nk_layout_row_dynamic(ctx, 0, 6);
+            nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_LB);
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_LB));
+            nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_L2);
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_L2));
+            nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_L3);
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_L3));
+            nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_R3);
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_R3));
+            nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_R2);
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_R2));
+            nuklear_gamepad_button_style(ctx, gamepads, i, NK_GAMEPAD_BUTTON_RB);
+            nk_button_label(ctx, nk_gamepad_button_name(gamepads, NK_GAMEPAD_BUTTON_RB));
+
             /* Axes */
             nk_widget_disable_end(ctx);
             nk_layout_row_dynamic(ctx, 0, 2);

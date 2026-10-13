@@ -233,6 +233,33 @@ int main() {
     nk_gamepad_update(&gamepads);
     NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X) == 0.0f);
 
+    /* Triggers always report 0..1, whatever range the platform used */
+    printf("NK_GAMEPAD_TRIGGER_THRESHOLD\n");
+    {
+        NK_ASSERT(NK_GAMEPAD_TRIGGER_THRESHOLD > 0.0f);
+        NK_ASSERT(NK_GAMEPAD_TRIGGER_THRESHOLD < 1.0f);
+
+        /* A released trigger on a -1..1 platform remaps to 0.0f */
+        nk_gamepad_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_TRIGGER, (-1.0f + 1.0f) * 0.5f);
+        NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_TRIGGER) == 0.0f);
+
+        /* A half-pressed trigger stays half, rather than clamping away to zero */
+        nk_gamepad_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_TRIGGER, (0.0f + 1.0f) * 0.5f);
+        NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_TRIGGER) == 0.5f);
+
+        /* Out-of-range trigger values clamp into 0..1 */
+        nk_gamepad_axis(&gamepads, 0, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, -0.5f);
+        NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_RIGHT_TRIGGER) == 0.0f);
+        nk_gamepad_axis(&gamepads, 0, NK_GAMEPAD_AXIS_RIGHT_TRIGGER, 1.5f);
+        NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_RIGHT_TRIGGER) == 1.0f);
+
+        /* The shoulder and trigger button names line up with the enum */
+        NK_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_LB), "LB") == 0);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_RB), "RB") == 0);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_L2), "L2") == 0);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(NULL, NK_GAMEPAD_BUTTON_R2), "R2") == 0);
+    }
+
     printf("nk_gamepad_free()\n");
     nk_gamepad_free(&gamepads);
 
