@@ -112,6 +112,14 @@ nk_gamepad_free(&gamepads);
 | `NK_GAMEPAD_UPDATE`   | Callback used to update all gamepad states |
 | `NK_GAMEPAD_NAME`     | Callback used to get a controller's name |
 | `NK_GAMEPAD_FREE`     | Callback used to disconnect the controllers |
+| `NK_GAMEPAD_TRIGGER_THRESHOLD` | How far an analog trigger must travel, from `0.0f` to `1.0f`, before it reports as `L2`/`R2`. Defaults to `0.5f` |
+
+### Triggers
+
+`NK_GAMEPAD_AXIS_LEFT_TRIGGER` and `NK_GAMEPAD_AXIS_RIGHT_TRIGGER` always report `0.0f` when released
+through to `1.0f` when fully pressed, regardless of the platform's own range. `NK_GAMEPAD_BUTTON_L2`
+and `NK_GAMEPAD_BUTTON_R2` are the same triggers as digital buttons, pressed once they travel past
+`NK_GAMEPAD_TRIGGER_THRESHOLD`.
 
 ## License
 
