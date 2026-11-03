@@ -426,8 +426,6 @@ NK_API int nk_gamepad_count(struct nk_gamepads* gamepads);
  * @param num The gamepad number.
  *
  * @return The name of the gamepad.
- *
- * @see NK_GAMEPAD_NAME
  */
 NK_API const char* nk_gamepad_name(struct nk_gamepads* gamepads, int num);
 
