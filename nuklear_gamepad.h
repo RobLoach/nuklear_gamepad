@@ -491,6 +491,43 @@ NK_API int nk_gamepad_input_source_count(void);
 #ifndef NK_GAMEPAD_IMPLEMENTATION_ONCE
 #define NK_GAMEPAD_IMPLEMENTATION_ONCE
 
+/*
+ * Local helpers, as nuklear's nk_zero, nk_itoa and NK_MEMCPY are only
+ * available in the translation unit that defines NK_IMPLEMENTATION.
+ */
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
+NK_INTERN void nk_gamepad__zero(void* ptr, nk_size size) {
+    nk_byte* bytes = (nk_byte*)ptr;
+    while (size-- > 0) {
+        *bytes++ = 0;
+    }
+}
+
+NK_INTERN void nk_gamepad__memcpy(void* dst, const void* src, nk_size size) {
+    nk_byte* d = (nk_byte*)dst;
+    const nk_byte* s = (const nk_byte*)src;
+    while (size-- > 0) {
+        *d++ = *s++;
+    }
+}
+
+/* Writes a non-negative integer as a NUL-terminated string. */
+NK_INTERN void nk_gamepad__itoa(char* buffer, int number) {
+    char digits[12];
+    int length = 0;
+    do {
+        digits[length++] = (char)('0' + (number % 10));
+        number /= 10;
+    } while (number > 0);
+    while (length > 0) {
+        *buffer++ = digits[--length];
+    }
+    *buffer = '\0';
+}
+
 /* Platform detection. */
 #if !defined(NK_GAMEPAD_SDL) && \
     !defined(NK_GAMEPAD_SDL3) && \
@@ -596,7 +633,7 @@ NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct 
     }
 
     /* Initialize the gamepads as a default state. */
-    nk_zero(gamepads, sizeof(struct nk_gamepads));
+    nk_gamepad__zero(gamepads, sizeof(struct nk_gamepads));
     gamepads->ctx = ctx;
     gamepads->input_source = input_source;
 
@@ -610,13 +647,13 @@ NK_API nk_bool nk_gamepad_init_with_source(struct nk_gamepads* gamepads, struct 
         }
 
         /* Add the # of the controller to the name. */
-        nk_itoa(&gamepads->gamepads[i].name[j], (long)(i + 1));
+        nk_gamepad__itoa(&gamepads->gamepads[i].name[j], i + 1);
     }
 
     /* Run the init() callback, or update() if it's not available. */
     if (input_source.init != NULL) {
         if (input_source.init(gamepads, input_source.user_data) == nk_false) {
-            nk_zero(gamepads, sizeof(struct nk_gamepads));
+            nk_gamepad__zero(gamepads, sizeof(struct nk_gamepads));
             return nk_false;
         }
     }
@@ -643,7 +680,7 @@ NK_API void nk_gamepad_free(struct nk_gamepads* gamepads) {
     }
 
     /* Reset the default state of the gamepad data. */
-    nk_zero(gamepads, sizeof(struct nk_gamepads));
+    nk_gamepad__zero(gamepads, sizeof(struct nk_gamepads));
 }
 
 NK_API void nk_gamepad_button(struct nk_gamepads* gamepads, int num, enum nk_gamepad_button button, nk_bool down) {
@@ -713,7 +750,7 @@ NK_API void nk_gamepad_update(struct nk_gamepads* gamepads) {
         }
         gamepads->gamepads[i].buttons_prev = gamepads->gamepads[i].buttons;
         gamepads->gamepads[i].buttons = 0;
-        nk_zero(gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
+        nk_gamepad__zero(gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
     }
 
     if (gamepads->input_source.update != NULL) {
@@ -1012,14 +1049,14 @@ NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct 
     for (i = 0; i < NK_GAMEPAD_MAX; i++) {
         new_gamepads.gamepads[i].buttons = gamepads->gamepads[i].buttons;
         new_gamepads.gamepads[i].buttons_prev = gamepads->gamepads[i].buttons_prev;
-        NK_MEMCPY(new_gamepads.gamepads[i].axes, gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
+        nk_gamepad__memcpy(new_gamepads.gamepads[i].axes, gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
     }
 
     /* Since it was successful, free the old gamepad system. */
     nk_gamepad_free(gamepads);
 
     /* Copy the new gamepad system over the old one. */
-    NK_MEMCPY(gamepads, &new_gamepads, sizeof(struct nk_gamepads));
+    nk_gamepad__memcpy(gamepads, &new_gamepads, sizeof(struct nk_gamepads));
 
     return nk_true;
 }
