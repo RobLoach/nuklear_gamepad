@@ -250,7 +250,7 @@ NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num);
  *
  * @param gamepads The gamepad system.
  * @param num Which gamepad to set as available or not. -1 will set all gamepads.
- * @param available True or false depending on whether or not the gamepad is available.
+ * @param available True or false depending on whether or not the gamepad is available. Setting false also clears its button and axis state.
  */
 NK_API void nk_gamepad_set_available(struct nk_gamepads* gamepads, int num, nk_bool available);
 
@@ -801,11 +801,18 @@ NK_API void nk_gamepad_set_available(struct nk_gamepads* gamepads, int num, nk_b
 
     if (num < 0) {
         for (num = 0; num < NK_GAMEPAD_MAX; num++) {
-            gamepads->gamepads[num].available = available;
+            nk_gamepad_set_available(gamepads, num, available);
         }
     }
     else if (num < NK_GAMEPAD_MAX) {
         gamepads->gamepads[num].available = available;
+
+        /* Clear any held state so a reconnect does not report phantom presses or releases. */
+        if (available == nk_false) {
+            gamepads->gamepads[num].buttons = 0;
+            gamepads->gamepads[num].buttons_prev = 0;
+            nk_zero(gamepads->gamepads[num].axes, sizeof(gamepads->gamepads[num].axes));
+        }
     }
 }
 

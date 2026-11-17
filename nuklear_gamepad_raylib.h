@@ -58,7 +58,7 @@ void nk_gamepad_raylib_update(struct nk_gamepads* gamepads, void* user_data) {
 
     for (num = 0; num < NK_GAMEPAD_MAX; num++) {
         if (!IsGamepadAvailable(num)) {
-            gamepads->gamepads[num].available = nk_false;
+            nk_gamepad_set_available(gamepads, num, nk_false);
             continue;
         }
 

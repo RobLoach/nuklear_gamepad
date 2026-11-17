@@ -63,7 +63,7 @@ NK_API void nk_gamepad_sdl_handle_event(struct nk_gamepads* gamepads, SDL_Event 
                     SDL_JoystickInstanceID(SDL_GameControllerGetJoystick((SDL_GameController*)gamepads->gamepads[i].data)) == event->cdevice.which) {
                     SDL_GameControllerClose((SDL_GameController*)gamepads->gamepads[i].data);
                     gamepads->gamepads[i].data = NULL;
-                    gamepads->gamepads[i].available = nk_false;
+                    nk_gamepad_set_available(gamepads, i, nk_false);
                     break;
                 }
             }
@@ -90,7 +90,7 @@ NK_API nk_bool nk_gamepad_sdl_init(struct nk_gamepads* gamepads, void* user_data
         }
 
         gamepads->gamepads[i].data = NULL;
-        gamepads->gamepads[i].available = nk_false;
+        nk_gamepad_set_available(gamepads, i, nk_false);
     }
 
     return nk_true;
@@ -107,7 +107,7 @@ NK_API void nk_gamepad_sdl_free(struct nk_gamepads* gamepads, void* user_data) {
         if (gamepads->gamepads[i].data != NULL) {
             SDL_GameControllerClose((SDL_GameController*)gamepads->gamepads[i].data);
             gamepads->gamepads[i].data = NULL;
-            gamepads->gamepads[i].available = nk_false;
+            nk_gamepad_set_available(gamepads, i, nk_false);
         }
     }
 }
@@ -148,7 +148,7 @@ NK_API void nk_gamepad_sdl_update(struct nk_gamepads* gamepads, void* user_data)
 
         /* Check to make sure it's still attached. */
         if (SDL_GameControllerGetAttached(controller) == SDL_FALSE) {
-            gamepads->gamepads[num].available = nk_false;
+            nk_gamepad_set_available(gamepads, num, nk_false);
             SDL_GameControllerClose(controller);
             gamepads->gamepads[num].data = NULL;
             continue;
