@@ -20,6 +20,30 @@
 #define NK_GAMEPAD_MOUSE
 #include "../nuklear_gamepad.h"
 
+/* A custom input source that only reports the first gamepad, and tracks how many are live. */
+static int test_source_live = 0;
+
+static nk_bool test_source_init(struct nk_gamepads* gamepads, void* user_data) {
+    NK_UNUSED(user_data);
+    /* The previous input source must be freed before a new one is initialized. */
+    NK_ASSERT(test_source_live == 0);
+    test_source_live++;
+    nk_gamepad_set_available(gamepads, 0, nk_true);
+    return nk_true;
+}
+
+static void test_source_free(struct nk_gamepads* gamepads, void* user_data) {
+    NK_UNUSED(gamepads);
+    NK_UNUSED(user_data);
+    test_source_live--;
+}
+
+static nk_bool test_source_init_fail(struct nk_gamepads* gamepads, void* user_data) {
+    NK_UNUSED(gamepads);
+    NK_UNUSED(user_data);
+    return nk_false;
+}
+
 int main() {
     struct nk_context ctx;
     struct nk_gamepads gamepads;
@@ -296,6 +320,54 @@ int main() {
         NK_ASSERT(nk_gamepad_input_source_supports(&none_gamepads, NK_GAMEPAD_CAP_HOTPLUG) == nk_false);
         NK_ASSERT(nk_gamepad_input_source_supports(&none_gamepads, NK_GAMEPAD_CAP_BUTTON_NAMES) == nk_false);
         nk_gamepad_free(&none_gamepads);
+    }
+
+    /* nk_gamepad_set_input_source() */
+    printf("nk_gamepad_set_input_source()\n");
+    {
+        struct nk_gamepads switch_gamepads;
+        struct nk_gamepad_input_source test_source;
+        struct nk_gamepad_input_source fail_source;
+        nk_zero(&test_source, sizeof(test_source));
+        test_source.init = test_source_init;
+        test_source.free = test_source_free;
+        nk_zero(&fail_source, sizeof(fail_source));
+        fail_source.init = test_source_init_fail;
+
+        NK_ASSERT(nk_gamepad_set_input_source(NULL, test_source) == nk_false);
+
+        /* Start with state on two gamepads. */
+        NK_ASSERT(nk_gamepad_init_with_source(&switch_gamepads, &ctx, test_source) == nk_true);
+        NK_ASSERT(test_source_live == 1);
+        nk_gamepad_set_available(&switch_gamepads, 1, nk_true);
+        nk_gamepad_button(&switch_gamepads, 0, NK_GAMEPAD_BUTTON_A, nk_true);
+        nk_gamepad_button(&switch_gamepads, 1, NK_GAMEPAD_BUTTON_B, nk_true);
+        nk_gamepad_axis(&switch_gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X, 0.5f);
+        nk_gamepad_axis(&switch_gamepads, 1, NK_GAMEPAD_AXIS_LEFT_X, 0.25f);
+
+        /* Re-selecting the source frees the old one first, and keeps the context. */
+        NK_ASSERT(nk_gamepad_set_input_source(&switch_gamepads, test_source) == nk_true);
+        NK_ASSERT(test_source_live == 1);
+        NK_ASSERT(switch_gamepads.ctx == &ctx);
+
+        /* State is carried over only to gamepads the new source reports as available. */
+        NK_ASSERT(nk_gamepad_is_available(&switch_gamepads, 0) == nk_true);
+        NK_ASSERT(nk_gamepad_is_button_down(&switch_gamepads, 0, NK_GAMEPAD_BUTTON_A) == nk_true);
+        NK_ASSERT(nk_gamepad_get_axis(&switch_gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X) == 0.5f);
+        NK_ASSERT(nk_gamepad_is_available(&switch_gamepads, 1) == nk_false);
+        NK_ASSERT(switch_gamepads.gamepads[1].buttons == 0);
+        NK_ASSERT(switch_gamepads.gamepads[1].buttons_prev == 0);
+        NK_ASSERT(switch_gamepads.gamepads[1].axes[NK_GAMEPAD_AXIS_LEFT_X] == 0.0f);
+
+        /* A source that fails to initialize leaves the previous source in place. */
+        NK_ASSERT(nk_gamepad_set_input_source(&switch_gamepads, fail_source) == nk_false);
+        NK_ASSERT(test_source_live == 1);
+        NK_ASSERT(switch_gamepads.ctx == &ctx);
+        NK_ASSERT(switch_gamepads.input_source.init == test_source_init);
+        NK_ASSERT(nk_gamepad_is_available(&switch_gamepads, 0) == nk_true);
+
+        nk_gamepad_free(&switch_gamepads);
+        NK_ASSERT(test_source_live == 0);
     }
 
     printf("nk_gamepad_free()\n");

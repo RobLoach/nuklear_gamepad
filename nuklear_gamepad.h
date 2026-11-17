@@ -998,28 +998,30 @@ NK_API nk_bool nk_gamepad_is_available(struct nk_gamepads* gamepads, int num) {
 
 NK_API nk_bool nk_gamepad_set_input_source(struct nk_gamepads* gamepads, struct nk_gamepad_input_source input_source) {
     int i;
-    struct nk_gamepads new_gamepads;
+    struct nk_gamepads old_gamepads;
     if (gamepads == NULL) {
         return nk_false;
     }
 
-    /* Initialize the new gamepad system. */
-    if (nk_gamepad_init_with_source(&new_gamepads, gamepads->ctx, input_source) == nk_false) {
+    /* Keep the old state, and free the old input source before initializing the new one. */
+    NK_MEMCPY(&old_gamepads, gamepads, sizeof(struct nk_gamepads));
+    nk_gamepad_free(gamepads);
+
+    /* Initialize the new input source, restoring the previous one if it fails. */
+    if (nk_gamepad_init_with_source(gamepads, old_gamepads.ctx, input_source) == nk_false) {
+        nk_gamepad_init_with_source(gamepads, old_gamepads.ctx, old_gamepads.input_source);
         return nk_false;
     }
 
-    /* Copy button and axis state over to the new gamepad system. */
+    /* Copy button and axis state over to the gamepads that are still available. */
     for (i = 0; i < NK_GAMEPAD_MAX; i++) {
-        new_gamepads.gamepads[i].buttons = gamepads->gamepads[i].buttons;
-        new_gamepads.gamepads[i].buttons_prev = gamepads->gamepads[i].buttons_prev;
-        NK_MEMCPY(new_gamepads.gamepads[i].axes, gamepads->gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
+        if (gamepads->gamepads[i].available == nk_false) {
+            continue;
+        }
+        gamepads->gamepads[i].buttons = old_gamepads.gamepads[i].buttons;
+        gamepads->gamepads[i].buttons_prev = old_gamepads.gamepads[i].buttons_prev;
+        NK_MEMCPY(gamepads->gamepads[i].axes, old_gamepads.gamepads[i].axes, sizeof(gamepads->gamepads[i].axes));
     }
-
-    /* Since it was successful, free the old gamepad system. */
-    nk_gamepad_free(gamepads);
-
-    /* Copy the new gamepad system over the old one. */
-    NK_MEMCPY(gamepads, &new_gamepads, sizeof(struct nk_gamepads));
 
     return nk_true;
 }
