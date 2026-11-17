@@ -56,13 +56,13 @@ void nk_gamepad_glfw_update(struct nk_gamepads* gamepads, void* user_data) {
     for (num = 0; num < NK_GAMEPAD_MAX && num <= GLFW_JOYSTICK_LAST; num++) {
         /* Make sure it's available. */
         if (glfwJoystickIsGamepad(num) == GLFW_FALSE) {
-            gamepads->gamepads[num].available = nk_false;
+            nk_gamepad_set_available(gamepads, num, nk_false);
             continue;
         }
 
         /* Grab the state. */
         if (glfwGetGamepadState(num, &state) == GLFW_FALSE) {
-            gamepads->gamepads[num].available = nk_false;
+            nk_gamepad_set_available(gamepads, num, nk_false);
             continue;
         }
 

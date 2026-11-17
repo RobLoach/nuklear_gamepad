@@ -209,8 +209,7 @@ NK_API void nk_gamepad_sdl3_handle_event(struct nk_gamepads* gamepads, SDL_Event
                     SDL_GetGamepadID((SDL_Gamepad*)gamepads->gamepads[i].data) == event->gdevice.which) {
                     SDL_CloseGamepad((SDL_Gamepad*)gamepads->gamepads[i].data);
                     gamepads->gamepads[i].data = NULL;
-                    gamepads->gamepads[i].available = nk_false;
-                    nk_gamepad_sdl3_reset_state(gamepads, i);
+                    nk_gamepad_set_available(gamepads, i, nk_false);
                     break;
                 }
             }
@@ -269,7 +268,7 @@ NK_API void nk_gamepad_sdl3_free(struct nk_gamepads* gamepads, void* user_data) 
         if (gamepads->gamepads[i].data != NULL) {
             SDL_CloseGamepad((SDL_Gamepad*)gamepads->gamepads[i].data);
             gamepads->gamepads[i].data = NULL;
-            gamepads->gamepads[i].available = nk_false;
+            nk_gamepad_set_available(gamepads, i, nk_false);
         }
     }
 
@@ -336,10 +335,9 @@ NK_API void nk_gamepad_sdl3_update(struct nk_gamepads* gamepads, void* user_data
 
         /* Check to make sure it's still attached. */
         if (!SDL_GamepadConnected(gamepad)) {
-            gamepads->gamepads[num].available = nk_false;
+            nk_gamepad_set_available(gamepads, num, nk_false);
             SDL_CloseGamepad(gamepad);
             gamepads->gamepads[num].data = NULL;
-            nk_gamepad_sdl3_reset_state(gamepads, num);
             continue;
         }
 

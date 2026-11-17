@@ -233,6 +233,20 @@ int main() {
     nk_gamepad_update(&gamepads);
     NK_ASSERT(nk_gamepad_get_axis(&gamepads, 0, NK_GAMEPAD_AXIS_LEFT_X) == 0.0f);
 
+    /* Unplugging a gamepad clears its state, so a reconnect has no phantom input */
+    printf("nk_gamepad_set_available() clears state\n");
+    {
+        nk_gamepad_set_available(&gamepads, 1, nk_true);
+        nk_gamepad_button(&gamepads, 1, NK_GAMEPAD_BUTTON_A, nk_true);
+        nk_gamepad_axis(&gamepads, 1, NK_GAMEPAD_AXIS_LEFT_X, 0.5f);
+        nk_gamepad_set_available(&gamepads, 1, nk_false);
+        nk_gamepad_set_available(&gamepads, 1, nk_true);
+        NK_ASSERT(nk_gamepad_is_button_down(&gamepads, 1, NK_GAMEPAD_BUTTON_A) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_pressed(&gamepads, 1, NK_GAMEPAD_BUTTON_A) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_released(&gamepads, 1, NK_GAMEPAD_BUTTON_A) == nk_false);
+        NK_ASSERT(nk_gamepad_get_axis(&gamepads, 1, NK_GAMEPAD_AXIS_LEFT_X) == 0.0f);
+    }
+
     /* Triggers always report 0..1, whatever range the platform used */
     printf("NK_GAMEPAD_TRIGGER_THRESHOLD\n");
     {
