@@ -158,6 +158,59 @@ int main() {
         nk_gamepad_free(&kbd_gamepads);
     }
 
+    /* keyboard: a NULL context does not crash the update */
+    printf("nk_gamepad_keyboard_update() with NULL ctx\n");
+    {
+        struct nk_gamepads null_gamepads;
+        nk_zero(&null_gamepads, sizeof(null_gamepads));
+        nk_gamepad_keyboard_update(&null_gamepads, NULL);
+        nk_gamepad_keyboard_update(NULL, NULL);
+    }
+
+    /* keyboard: an initialized custom map with no entries maps nothing */
+    printf("nk_gamepad_keyboard_map_init()\n");
+    {
+        struct nk_gamepad_keyboard_map emap;
+        struct nk_gamepads kbd_gamepads;
+        int pressed_num;
+        enum nk_gamepad_button pressed_button;
+        nk_gamepad_keyboard_map_init(&emap);
+        nk_gamepad_init_with_source(&kbd_gamepads, &ctx, nk_gamepad_keyboard_input_source(&emap));
+        ctx.input.keyboard.text[0] = 'a';
+        ctx.input.keyboard.text[1] = 'Z';
+        ctx.input.keyboard.text[2] = '1';
+        ctx.input.keyboard.text_len = 3;
+        nk_gamepad_update(&kbd_gamepads);
+        NK_ASSERT(nk_gamepad_any_button_pressed(&kbd_gamepads, -1, &pressed_num, &pressed_button) == nk_false);
+        NK_ASSERT(nk_gamepad_is_button_down(&kbd_gamepads, 0, NK_GAMEPAD_BUTTON_UP) == nk_false);
+        ctx.input.keyboard.text_len = 0;
+        nk_gamepad_free(&kbd_gamepads);
+    }
+
+    /* keyboard: L2/R2/L3/R3 have default char mappings */
+    printf("keyboard L2/R2/L3/R3 defaults\n");
+    {
+        struct nk_gamepads kbd_gamepads;
+        nk_gamepad_init_with_source(&kbd_gamepads, &ctx, nk_gamepad_keyboard_input_source(NULL));
+        ctx.input.keyboard.text[0] = 'e';
+        ctx.input.keyboard.text[1] = 'R';
+        ctx.input.keyboard.text[2] = 'd';
+        ctx.input.keyboard.text[3] = 'F';
+        ctx.input.keyboard.text_len = 4;
+        nk_gamepad_update(&kbd_gamepads);
+        NK_ASSERT(nk_gamepad_is_button_down(&kbd_gamepads, 0, NK_GAMEPAD_BUTTON_L2) == nk_true);
+        NK_ASSERT(nk_gamepad_is_button_down(&kbd_gamepads, 0, NK_GAMEPAD_BUTTON_R2) == nk_true);
+        NK_ASSERT(nk_gamepad_is_button_down(&kbd_gamepads, 0, NK_GAMEPAD_BUTTON_L3) == nk_true);
+        NK_ASSERT(nk_gamepad_is_button_down(&kbd_gamepads, 0, NK_GAMEPAD_BUTTON_R3) == nk_true);
+        NK_ASSERT(nk_gamepad_is_button_down(&kbd_gamepads, 0, NK_GAMEPAD_BUTTON_UP) == nk_false);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(&kbd_gamepads, NK_GAMEPAD_BUTTON_L2), "E") == 0);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(&kbd_gamepads, NK_GAMEPAD_BUTTON_R2), "R") == 0);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(&kbd_gamepads, NK_GAMEPAD_BUTTON_L3), "D") == 0);
+        NK_ASSERT(strcmp(nk_gamepad_button_name(&kbd_gamepads, NK_GAMEPAD_BUTTON_R3), "F") == 0);
+        ctx.input.keyboard.text_len = 0;
+        nk_gamepad_free(&kbd_gamepads);
+    }
+
     /* nk_gamepad_mouse D-pad threshold */
     printf("nk_gamepad_mouse D-pad threshold\n");
     {

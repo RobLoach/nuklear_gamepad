@@ -4,6 +4,10 @@
 /**
  * Keyboard mapping to gamepad buttons.
  *
+ * Custom maps must be initialized with nk_gamepad_keyboard_map_init() before setting entries. A
+ * zero-initialized map would map every char to NK_GAMEPAD_BUTTON_UP, since that button's value is 0.
+ *
+ * @see nk_gamepad_keyboard_map_init()
  * @see nk_gamepad_keyboard_map_default
  * @see nk_gamepad_keyboard_input_source()
  */
@@ -28,6 +32,13 @@ extern "C" {
  * @see nk_gamepad_keyboard_map_default
  */
 NK_API struct nk_gamepad_input_source nk_gamepad_keyboard_input_source(void* user_data);
+
+/**
+ * Clears a keyboard map so that no keys or chars are mapped to any button.
+ *
+ * @param map The keyboard map to initialize.
+ */
+NK_API void nk_gamepad_keyboard_map_init(struct nk_gamepad_keyboard_map* map);
 NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user_data);
 NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_data);
 NK_API const char* nk_gamepad_keyboard_name(struct nk_gamepads* gamepads, int num, void* user_data);
@@ -57,7 +68,7 @@ NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_
     enum nk_gamepad_button button;
     struct nk_gamepad_keyboard_map* map;
     unsigned char character;
-    if (!gamepads) {
+    if (gamepads == NULL || gamepads->ctx == NULL) {
         return;
     }
 
@@ -86,6 +97,19 @@ NK_API void nk_gamepad_keyboard_update(struct nk_gamepads* gamepads, void* user_
     }
 }
 
+NK_API void nk_gamepad_keyboard_map_init(struct nk_gamepad_keyboard_map* map) {
+    int i;
+    if (map == NULL) {
+        return;
+    }
+    for (i = 0; i < NK_GAMEPAD_BUTTON_LAST; i++) {
+        map->keys[i] = NK_KEY_NONE;
+    }
+    for (i = 0; i < 256; i++) {
+        map->chars[i] = NK_GAMEPAD_BUTTON_INVALID;
+    }
+}
+
 NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user_data) {
     int i;
     if (!gamepads) {
@@ -100,7 +124,7 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     }
 
     /* Initialize the default keyboard mapping. */
-    nk_zero(&nk_gamepad_keyboard_map_default, sizeof(nk_gamepad_keyboard_map_default));
+    nk_gamepad_keyboard_map_init(&nk_gamepad_keyboard_map_default);
 
     /* Keys */
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_START] = NK_KEY_ENTER;
@@ -113,9 +137,6 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     nk_gamepad_keyboard_map_default.keys[NK_GAMEPAD_BUTTON_B] = NK_KEY_BACKSPACE;
 
     /* Text Buttons */
-    for (i = 0; i < 256; i++) {
-        nk_gamepad_keyboard_map_default.chars[i] = NK_GAMEPAD_BUTTON_INVALID;
-    }
     nk_gamepad_keyboard_map_default.chars['Z'] = NK_GAMEPAD_BUTTON_A;
     nk_gamepad_keyboard_map_default.chars['z'] = NK_GAMEPAD_BUTTON_A;
     nk_gamepad_keyboard_map_default.chars[' '] = NK_GAMEPAD_BUTTON_A;
@@ -129,6 +150,14 @@ NK_API nk_bool nk_gamepad_keyboard_init(struct nk_gamepads* gamepads, void* user
     nk_gamepad_keyboard_map_default.chars['q'] = NK_GAMEPAD_BUTTON_LB;
     nk_gamepad_keyboard_map_default.chars['W'] = NK_GAMEPAD_BUTTON_RB;
     nk_gamepad_keyboard_map_default.chars['w'] = NK_GAMEPAD_BUTTON_RB;
+    nk_gamepad_keyboard_map_default.chars['E'] = NK_GAMEPAD_BUTTON_L2;
+    nk_gamepad_keyboard_map_default.chars['e'] = NK_GAMEPAD_BUTTON_L2;
+    nk_gamepad_keyboard_map_default.chars['R'] = NK_GAMEPAD_BUTTON_R2;
+    nk_gamepad_keyboard_map_default.chars['r'] = NK_GAMEPAD_BUTTON_R2;
+    nk_gamepad_keyboard_map_default.chars['D'] = NK_GAMEPAD_BUTTON_L3;
+    nk_gamepad_keyboard_map_default.chars['d'] = NK_GAMEPAD_BUTTON_L3;
+    nk_gamepad_keyboard_map_default.chars['F'] = NK_GAMEPAD_BUTTON_R3;
+    nk_gamepad_keyboard_map_default.chars['f'] = NK_GAMEPAD_BUTTON_R3;
     nk_gamepad_keyboard_map_default.chars['1'] = NK_GAMEPAD_BUTTON_START;
     nk_gamepad_keyboard_map_default.chars['!'] = NK_GAMEPAD_BUTTON_START;
     nk_gamepad_keyboard_map_default.chars['2'] = NK_GAMEPAD_BUTTON_BACK;
