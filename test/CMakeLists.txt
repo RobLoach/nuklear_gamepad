@@ -1,5 +1,5 @@
 # nuklear_gamepad_test
-add_executable(nuklear_gamepad_test nuklear_gamepad_test.c)
+add_executable(nuklear_gamepad_test nuklear_gamepad_test.c nuklear_gamepad_impl.c)
 
 # C99 Standard
 set_property(TARGET nuklear_gamepad_test PROPERTY C_STANDARD 90)

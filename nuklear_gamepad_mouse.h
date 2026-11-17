@@ -157,7 +157,7 @@ NK_API nk_bool nk_gamepad_mouse_init(struct nk_gamepads* gamepads, void* user_da
     }
 
     /* Initialize the default mouse mapping. */
-    nk_zero(&nk_gamepad_mouse_map_default, sizeof(nk_gamepad_mouse_map_default));
+    nk_gamepad__zero(&nk_gamepad_mouse_map_default, sizeof(nk_gamepad_mouse_map_default));
     nk_gamepad_mouse_map_default.sensitivity = NK_GAMEPAD_MOUSE_SENSITIVITY;
 
     /* Initialize all button slots to invalid. */

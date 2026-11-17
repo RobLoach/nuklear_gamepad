@@ -132,7 +132,7 @@ extern "C" {
 static void nk_gamepad_sdl3_reset_state(struct nk_gamepads* gamepads, int num) {
     gamepads->gamepads[num].buttons = 0;
     gamepads->gamepads[num].buttons_prev = 0;
-    nk_zero(gamepads->gamepads[num].axes, sizeof(gamepads->gamepads[num].axes));
+    nk_gamepad__zero(gamepads->gamepads[num].axes, sizeof(gamepads->gamepads[num].axes));
 }
 
 /**

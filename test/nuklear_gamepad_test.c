@@ -15,10 +15,11 @@
 #define NK_IMPLEMENTATION
 #include "../vendor/nuklear/nuklear.h"
 
-#define NK_GAMEPAD_IMPLEMENTATION
-#define NK_GAMEPAD_KEYBOARD
-#define NK_GAMEPAD_MOUSE
+/* The implementation is in nuklear_gamepad_impl.c, without NK_IMPLEMENTATION. */
 #include "../nuklear_gamepad.h"
+#include "../nuklear_gamepad_keyboard.h"
+#include "../nuklear_gamepad_mouse.h"
+#include "../nuklear_gamepad_none.h"
 
 int main() {
     struct nk_context ctx;
